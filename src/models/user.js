@@ -9,7 +9,7 @@ export default {
     },
 
     effects: {
-        *fetch(_, {call, put}) {
+        * fetch(_, {call, put}) {
             const response = yield call(queryUsers);
             yield put({
                 type: 'save',

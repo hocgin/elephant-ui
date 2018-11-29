@@ -20,7 +20,9 @@ import Exception403 from '../pages/Exception/403';
 
 const {Content} = Layout;
 
-// Conversion router to menu.
+/**
+ * 处理资源数据
+ */
 function formatter(data, parentAuthority, parentName) {
     return data
         .map(item => {
@@ -79,12 +81,60 @@ const query = {
     },
 };
 
-@connect(({global, setting}) => ({
-    collapsed: global.collapsed,
-    resources: global.resources,
-    layout: setting.layout,
-    ...setting,
-}))
+
+/**
+ * 发起请求
+ */
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onTestDispatch() {
+            dispatch({
+                type: ``
+            });
+        },
+        handleMenuCollapse(collapsed) {
+            dispatch({
+                type: `global/changeLayoutCollapsed`,
+                payload: collapsed,
+            });
+        },
+        user_fetchCurrent() {
+            dispatch({
+                type: 'user/fetchCurrent',
+            });
+        },
+        setting_getSetting() {
+            dispatch({
+                type: 'setting/getSetting',
+            });
+        },
+        global_fetchResource() {
+            dispatch({
+                type: 'global/fetchResource',
+                payload: {
+                    token: '123456'
+                }
+            });
+        }
+    };
+};
+
+/**
+ * 取数据
+ */
+const mapStateToProps = (states) => {
+    const global = states['global'],
+        setting = states['setting'];
+    console.log('mapStateToProps', global, setting);
+    return {
+        collapsed: global.collapsed,
+        resources: global.resources,
+        layout: setting.layout,
+        ...setting,
+    };
+};
+
+@connect(mapStateToProps, mapDispatchToProps)
 class BasicLayout extends React.PureComponent {
 
     constructor(props) {
@@ -102,19 +152,10 @@ class BasicLayout extends React.PureComponent {
     };
 
     componentDidMount() {
-        const {dispatch} = this.props;
-        dispatch({
-            type: 'user/fetchCurrent',
-        });
-        dispatch({
-            type: 'setting/getSetting',
-        });
-        dispatch({
-            type: 'global/fetchResource',
-            payload: {
-                token: '123456'
-            }
-        });
+        this.props.user_fetchCurrent();
+        this.props.setting_getSetting();
+        this.props.global_fetchResource();
+
 
         this.renderRef = requestAnimationFrame(() => {
             this.setState({
@@ -138,7 +179,7 @@ class BasicLayout extends React.PureComponent {
         const {isMobile} = this.state;
         const {collapsed} = this.props;
         if (isMobile && !preProps.isMobile && !collapsed) {
-            this.handleMenuCollapse(false);
+            this.props.handleMenuCollapse(false);
         }
     }
 
@@ -158,9 +199,11 @@ class BasicLayout extends React.PureComponent {
     getMenuData() {
         const {
             route: {routes},
+            resources
         } = this.props;
         let data = memoizeOneFormatter(routes);
-        console.log("menuData", data);
+        // data = memoizeOneFormatter(resources);
+        // console.log("menuData", this.props.route, resources);
         return data;
     }
 
@@ -222,13 +265,6 @@ class BasicLayout extends React.PureComponent {
         };
     };
 
-    handleMenuCollapse = collapsed => {
-        const {dispatch} = this.props;
-        dispatch({
-            type: 'global/changeLayoutCollapsed',
-            payload: collapsed,
-        });
-    };
 
     renderSettingDrawer() {
         // Do not render SettingDrawer in production
@@ -248,6 +284,7 @@ class BasicLayout extends React.PureComponent {
             location: {pathname},
         } = this.props;
         const {isMobile, menuData} = this.state;
+        console.log('render()', menuData);
         const isTop = PropsLayout === 'topmenu';
         const routerConfig = this.matchParamsPath(pathname);
         const layout = (
@@ -257,7 +294,7 @@ class BasicLayout extends React.PureComponent {
                         logo={logo}
                         Authorized={Authorized}
                         theme={navTheme}
-                        onCollapse={this.handleMenuCollapse}
+                        onCollapse={this.props.handleMenuCollapse}
                         menuData={menuData}
                         isMobile={isMobile}
                         {...this.props}
@@ -271,7 +308,7 @@ class BasicLayout extends React.PureComponent {
                 >
                     <Header
                         menuData={menuData}
-                        handleMenuCollapse={this.handleMenuCollapse}
+                        handleMenuCollapse={this.props.handleMenuCollapse}
                         logo={logo}
                         isMobile={isMobile}
                         {...this.props}

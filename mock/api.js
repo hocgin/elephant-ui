@@ -344,14 +344,16 @@ export default {
     'GET /api/resources': (req, res) => {
         return res.json(ok([
             {
-                title: "test",
-                icon: "",
-                uri: "/a/b/c",
+                locale: "test",
+                name: "test",
+                icon: "check-circle-o",
+                path: "/dashboard",
                 children: [
                     {
-                        title: "test",
-                        icon: "",
-                        uri: "/a/b/c",
+                        locale: "test",
+                        name: "test",
+                        icon: "check-circle-o",
+                        path: "/dashboard/analysis",
                         children: []
                     }
                 ]
