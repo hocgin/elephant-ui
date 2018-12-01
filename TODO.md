@@ -1,0 +1,1 @@
+事件函数命名 `onClickXXX`

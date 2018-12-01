@@ -124,3 +124,9 @@ export async function queryNotices() {
 export async function getFakeCaptcha(mobile) {
     return request(`/api/captcha?mobile=${mobile}`);
 }
+/**
+ * 列出所有角色
+ */
+export async function queryRole(params){
+    return request('/api/role');
+}

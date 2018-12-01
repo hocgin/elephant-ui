@@ -1,17 +1,22 @@
 export default {
-    namespace: 'test', // model 的唯一标识
-    state: [], //  model 管理的数据
+    // model 的唯一标识
+    namespace: 'test',
+    //  model 管理的数据
+    state: {},
     effects: { // 异步操作(不可以修改 state)
-        async query({type, payload}, {call, put}) {
+        * query({type, payload}, {call, put}) {
             console.log('query');
-            let data = await call(fn, param1, param2); // 同步调用, 等同于 fn(param1, param2)
-            await put({ // 等同于 dispatch
+            // 同步调用, 等同于 fn(payload)
+            let data = yield call(fn, payload);
+            // 等同于 dispatch
+            yield put({
                 type: 'test/save',
                 payload: data
             });
         }
     },
-    reducers: {// 同步操作(可以修改 state)
+    // 同步操作(可以修改 state)
+    reducers: {
         save(state, {payload}) {
             console.log('save');
             return 'ok';

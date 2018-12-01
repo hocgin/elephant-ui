@@ -491,7 +491,32 @@ export default {
                 name: "settings",
                 path: "/account/settings"
             }]
-        }]));
+        },
+
+            // 测试专用
+            {
+                icon: "warning",
+                name: "测试专用",
+                path: "/test",
+                children: [{
+                    name: "例子",
+                    path: "/test/data-table"
+                }]
+            }]));
+    },
+
+    /**
+     * 列出所有角色
+     */
+    'GET /api/role': (req, res) => {
+        return res.json(ok({
+            list: [],
+            pagination: {
+                total: 0,
+                pageSize: 0,
+                current: 1
+            },
+        }));
     }
 
 };

@@ -85,9 +85,7 @@ const mapDispatchToProps = (dispatch) => {
  * 取数据
  */
 const mapStateToProps = (states) => {
-    const global = states['global'],
-        setting = states['setting'],
-        user = states['user'];
+    const {global, setting, user} = states;
     return {
         collapsed: global.collapsed,
         menuData: user.menuData,
