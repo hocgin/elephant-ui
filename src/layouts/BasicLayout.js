@@ -19,43 +19,6 @@ import Context from './MenuContext';
 import Exception403 from '../pages/Exception/403';
 
 const {Content} = Layout;
-
-/**
- * 处理资源数据
- */
-function formatter(data, parentAuthority, parentName) {
-    return data
-        .map(item => {
-            let locale = 'menu';
-            if (parentName && item.name) {
-                locale = `${parentName}.${item.name}`;
-            } else if (item.name) {
-                locale = `menu.${item.name}`;
-            } else if (parentName) {
-                locale = parentName;
-            }
-            if (item.path) {
-                const result = {
-                    ...item,
-                    locale,
-                    authority: item.authority || parentAuthority,
-                };
-                if (item.routes) {
-                    const children = formatter(item.routes, item.authority, locale);
-                    // Reduce memory usage
-                    result.children = children;
-                }
-                delete result.routes;
-                return result;
-            }
-
-            return null;
-        })
-        .filter(item => item);
-}
-
-const memoizeOneFormatter = memoizeOne(formatter, isEqual);
-
 const query = {
     'screen-xs': {
         maxWidth: 575,
@@ -80,7 +43,6 @@ const query = {
         minWidth: 1600,
     },
 };
-
 
 /**
  * 发起请求
@@ -108,9 +70,9 @@ const mapDispatchToProps = (dispatch) => {
                 type: 'setting/getSetting',
             });
         },
-        global_fetchResource() {
+        user_queryUserMenu() {
             dispatch({
-                type: 'global/fetchResource',
+                type: 'user/queryUserMenu',
                 payload: {
                     token: '123456'
                 }
@@ -124,11 +86,11 @@ const mapDispatchToProps = (dispatch) => {
  */
 const mapStateToProps = (states) => {
     const global = states['global'],
-        setting = states['setting'];
-    console.log('mapStateToProps', global, setting);
+        setting = states['setting'],
+        user = states['user'];
     return {
         collapsed: global.collapsed,
-        resources: global.resources,
+        menuData: user.menuData,
         layout: setting.layout,
         ...setting,
     };
@@ -146,15 +108,18 @@ class BasicLayout extends React.PureComponent {
     }
 
     state = {
+        // 是否正在渲染
         rendering: true,
+        // 是否移动端
         isMobile: false,
-        menuData: this.getMenuData(),
+        // 菜单数据
+        menuData: [],
     };
 
     componentDidMount() {
         this.props.user_fetchCurrent();
         this.props.setting_getSetting();
-        this.props.global_fetchResource();
+        this.props.user_queryUserMenu();
 
 
         this.renderRef = requestAnimationFrame(() => {
@@ -196,17 +161,6 @@ class BasicLayout extends React.PureComponent {
         };
     }
 
-    getMenuData() {
-        const {
-            route: {routes},
-            resources
-        } = this.props;
-        let data = memoizeOneFormatter(routes);
-        // data = memoizeOneFormatter(resources);
-        // console.log("menuData", this.props.route, resources);
-        return data;
-    }
-
     /**
      * 获取面包屑映射
      * @param {Object} menuData 菜单配置
@@ -222,7 +176,7 @@ class BasicLayout extends React.PureComponent {
                 routerMap[menuItem.path] = menuItem;
             });
         };
-        mergeMenuAndRouter(this.getMenuData());
+        mergeMenuAndRouter(this.state.menuData);
         return routerMap;
     }
 
@@ -233,17 +187,22 @@ class BasicLayout extends React.PureComponent {
         return this.breadcrumbNameMap[pathKey];
     };
 
+    /**
+     * 标签页文字
+     **/
     getPageTitle = pathname => {
+        let title = '后台管理系统';
+
         const currRouterData = this.matchParamsPath(pathname);
 
         if (!currRouterData) {
-            return 'Ant Design Pro';
+            return `${title}`;
         }
         const message = formatMessage({
             id: currRouterData.locale || currRouterData.name,
             defaultMessage: currRouterData.name,
         });
-        return `${message} - Ant Design Pro`;
+        return `${message} - ${title}`;
     };
 
     getLayoutStyle = () => {
@@ -284,11 +243,11 @@ class BasicLayout extends React.PureComponent {
             location: {pathname},
         } = this.props;
         const {isMobile, menuData} = this.state;
-        console.log('render()', menuData);
         const isTop = PropsLayout === 'topmenu';
         const routerConfig = this.matchParamsPath(pathname);
         const layout = (
             <Layout>
+                {/* 左侧菜单栏 */}
                 {isTop && !isMobile ? null : (
                     <SiderMenu
                         logo={logo}
@@ -300,6 +259,7 @@ class BasicLayout extends React.PureComponent {
                         {...this.props}
                     />
                 )}
+                {/* 右侧内容 */}
                 <Layout
                     style={{
                         ...this.getLayoutStyle(),

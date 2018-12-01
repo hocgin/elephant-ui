@@ -341,24 +341,157 @@ export default {
     'GET /api/fake_list': getFakeList,
     'POST /api/fake_list': postFakeList,
     'GET /api/captcha': getFakeCaptcha,
-    'GET /api/resources': (req, res) => {
-        return res.json(ok([
-            {
-                locale: "test",
-                name: "test",
-                icon: "check-circle-o",
-                path: "/dashboard",
+
+    /**
+     * 用户菜单资源
+     */
+    'GET /api/user/menu': (req, res) => {
+        return res.json(ok([{
+            icon: "dashboard",
+            locale: "menu.dashboard",
+            name: "dashboard",
+            path: "/dashboard",
+            children: [{
+                locale: "menu.dashboard.analysis",
+                name: "analysis",
+                icon: "dashboard",
+                path: "/dashboard/analysis",
                 children: [
                     {
-                        locale: "test",
-                        name: "test",
-                        icon: "check-circle-o",
+                        locale: "menu.dashboard.analysis",
+                        name: "analysis",
+                        icon: "dashboard",
                         path: "/dashboard/analysis",
-                        children: []
+                        children: [
+                            {
+                                icon: "dashboard",
+                                locale: "menu.dashboard.monitor",
+                                name: "monitor",
+                                path: "/dashboard/monitor",
+                            }
+                        ]
                     }
                 ]
-            }
-        ]));
+            }, {
+                locale: "menu.dashboard.monitor",
+                name: "monitor",
+                path: "/dashboard/monitor",
+            }, {
+                locale: "menu.dashboard.workplace",
+                name: "workplace",
+                path: "/dashboard/workplace",
+            }],
+        }, {
+            icon: "form",
+            locale: "menu.form",
+            name: "form",
+            path: "/form",
+            children: [{
+                locale: "menu.form.basicform",
+                name: "basicform",
+                path: "/form/basic-form"
+            }, {
+                locale: "menu.form.stepform",
+                name: "stepform",
+                path: "/form/step-form"
+            }, {
+                locale: "menu.form.advancedform",
+                name: "advancedform",
+                path: "/form/advanced-form"
+            }]
+        }, {
+            icon: "table",
+            locale: "menu.list",
+            name: "list",
+            path: "/list",
+            children: [{
+                locale:
+                    "menu.list.searchtable",
+                name:
+                    "searchtable",
+                path:
+                    "/list/table-list"
+            }, {
+                locale:
+                    "menu.list.basiclist",
+                name:
+                    "basiclist",
+                path:
+                    "/list/basic-list",
+            }, {
+                locale: "menu.list.cardlist",
+                name: "cardlist",
+                path: "/list/card-list"
+            }, {
+                locale: "menu.list.searchlist",
+                name: "searchlist",
+                path: "/list/search"
+            }]
+        }, {
+            icon: "profile",
+            locale: "menu.profile",
+            name: "profile",
+            path: "/profile",
+            children: [{
+                locale: "menu.profile.basic",
+                name: "basic",
+                path: "/profile/basic"
+            }, {
+                locale: "menu.profile.advanced",
+                name: "advanced",
+                path: "/profile/advanced"
+            }]
+        }, {
+            icon: "check-circle-o",
+            locale: "menu.result",
+            name: "result",
+            path: "/result",
+            children: [{
+                locale: "menu.result.success",
+                name: "success",
+                path: "/result/success"
+            }, {
+                locale: "menu.result.fail",
+                name: "fail",
+                path: "/result/fail"
+            }]
+        }, {
+            icon: "warning",
+            locale: "menu.exception",
+            name: "exception",
+            path: "/exception",
+            children: [{
+                locale: "menu.exception.not-permission",
+                name: "not-permission",
+                path: "/exception/403"
+            }, {
+                locale: "menu.exception.not-find",
+                name: "not-find",
+                path: "/exception/404"
+            }, {
+                locale: "menu.exception.server-error",
+                name: "server-error",
+                path: "/exception/500"
+            }, {
+                locale: "menu.exception.trigger",
+                name: "trigger",
+                path: "/exception/trigger"
+            }]
+        }, {
+            icon: "user",
+            locale: "menu.account",
+            name: "account",
+            path: "/account",
+            children: [{
+                locale: "menu.account.center",
+                name: "center",
+                path: "/account/center"
+            }, {
+                locale: "menu.account.settings",
+                name: "settings",
+                path: "/account/settings"
+            }]
+        }]));
     }
 
 };

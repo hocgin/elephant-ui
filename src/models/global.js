@@ -1,4 +1,4 @@
-import {queryNotices, queryResource} from '@/services/api';
+import {queryNotices} from '@/services/api';
 
 export default {
     namespace: 'global',
@@ -6,18 +6,9 @@ export default {
     state: {
         collapsed: false,
         notices: [],
-        resources: [],
     },
 
     effects: {
-        * fetchResource({payload}, {call, put}) {
-            let data = yield call(queryResource, payload);
-            yield put({
-                type: 'changeResource',
-                payload: data.result,
-            });
-            console.log('fetchResource', data)
-        },
         * fetchNotices(_, {call, put}) {
             const data = yield call(queryNotices);
             yield put({
@@ -43,16 +34,6 @@ export default {
     },
 
     reducers: {
-        /**
-         * 更改菜单资源
-         */
-        changeResource(state, {payload}) {
-            console.log('reducers');
-            return {
-                ...state,
-                resources: payload,
-            };
-        },
         changeLayoutCollapsed(state, {payload}) {
             return {
                 ...state,

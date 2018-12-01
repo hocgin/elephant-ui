@@ -1,4 +1,8 @@
-import {query as queryUsers, queryCurrent} from '@/services/user';
+import {
+    query as queryUsers,
+    queryCurrent,
+    queryUserMenu
+} from '@/services/user';
 
 export default {
     namespace: 'user',
@@ -6,9 +10,17 @@ export default {
     state: {
         list: [],
         currentUser: {},
+        menuData: [],
     },
 
     effects: {
+        * queryUserMenu({payload}, {call, put}) {
+            let data = yield call(queryUserMenu, payload);
+            yield put({
+                type: 'changeUserMenu',
+                payload: data.result,
+            });
+        },
         * fetch(_, {call, put}) {
             const response = yield call(queryUsers);
             yield put({
@@ -26,6 +38,15 @@ export default {
     },
 
     reducers: {
+        /**
+         * 更改菜单资源
+         */
+        changeUserMenu(state, {payload}) {
+            return {
+                ...state,
+                menuData: payload,
+            };
+        },
         save(state, action) {
             return {
                 ...state,
