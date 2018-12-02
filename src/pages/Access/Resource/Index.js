@@ -8,6 +8,7 @@ import {
     Form,
     Input,
     Select,
+    Switch,
     Icon,
     Button,
     Dropdown,
@@ -20,217 +21,21 @@ import {
     Divider,
     Steps,
     Radio,
-    Switch,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import styles from './Index.less';
 
+const FormItem = Form.Item;
+const {Step} = Steps;
+const {TextArea} = Input;
+const {Option} = Select;
+const RadioGroup = Radio.Group;
 const getValue = obj =>
     Object.keys(obj)
         .map(key => obj[key])
         .join(',');
-
-/**
- * - visible
- * - onModalVisible
- * - onDone
- */
-@Form.create()
-class CreateModal extends PureComponent {
-    state = {
-        // 当前步骤
-        step: 0,
-        // 待提交的值
-        formValue: {}
-    };
-    formLayout = {
-        labelCol: {span: 7},
-        wrapperCol: {span: 13},
-    };
-    /**
-     * 步骤渲染
-     */
-    steps = () => {
-        const {step, formValue} = this.state;
-        const {form, onModalVisible} = this.props;
-        const that = this;
-        console.log('onModalVisible', this.state, this.props);
-
-        return [{
-            title() {
-                return (<Steps.Step title="基本信息"/>);
-            },
-            content() {
-                return [
-                    <Form.Item key="target" {...that.formLayout} label="监控对象">
-                        {form.getFieldDecorator('target', {
-                            initialValue: 1,
-                        })(
-                            <Select style={{width: '100%'}}>
-                                <Select.Option value="0">表一</Select.Option>
-                                <Select.Option value="1">表二</Select.Option>
-                            </Select>
-                        )}
-                    </Form.Item>
-                ]
-            },
-            footer() {
-                return [
-                    <Button key="cancel" onClick={() => onModalVisible()}>
-                        取消
-                    </Button>,
-                    <Button key="forward" type="primary" onClick={() => that.onClickNext(step)}>
-                        下一步
-                    </Button>,
-                ]
-            }
-        }, {
-            title() {
-                return (<Steps.Step title="配置规则属性"/>);
-            },
-            content() {
-                return [
-                    <Form.Item key="target" {...that.formLayout} label="监控对象">
-                        {form.getFieldDecorator('target', {
-                            initialValue: 1,
-                        })(
-                            <Select style={{width: '100%'}}>
-                                <Select.Option value="0">表一</Select.Option>
-                                <Select.Option value="1">表二</Select.Option>
-                            </Select>
-                        )}
-                    </Form.Item>,
-                ]
-            },
-            footer() {
-                return [
-                    <Button key="back" style={{float: 'left'}} onClick={that.backward}>
-                        上一步
-                    </Button>,
-                    <Button key="cancel" onClick={() => onModalVisible()}>
-                        取消
-                    </Button>,
-                    <Button key="forward" type="primary" onClick={() => that.onClickNext(step)}>
-                        下一步
-                    </Button>,
-                ]
-            }
-        }, {
-            title() {
-                return (<Steps.Step title="设定调度周期"/>);
-            },
-            content() {
-                return [
-                    <Form.Item key="target" {...that.formLayout} label="监控对象">
-                        {form.getFieldDecorator('target', {
-                            initialValue: 1,
-                        })(
-                            <Select style={{width: '100%'}}>
-                                <Select.Option value="0">表一</Select.Option>
-                                <Select.Option value="1">表二</Select.Option>
-                            </Select>
-                        )}
-                    </Form.Item>,
-                ]
-            },
-            footer() {
-                return [
-                    <Button key="back" style={{float: 'left'}} onClick={that.backward}>
-                        上一步
-                    </Button>,
-                    <Button key="cancel" onClick={() => onModalVisible()}>
-                        取消
-                    </Button>,
-                    <Button key="submit" type="primary" onClick={() => that.onClickNext(step)}>
-                        完成
-                    </Button>,
-                ]
-            }
-        }];
-    };
-
-    constructor(props) {
-        super(props);
-    }
-
-    /**
-     * =====================================
-     *                  渲染
-     * =====================================
-     */
-    render() {
-        const {visible, onModalVisible} = this.props;
-        const {step, form} = this.state;
-        return (<Modal
-            width={640}
-            bodyStyle={{padding: '32px 40px 48px'}}
-            destroyOnClose
-            title="规则配置"
-            visible={visible}
-            footer={this.steps()[step].footer()}
-            onCancel={() => onModalVisible()}
-        >
-            <Steps style={{marginBottom: 28}} size="small" current={step}>
-                {this.steps().map((step) => {
-                    return step.title();
-                })}
-            </Steps>
-            {this.steps()[step].content()}
-        </Modal>);
-    }
-
-    /**
-     * =====================================
-     *                  函数
-     * =====================================
-     */
-    /**
-     * 后退
-     */
-    backward = () => {
-        const {step} = this.state;
-        this.setState({
-            step: step - 1,
-        });
-    };
-
-    /**
-     * 前进
-     */
-    forward() {
-        const {step} = this.state;
-        this.setState({
-            step: step + 1,
-        });
-    }
-
-    /**
-     * @下一页
-     */
-    onClickNext = (step) => {
-        const {form, onDone} = this.props;
-        const {formValue: oldValue} = this.state;
-        form.validateFields((err, fieldsValue) => {
-            if (err) return;
-            const formVals = {...oldValue, ...fieldsValue};
-            this.setState(
-                {
-                    formVals,
-                },
-                () => {
-                    if (step < this.steps().length - 1) {
-                        this.forward();
-                    } else {
-                        onDone(formVals);
-                    }
-                }
-            );
-        });
-    }
-}
-
 
 /**
  * 新建弹窗
@@ -252,9 +57,7 @@ const CreateForm = Form.create()(props => {
             onOk={okHandle}
             onCancel={() => handleModalVisible()}
         >
-            <Form.Item labelCol={{span: 5}}
-                       wrapperCol={{span: 15}}
-                       label="角色名">
+            <Form.Item labelCol={{span: 5}} wrapperCol={{span: 15}} label="角色名">
                 {form.getFieldDecorator('name', {
                     rules: [{
                         whitespace: true,
@@ -264,28 +67,22 @@ const CreateForm = Form.create()(props => {
                     }],
                 })(<Input placeholder="请输入"/>)}
             </Form.Item>
-            <Form.Item labelCol={{span: 5}}
-                       wrapperCol={{span: 15}}
-                       label="角色标识">
+            <Form.Item labelCol={{span: 5}} wrapperCol={{span: 15}} label="角色标识">
                 {form.getFieldDecorator('role', {
                     rules: [{required: true, message: '请输入至少三个字符的角色标识！', min: 3}],
                 })(<Input placeholder="请输入"/>)}
             </Form.Item>
-            <Form.Item labelCol={{span: 5}}
-                       wrapperCol={{span: 15}}
-                       label="描述">
+            <Form.Item labelCol={{span: 5}} wrapperCol={{span: 15}} label="描述">
                 {form.getFieldDecorator('desc', {
                     rules: [{required: true, message: '请输入至少五个字符的规则描述！', min: 5}],
                 })(<Input placeholder="请输入"/>)}
             </Form.Item>
-            <Form.Item labelCol={{span: 5}}
-                       wrapperCol={{span: 15}}
-                       label="状态">
+            <Form.Item labelCol={{span: 5}} wrapperCol={{span: 15}} label="状态">
                 {form.getFieldDecorator('status', {
                     rules: [],
                 })(<Switch checkedChildren="启用"
                            unCheckedChildren="禁用"
-                           defaultChecked/>)}
+                           defaultChecked />)}
             </Form.Item>
         </Modal>
     );
@@ -358,41 +155,41 @@ class UpdateForm extends PureComponent {
         const {form} = this.props;
         if (currentStep === 1) {
             return [
-                <Form.Item key="target" {...this.formLayout} label="监控对象">
+                <FormItem key="target" {...this.formLayout} label="监控对象">
                     {form.getFieldDecorator('target', {
                         initialValue: formVals.target,
                     })(
                         <Select style={{width: '100%'}}>
-                            <Select.Option value="0">表一</Select.Option>
-                            <Select.Option value="1">表二</Select.Option>
+                            <Option value="0">表一</Option>
+                            <Option value="1">表二</Option>
                         </Select>
                     )}
-                </Form.Item>,
-                <Form.Item key="template" {...this.formLayout} label="规则模板">
+                </FormItem>,
+                <FormItem key="template" {...this.formLayout} label="规则模板">
                     {form.getFieldDecorator('template', {
                         initialValue: formVals.template,
                     })(
                         <Select style={{width: '100%'}}>
-                            <Select.Option value="0">规则模板一</Select.Option>
-                            <Select.Option value="1">规则模板二</Select.Option>
+                            <Option value="0">规则模板一</Option>
+                            <Option value="1">规则模板二</Option>
                         </Select>
                     )}
-                </Form.Item>,
-                <Form.Item key="type" {...this.formLayout} label="规则类型">
+                </FormItem>,
+                <FormItem key="type" {...this.formLayout} label="规则类型">
                     {form.getFieldDecorator('type', {
                         initialValue: formVals.type,
                     })(
-                        <Radio.Group>
+                        <RadioGroup>
                             <Radio value="0">强</Radio>
                             <Radio value="1">弱</Radio>
-                        </Radio.Group>
+                        </RadioGroup>
                     )}
-                </Form.Item>,
+                </FormItem>,
             ];
         }
         if (currentStep === 2) {
             return [
-                <Form.Item key="time" {...this.formLayout} label="开始时间">
+                <FormItem key="time" {...this.formLayout} label="开始时间">
                     {form.getFieldDecorator('time', {
                         rules: [{required: true, message: '请选择开始时间！'}],
                     })(
@@ -403,32 +200,32 @@ class UpdateForm extends PureComponent {
                             placeholder="选择开始时间"
                         />
                     )}
-                </Form.Item>,
-                <Form.Item key="frequency" {...this.formLayout} label="调度周期">
+                </FormItem>,
+                <FormItem key="frequency" {...this.formLayout} label="调度周期">
                     {form.getFieldDecorator('frequency', {
                         initialValue: formVals.frequency,
                     })(
                         <Select style={{width: '100%'}}>
-                            <Select.Option value="month">月</Select.Option>
-                            <Select.Option value="week">周</Select.Option>
+                            <Option value="month">月</Option>
+                            <Option value="week">周</Option>
                         </Select>
                     )}
-                </Form.Item>,
+                </FormItem>,
             ];
         }
         return [
-            <Form.Item key="name" {...this.formLayout} label="规则名称">
+            <FormItem key="name" {...this.formLayout} label="规则名称">
                 {form.getFieldDecorator('name', {
                     rules: [{required: true, message: '请输入规则名称！'}],
                     initialValue: formVals.name,
                 })(<Input placeholder="请输入"/>)}
-            </Form.Item>,
-            <Form.Item key="desc" {...this.formLayout} label="规则描述">
+            </FormItem>,
+            <FormItem key="desc" {...this.formLayout} label="规则描述">
                 {form.getFieldDecorator('desc', {
                     rules: [{required: true, message: '请输入至少五个字符的规则描述！', min: 5}],
                     initialValue: formVals.desc,
-                })(<Input.TextArea rows={4} placeholder="请输入至少五个字符"/>)}
-            </Form.Item>,
+                })(<TextArea rows={4} placeholder="请输入至少五个字符"/>)}
+            </FormItem>,
         ];
     };
 
@@ -485,9 +282,9 @@ class UpdateForm extends PureComponent {
                 onCancel={() => handleUpdateModalVisible()}
             >
                 <Steps style={{marginBottom: 28}} size="small" current={currentStep}>
-                    <Steps.Step title="基本信息"/>
-                    <Steps.Step title="配置规则属性"/>
-                    <Steps.Step title="设定调度周期"/>
+                    <Step title="基本信息"/>
+                    <Step title="配置规则属性"/>
+                    <Step title="设定调度周期"/>
                 </Steps>
                 {this.renderContent(currentStep, formVals)}
             </Modal>
@@ -808,22 +605,22 @@ class Index extends PureComponent {
             <Form onSubmit={this.handleSearch} layout="inline">
                 <Row gutter={{md: 8, lg: 24, xl: 48}}>
                     <Col md={8} sm={24}>
-                        <Form.Item label="角色名称">
+                        <FormItem label="角色名称">
                             {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
-                        </Form.Item>
+                        </FormItem>
                     </Col>
                     <Col md={8} sm={24}>
-                        <Form.Item label="使用状态">
+                        <FormItem label="使用状态">
                             {getFieldDecorator('status')(
                                 <Select placeholder="请选择" style={{width: '100%'}}>
                                     {
                                         Expand.status().map((({status, text}) => {
-                                            return (<Select.Option key={status} value={status}>{text}</Select.Option>);
+                                            return (<Option key={status} value={status}>{text}</Option>);
                                         }))
                                     }
                                 </Select>
                             )}
-                        </Form.Item>
+                        </FormItem>
                     </Col>
                     <Col md={8} sm={24}>
                         <span className={styles.submitButtons}>
@@ -854,29 +651,29 @@ class Index extends PureComponent {
             <Form onSubmit={this.handleSearch} layout="inline">
                 <Row gutter={{md: 8, lg: 24, xl: 48}}>
                     <Col md={8} sm={24}>
-                        <Form.Item label="角色名称">
+                        <FormItem label="角色名称">
                             {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
-                        </Form.Item>
+                        </FormItem>
                     </Col>
                     <Col md={8} sm={24}>
-                        <Form.Item label="使用状态">
+                        <FormItem label="使用状态">
                             {getFieldDecorator('status')(
                                 <Select placeholder="请选择" style={{width: '100%'}}>
                                     {
                                         Expand.status().map((({status, text}) => {
-                                            return (<Select.Option value={status}>{text}</Select.Option>);
+                                            return (<Option value={status}>{text}</Option>);
                                         }))
                                     }
                                 </Select>
                             )}
-                        </Form.Item>
+                        </FormItem>
                     </Col>
                     <Col md={8} sm={24}>
-                        <Form.Item label="创建日期">
+                        <FormItem label="创建日期">
                             {getFieldDecorator('createdAt')(
                                 <DatePicker style={{width: '100%'}} placeholder="请输入更新日期"/>
                             )}
-                        </Form.Item>
+                        </FormItem>
                     </Col>
                 </Row>
                 <div style={{overflow: 'hidden'}}>
@@ -967,17 +764,13 @@ class Index extends PureComponent {
                 {/*新增弹窗*/}
                 <CreateForm {...parentMethods} modalVisible={modalVisible}/>
                 {/*更新弹窗*/}
-                {/*{stepFormValues && Object.keys(stepFormValues).length ? (*/}
-                {/*<UpdateForm*/}
-                {/*{...updateMethods}*/}
-                {/*updateModalVisible={updateModalVisible}*/}
-                {/*values={stepFormValues}*/}
-                {/*/>*/}
-                {/*) : null}*/}
-                <CreateModal visible={updateModalVisible}
-                             onModalVisible={this.handleUpdateModalVisible}
-                             onDone={this.handleUpdate}
-                />
+                {stepFormValues && Object.keys(stepFormValues).length ? (
+                    <UpdateForm
+                        {...updateMethods}
+                        updateModalVisible={updateModalVisible}
+                        values={stepFormValues}
+                    />
+                ) : null}
             </PageHeaderWrapper>
         );
     }

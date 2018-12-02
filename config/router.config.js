@@ -273,9 +273,13 @@ export default [
                 name: "访问控制",
                 path: "/access",
                 routes: [{
-                    name: "例子",
+                    name: "角色管理",
                     component: './Access/Role/Index',
                     path: "/access/role"
+                },{
+                    name: "资源管理",
+                    component: './Access/Resource/Index',
+                    path: "/access/resource"
                 }]
             },
             {

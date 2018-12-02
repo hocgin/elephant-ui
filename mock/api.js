@@ -512,6 +512,9 @@ export default {
                 children: [{
                     name: "角色管理",
                     path: "/access/role"
+                },{
+                    name: "资源管理",
+                    path: "/access/resource"
                 }]
             }
         ]));
@@ -519,11 +522,12 @@ export default {
 
     /**
      * 列出所有角色
+     * - status [禁用/启用]
      */
     'GET /api/role': (req, res) => {
         return res.json(ok({
             list: [{
-                id: "1",
+                id: 1,
                 name: "管理员",
                 role: "ADMIN",
                 desc: "可爱的管理员",
@@ -536,6 +540,37 @@ export default {
                 current: 1
             },
         }));
+    },
+    /**
+     * 列出所有权限
+     * - type [菜单/资源]
+     * - status [禁用/启用]
+     */
+    'GET /api/resource': (req, res) =>{
+        const {query:{params}} = req;
+        const {
+            status
+        } = params;
+
+
+        return res.json(ok([{
+            id: 1,
+            name: "仪表盘",
+            uri: "/dashboard",
+            desc: "仪表盘的描述",
+            createdAt: 1543674756762.010,
+            type: 1,
+            status: 1,
+            children: [{
+                id: 11,
+                name: "仪表盘/1",
+                uri: "/dashboard/1",
+                desc: "仪表盘/1的描述",
+                createdAt: 1543674756762.010,
+                type: 2,
+                status: 1
+            }]
+        }]))
     }
 
 };
