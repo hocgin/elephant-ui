@@ -267,6 +267,17 @@ export default [
                     path: "/test/data-table"
                 }]
             },
+            // test
+            {
+                icon: "warning",
+                name: "访问控制",
+                path: "/access",
+                routes: [{
+                    name: "例子",
+                    component: './Access/Role/Index',
+                    path: "/access/role"
+                }]
+            },
             {
                 component: '404',
             },

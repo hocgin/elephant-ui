@@ -35,8 +35,6 @@ const getValue = obj =>
     Object.keys(obj)
         .map(key => obj[key])
         .join(',');
-const statusMap = ['default', 'processing', 'success', 'error'];
-const status = ['关闭', '运行中', '已上线', '异常'];
 
 /**
  * 新建弹窗
@@ -272,7 +270,13 @@ class UpdateForm extends PureComponent {
 }
 
 
+
+
 const Expand = {
+    // 标题
+    title() {
+        return '角色管理';
+    },
     // 取数据
     mapStateToProps(states) {
         const {role, loading} = states;
@@ -322,6 +326,16 @@ const Expand = {
                 });
             }
         };
+    },
+    // 状态解析
+    status() {
+        return [{
+            status: 'error',
+            text: '禁用'
+        }, {
+            status: 'success',
+            text: '启用'
+        }];
     }
 };
 
@@ -341,68 +355,53 @@ class Index extends PureComponent {
     // 字段
     columns = [
         {
-            title: '规则名称',
+            title: '角色名',
             dataIndex: 'name',
+        },
+        {
+            title: '角色标识',
+            dataIndex: 'role',
         },
         {
             title: '描述',
             dataIndex: 'desc',
         },
         {
-            title: '服务调用次数',
-            dataIndex: 'callNo',
-            sorter: true,
-            align: 'right',
-            render: val => `${val} 万`,
-            // mark to display a total number
-            needTotal: true,
-        },
-        {
             title: '状态',
             dataIndex: 'status',
             filters: [
                 {
-                    text: status[0],
+                    text: Expand.status()[0].text,
                     value: 0,
                 },
                 {
-                    text: status[1],
+                    text: Expand.status()[1].text,
                     value: 1,
-                },
-                {
-                    text: status[2],
-                    value: 2,
-                },
-                {
-                    text: status[3],
-                    value: 3,
-                },
+                }
             ],
             render(val) {
-                return <Badge status={statusMap[val]} text={status[val]}/>;
+                let {status, text} = Expand.status()[val];
+                return <Badge status={status} text={text}/>;
             },
-        },
-        {
-            title: '上次调度时间',
-            dataIndex: 'updatedAt',
+        }, {
+            title: '创建时间',
+            dataIndex: 'createdAt',
             sorter: true,
             render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
-        },
-        {
+        }, {
             title: '操作',
             key: 'operation',
-            // fixed: 'right',
             render: (text, record) => {
                 const menu = (
                     <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-                        <Menu.Item key="remove">修改</Menu.Item>
-                        <Menu.Item key="approval">查看详情</Menu.Item>
+                        <Menu.Item key="edit">修改</Menu.Item>
+                        <Menu.Item key="on">启用</Menu.Item>
+                        <Menu.Item key="off">禁用</Menu.Item>
                     </Menu>
                 );
                 return (
-
                     <Fragment>
-                        <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a>
+                        <a onClick={() => this.handleUpdateModalVisible(true, record)}>查看详情</a>
                         <Divider type="vertical"/>
                         <Dropdown overlay={menu}>
                             <a className="ant-dropdown-link" href="#">
@@ -410,7 +409,7 @@ class Index extends PureComponent {
                             </a>
                         </Dropdown>
                     </Fragment>
-                )
+                );
             },
         },
     ];
@@ -454,6 +453,7 @@ class Index extends PureComponent {
      * 处理搜索条件重置
      */
     handleFormReset = () => {
+        const {form} = this.props;
         form.resetFields();
         this.setState({
             formValues: {},
@@ -584,7 +584,7 @@ class Index extends PureComponent {
             <Form onSubmit={this.handleSearch} layout="inline">
                 <Row gutter={{md: 8, lg: 24, xl: 48}}>
                     <Col md={8} sm={24}>
-                        <FormItem label="规则名称">
+                        <FormItem label="角色名称">
                             {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
                         </FormItem>
                     </Col>
@@ -592,24 +592,27 @@ class Index extends PureComponent {
                         <FormItem label="使用状态">
                             {getFieldDecorator('status')(
                                 <Select placeholder="请选择" style={{width: '100%'}}>
-                                    <Option value="0">关闭</Option>
-                                    <Option value="1">运行中</Option>
+                                    {
+                                        Expand.status().map((({status, text}) => {
+                                            return (<Option key={status} value={status}>{text}</Option>);
+                                        }))
+                                    }
                                 </Select>
                             )}
                         </FormItem>
                     </Col>
                     <Col md={8} sm={24}>
-            <span className={styles.submitButtons}>
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{marginLeft: 8}} onClick={this.handleFormReset}>
-                重置
-              </Button>
-              <a style={{marginLeft: 8}} onClick={this.toggleForm}>
-                展开 <Icon type="down"/>
-              </a>
-            </span>
+                        <span className={styles.submitButtons}>
+                          <Button type="primary" htmlType="submit">
+                            查询
+                          </Button>
+                          <Button style={{marginLeft: 8}} onClick={this.handleFormReset}>
+                            重置
+                          </Button>
+                          <a style={{marginLeft: 8}} onClick={this.toggleForm}>
+                            展开 <Icon type="down"/>
+                          </a>
+                        </span>
                     </Col>
                 </Row>
             </Form>
@@ -627,7 +630,7 @@ class Index extends PureComponent {
             <Form onSubmit={this.handleSearch} layout="inline">
                 <Row gutter={{md: 8, lg: 24, xl: 48}}>
                     <Col md={8} sm={24}>
-                        <FormItem label="规则名称">
+                        <FormItem label="角色名称">
                             {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
                         </FormItem>
                     </Col>
@@ -635,43 +638,19 @@ class Index extends PureComponent {
                         <FormItem label="使用状态">
                             {getFieldDecorator('status')(
                                 <Select placeholder="请选择" style={{width: '100%'}}>
-                                    <Option value="0">关闭</Option>
-                                    <Option value="1">运行中</Option>
+                                    {
+                                        Expand.status().map((({status, text}) => {
+                                            return (<Option value={status}>{text}</Option>);
+                                        }))
+                                    }
                                 </Select>
                             )}
                         </FormItem>
                     </Col>
                     <Col md={8} sm={24}>
-                        <FormItem label="调用次数">
-                            {getFieldDecorator('number')(<InputNumber style={{width: '100%'}}/>)}
-                        </FormItem>
-                    </Col>
-                </Row>
-                <Row gutter={{md: 8, lg: 24, xl: 48}}>
-                    <Col md={8} sm={24}>
-                        <FormItem label="更新日期">
-                            {getFieldDecorator('date')(
+                        <FormItem label="创建日期">
+                            {getFieldDecorator('createdAt')(
                                 <DatePicker style={{width: '100%'}} placeholder="请输入更新日期"/>
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col md={8} sm={24}>
-                        <FormItem label="使用状态">
-                            {getFieldDecorator('status3')(
-                                <Select placeholder="请选择" style={{width: '100%'}}>
-                                    <Option value="0">关闭</Option>
-                                    <Option value="1">运行中</Option>
-                                </Select>
-                            )}
-                        </FormItem>
-                    </Col>
-                    <Col md={8} sm={24}>
-                        <FormItem label="使用状态">
-                            {getFieldDecorator('status4')(
-                                <Select placeholder="请选择" style={{width: '100%'}}>
-                                    <Option value="0">关闭</Option>
-                                    <Option value="1">运行中</Option>
-                                </Select>
                             )}
                         </FormItem>
                     </Col>
@@ -728,7 +707,7 @@ class Index extends PureComponent {
             handleUpdate: this.handleUpdate,
         };
         return (
-            <PageHeaderWrapper title="查询表格">
+            <PageHeaderWrapper title={Expand.title()}>
                 <Card bordered={false}>
                     <div className={styles.tableList}>
                         {/*搜索层*/}
@@ -751,6 +730,7 @@ class Index extends PureComponent {
                         </div>
                         {/*数据表格层*/}
                         <StandardTable
+                            rowKey="id"
                             selectedRows={selectedRows}
                             loading={loading}
                             data={data}

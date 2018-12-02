@@ -502,7 +502,19 @@ export default {
                     name: "例子",
                     path: "/test/data-table"
                 }]
-            }]));
+            },
+
+            // 正式
+            {
+                icon: "warning",
+                name: "访问控制",
+                path: "/access",
+                children: [{
+                    name: "角色管理",
+                    path: "/access/role"
+                }]
+            }
+        ]));
     },
 
     /**
@@ -510,10 +522,17 @@ export default {
      */
     'GET /api/role': (req, res) => {
         return res.json(ok({
-            list: [],
+            list: [{
+                id: "1",
+                name: "管理员",
+                role: "ADMIN",
+                desc: "可爱的管理员",
+                createdAt: 1543674756762.010,
+                status: 1
+            }],
             pagination: {
                 total: 0,
-                pageSize: 0,
+                pageSize: 10,
                 current: 1
             },
         }));
