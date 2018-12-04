@@ -12,10 +12,10 @@ export default {
     },
     effects: {
         *query({type, payload}, {call, put}) {
-            let data = yield call(queryRole, payload);
+            let result = yield call(queryRole, payload);
             yield put({
                 type: 'updateRole',
-                payload: data.result
+                payload: result.data
             });
         }
     },

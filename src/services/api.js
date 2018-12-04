@@ -130,3 +130,11 @@ export async function getFakeCaptcha(mobile) {
 export async function queryRole(params){
     return request('/api/role');
 }
+
+/**
+ * 获取所有菜单
+ * @param token
+ */
+export async function queryUserMenu(token) {
+    return request(`/api/user/menu?token=${token}`);
+}

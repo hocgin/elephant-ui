@@ -435,15 +435,16 @@ class EditModal extends PureComponent {
 const Expand = {
     // 标题
     title() {
-        return '资源管理';
+        return '数据字典';
     },
     // 取数据
     mapStateToProps(states) {
-        const {role, loading} = states;
+        const {dictionary, loading} = states;
+        console.log('mapStateToProps', dictionary);
         return {
-            result: role,
+            result: dictionary,
             // data 数据的加载状态
-            loading: loading.models.role,
+            loading: loading.models.dictionary,
         };
     },
     // 发起请求
@@ -454,13 +455,13 @@ const Expand = {
             // 查询
             query(params) {
                 dispatch({
-                    type: 'role/query',
+                    type: 'dictionary/query',
                     payload: params,
                 });
             },
             remove(key, callback) {
                 dispatch({
-                    type: 'rule/remove',
+                    type: 'dictionary/remove',
                     payload: {
                         key: key,
                     },
@@ -469,7 +470,7 @@ const Expand = {
             },
             add(desc) {
                 dispatch({
-                    type: 'rule/add',
+                    type: 'dictionary/add',
                     payload: {
                         desc: desc,
                     },
@@ -477,7 +478,7 @@ const Expand = {
             },
             update(name, desc, key) {
                 dispatch({
-                    type: 'rule/update',
+                    type: 'dictionary/update',
                     payload: {
                         name,
                         desc,
@@ -506,6 +507,7 @@ class Index extends PureComponent {
     state = {
         modalVisible: false,
         updateModalVisible: false,
+        // 是否展开多项搜索框
         expandForm: false,
         selectedRows: [],
         formValues: {},
@@ -516,34 +518,11 @@ class Index extends PureComponent {
     // 字段
     columns = [
         {
-            title: '角色名',
-            dataIndex: 'name',
-        },
-        {
-            title: '角色标识',
-            dataIndex: 'role',
-        },
-        {
+            title: '属性值',
+            dataIndex: 'label',
+        }, {
             title: '描述',
-            dataIndex: 'desc',
-        },
-        {
-            title: '状态',
-            dataIndex: 'status',
-            filters: [
-                {
-                    text: Expand.status()[0].text,
-                    value: 0,
-                },
-                {
-                    text: Expand.status()[1].text,
-                    value: 1,
-                }
-            ],
-            render(val) {
-                let {status, text} = Expand.status()[val];
-                return <Badge status={status} text={text}/>;
-            },
+            dataIndex: 'description',
         }, {
             title: '创建时间',
             dataIndex: 'createdAt',
@@ -552,6 +531,8 @@ class Index extends PureComponent {
         }, {
             title: '操作',
             key: 'operation',
+            fixed: 'right',
+            width: 200,
             render: (text, record) => {
                 const menu = (
                     <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
@@ -851,6 +832,7 @@ class Index extends PureComponent {
             result: {data},
             loading,
         } = this.props;
+
         const {
             selectedRows,
             modalVisible,

@@ -60,8 +60,8 @@ class CreateModal extends PureComponent {
         const that = this;
 
         return [{
-            title() {
-                return (<Steps.Step title="基本信息"/>);
+            title(key = '') {
+                return (<Steps.Step key={key} title="基本信息"/>);
             },
             content() {
                 return [
@@ -88,8 +88,8 @@ class CreateModal extends PureComponent {
                 ]
             }
         }, {
-            title() {
-                return (<Steps.Step title="配置规则属性"/>);
+            title(key = '') {
+                return (<Steps.Step key={key} title="配置规则属性"/>);
             },
             content() {
                 return [
@@ -119,8 +119,8 @@ class CreateModal extends PureComponent {
                 ]
             }
         }, {
-            title() {
-                return (<Steps.Step title="设定调度周期"/>);
+            title(key = '') {
+                return (<Steps.Step key={key} title="设定调度周期"/>);
             },
             content() {
                 return [
@@ -174,8 +174,8 @@ class CreateModal extends PureComponent {
             onCancel={() => onModalVisible()}
         >
             <Steps style={{marginBottom: 28}} size="small" current={step}>
-                {this.steps().map((step) => {
-                    return step.title();
+                {this.steps().map((step, index) => {
+                    return step.title(index);
                 })}
             </Steps>
             {this.steps()[step].content()}
@@ -260,8 +260,8 @@ class EditModal extends PureComponent {
         const that = this;
 
         return [{
-            title() {
-                return (<Steps.Step title="基本信息"/>);
+            title(key = '') {
+                return (<Steps.Step key={key} title="基本信息"/>);
             },
             content() {
                 return [
@@ -288,8 +288,8 @@ class EditModal extends PureComponent {
                 ]
             }
         }, {
-            title() {
-                return (<Steps.Step title="配置规则属性"/>);
+            title(key = '') {
+                return (<Steps.Step key={key} title="配置规则属性"/>);
             },
             content() {
                 return [
@@ -319,8 +319,8 @@ class EditModal extends PureComponent {
                 ]
             }
         }, {
-            title() {
-                return (<Steps.Step title="设定调度周期"/>);
+            title(key = '') {
+                return (<Steps.Step key={key} title="设定调度周期"/>);
             },
             content() {
                 return [
@@ -374,8 +374,8 @@ class EditModal extends PureComponent {
             onCancel={() => onModalVisible()}
         >
             <Steps style={{marginBottom: 28}} size="small" current={step}>
-                {this.steps().map((step) => {
-                    return step.title();
+                {this.steps().map((step, index) => {
+                    return step.title(index);
                 })}
             </Steps>
             {this.steps()[step].content()}
@@ -726,7 +726,7 @@ class Index extends PureComponent {
              * 处理更改请求
              * @param fields
              */
-            handleUpdate(fields){
+            handleUpdate(fields) {
                 that.props.update({
                     name: fields.name,
                     desc: fields.desc,
@@ -806,7 +806,7 @@ class Index extends PureComponent {
                                 <Select placeholder="请选择" style={{width: '100%'}}>
                                     {
                                         Expand.status().map((({status, text}) => {
-                                            return (<Select.Option value={status}>{text}</Select.Option>);
+                                            return (<Select.Option key={status} value={status}>{text}</Select.Option>);
                                         }))
                                     }
                                 </Select>
@@ -863,15 +863,6 @@ class Index extends PureComponent {
                 <Menu.Item key="approval">批量审批</Menu.Item>
             </Menu>
         );
-
-        const parentMethods = {
-            handleAdd: this.handleAdd,
-            handleModalVisible: this.handleModalVisible,
-        };
-        const updateMethods = {
-            handleUpdateModalVisible: this.handleUpdateModalVisible,
-            handleUpdate: this.handleUpdate,
-        };
         return (
             <PageHeaderWrapper title={Expand.title()}>
                 <Card bordered={false}>
@@ -920,8 +911,6 @@ class Index extends PureComponent {
                            onModalVisible={this.handleUpdateModalVisible}
                            onDone={this.methods().handleUpdate}
                            values={stepFormValues}/>
-                )}
-                />
             </PageHeaderWrapper>
         );
     }

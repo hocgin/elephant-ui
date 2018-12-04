@@ -283,6 +283,22 @@ export default [
                 }]
             },
             {
+                icon: "warning",
+                name: "系统配置",
+                path: "/system",
+                routes: [{
+                    name: "数据字典",
+                    component: './System/Dictionary/Index',
+                    path: "/system/dictionary"
+                },
+                //     {
+                //     name: "变量配置",
+                //     component: './System/Property/Index',
+                //     path: "/system/property"
+                // }
+                ]
+            },
+            {
                 component: '404',
             },
         ],

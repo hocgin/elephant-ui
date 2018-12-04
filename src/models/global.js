@@ -1,4 +1,7 @@
-import {queryNotices} from '@/services/api';
+import {
+    queryNotices,
+    queryUserMenu
+} from '@/services/api';
 
 export default {
     namespace: 'global',
@@ -6,9 +9,18 @@ export default {
     state: {
         collapsed: false,
         notices: [],
+        // 左侧菜单
+        menuData: [],
     },
 
     effects: {
+        *fetchMenu({payload}, {call, put}) {
+            let result = yield call(queryUserMenu, payload);
+            yield put({
+                type: 'updateMenu',
+                payload: result.data,
+            });
+        },
         * fetchNotices(_, {call, put}) {
             const data = yield call(queryNotices);
             yield put({
@@ -34,6 +46,18 @@ export default {
     },
 
     reducers: {
+        /**
+         * 更改菜单资源
+         */
+        updateMenu(state, {payload}) {
+            return {
+                ...state,
+                menuData: payload
+            };
+        },
+        /**
+         * 左侧菜单栏，展开/关闭
+         */
         changeLayoutCollapsed(state, {payload}) {
             return {
                 ...state,
