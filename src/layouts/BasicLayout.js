@@ -344,7 +344,14 @@ class BasicLayout extends React.PureComponent {
                 return <SettingDrawer/>;
             }
         };
-    }
+    };
+
+    /**
+     * 事件监听函数
+     */
+    listener = () => {
+        return {};
+    };
 }
 
 export default BasicLayout;
