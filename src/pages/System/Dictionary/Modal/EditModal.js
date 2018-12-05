@@ -129,6 +129,12 @@ export default class EditModal extends PureComponent {
 
     constructor(props) {
         super(props);
+        const {onClickNext} = this.method();
+        this.onClickNext = onClickNext;
+
+        const {backward, forward} = this.listener();
+        this.forward = forward;
+        this.backward = backward;
     }
 
     /**
@@ -158,51 +164,67 @@ export default class EditModal extends PureComponent {
     }
 
     /**
-     * =====================================
-     *                  函数
-     * =====================================
+     * 自定义函数
      */
-    /**
-     * 后退
-     */
-    backward = () => {
-        const {step} = this.state;
-        this.setState({
-            step: step - 1,
-        });
+    method = () => {
+        return {
+            /**
+             * @下一页
+             */
+            onClickNext(step) {
+                const {form, onDone} = this.props;
+                const {formValue: oldValue} = this.state;
+                form.validateFields((err, fieldsValue) => {
+                    if (err) return;
+                    const formVals = {...oldValue, ...fieldsValue};
+                    this.setState(
+                        {
+                            formVals,
+                        },
+                        () => {
+                            if (step < this.steps().length - 1) {
+                                this.forward();
+                            } else {
+                                onDone(formVals);
+                            }
+                        }
+                    );
+                });
+            }
+        }
     };
 
     /**
-     * 前进
+     * 渲染函数
      */
-    forward() {
-        const {step} = this.state;
-        this.setState({
-            step: step + 1,
-        });
-    }
+    rendering = () => {
+        return {};
+    };
 
     /**
-     * @下一页
+     * 事件监听函数
      */
-    onClickNext = (step) => {
-        const {form, onDone} = this.props;
-        const {formValue: oldValue} = this.state;
-        form.validateFields((err, fieldsValue) => {
-            if (err) return;
-            const formVals = {...oldValue, ...fieldsValue};
-            this.setState(
-                {
-                    formVals,
-                },
-                () => {
-                    if (step < this.steps().length - 1) {
-                        this.forward();
-                    } else {
-                        onDone(formVals);
-                    }
-                }
-            );
-        });
-    }
+    listener = () => {
+        return {
+
+            /**
+             * 后退
+             */
+            backward() {
+                const {step} = this.state;
+                this.setState({
+                    step: step - 1,
+                });
+            },
+            /**
+             * 前进
+             */
+            forward() {
+                const {step} = this.state;
+                this.setState({
+                    step: step + 1,
+                });
+            },
+        };
+    };
 }
