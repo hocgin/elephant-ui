@@ -167,22 +167,23 @@ export default class CreateModal extends PureComponent {
      * 自定义函数
      */
     method = () => {
+        const that = this;
         return {
             /**
              * @下一页
              */
             onClickNext(step) {
-                const {form, onDone} = this.props;
-                const {formValue: oldValue} = this.state;
+                const {form, onDone} = that.props;
+                const {formValue: oldValue} = that.state;
                 form.validateFields((err, fieldsValue) => {
                     if (err) return;
                     const formVals = {...oldValue, ...fieldsValue};
-                    this.setState(
+                    that.setState(
                         {
                             formVals,
                         },
                         () => {
-                            if (step < this.steps().length - 1) {
+                            if (step < that.steps().length - 1) {
                                 this.forward();
                             } else {
                                 onDone(formVals);
@@ -198,6 +199,7 @@ export default class CreateModal extends PureComponent {
      * 渲染函数
      */
     rendering = () => {
+        const that = this;
         return {};
     };
 
@@ -205,14 +207,15 @@ export default class CreateModal extends PureComponent {
      * 事件监听函数
      */
     listener = () => {
+        const that = this;
         return {
 
             /**
              * 后退
              */
             backward() {
-                const {step} = this.state;
-                this.setState({
+                const {step} = that.state;
+                that.setState({
                     step: step - 1,
                 });
             },
@@ -220,8 +223,8 @@ export default class CreateModal extends PureComponent {
              * 前进
              */
             forward() {
-                const {step} = this.state;
-                this.setState({
+                const {step} = that.state;
+                that.setState({
                     step: step + 1,
                 });
             },

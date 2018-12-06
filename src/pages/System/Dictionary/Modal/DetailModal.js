@@ -15,7 +15,7 @@ import {
  * - onDone 完成时触发
  */
 @Form.create()
-export default class EditModal extends PureComponent {
+export default class DetailModal extends PureComponent {
     state = {
         // 当前步骤
         step: 0,
@@ -40,7 +40,8 @@ export default class EditModal extends PureComponent {
             },
             content() {
                 return [
-                    <Form.Item key="target" {...that.formLayout} label="监控对象">
+                    <Form.Item key="target" {...that.formLayout}
+                               label="监控对象">
                         {form.getFieldDecorator('target', {
                             initialValue: 1,
                         })(
@@ -152,13 +153,16 @@ export default class EditModal extends PureComponent {
             title="规则配置"
             visible={visible}
             footer={this.steps()[step].footer()}
-            onCancel={() => onModalVisible()}
-        >
+            onCancel={() => onModalVisible()}>
             <Steps style={{marginBottom: 28}} size="small" current={step}>
                 {this.steps().map((step, index) => {
                     return step.title(index);
                 })}
             </Steps>
+            {this.steps()[step].content()}
+            {this.steps()[step].content()}
+            {this.steps()[step].content()}
+            {this.steps()[step].content()}
             {this.steps()[step].content()}
         </Modal>);
     }
@@ -199,7 +203,6 @@ export default class EditModal extends PureComponent {
      * 渲染函数
      */
     rendering = () => {
-        const that = this;
         return {};
     };
 

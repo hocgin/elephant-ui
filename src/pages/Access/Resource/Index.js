@@ -562,7 +562,7 @@ class Index extends PureComponent {
                 );
                 return (
                     <Fragment>
-                        <a onClick={() => this.handleUpdateModalVisible(true, record)}>查看详情</a>
+                        <a onClick={() => this.onClickDetailButton(true, record)}>查看详情</a>
                         <Divider type="vertical"/>
                         <Dropdown overlay={menu}>
                             <a className="ant-dropdown-link" href="#">
@@ -720,7 +720,7 @@ class Index extends PureComponent {
                 that.props.add(fields.desc);
 
                 message.success('添加成功');
-                that.handleModalVisible();
+                that.onClickCreateButton();
             },
             /**
              * 处理更改请求
@@ -734,7 +734,7 @@ class Index extends PureComponent {
                 });
 
                 message.success('配置成功');
-                that.handleUpdateModalVisible();
+                that.onClickDetailButton();
             }
         };
     }
@@ -747,7 +747,7 @@ class Index extends PureComponent {
             form: {getFieldDecorator},
         } = this.props;
         return (
-            <Form onSubmit={this.handleSearch} layout="inline">
+            <Form onSubmit={this.onClickSearchButton} layout="inline">
                 <Row gutter={{md: 8, lg: 24, xl: 48}}>
                     <Col md={8} sm={24}>
                         <Form.Item label="角色名称">
@@ -793,7 +793,7 @@ class Index extends PureComponent {
             form: {getFieldDecorator},
         } = this.props;
         return (
-            <Form onSubmit={this.handleSearch} layout="inline">
+            <Form onSubmit={this.onClickSearchButton} layout="inline">
                 <Row gutter={{md: 8, lg: 24, xl: 48}}>
                     <Col md={8} sm={24}>
                         <Form.Item label="角色名称">
@@ -871,7 +871,7 @@ class Index extends PureComponent {
                         <div className={styles.tableListForm}>{this.renderForm()}</div>
                         {/*工具栏(新建/批量操作)层*/}
                         <div className={styles.tableListOperator}>
-                            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                            <Button icon="plus" type="primary" onClick={() => this.onClickCreateButton(true)}>
                                 新建
                             </Button>
                             {selectedRows.length > 0 && (
@@ -892,14 +892,14 @@ class Index extends PureComponent {
                             loading={loading}
                             data={data}
                             columns={this.columns}
-                            onSelectRow={this.handleSelectRows}
+                            onSelectRow={this.onSelectRows}
                             onChange={this.handleStandardTableChange}
                         />
                     </div>
                 </Card>
                 {/*新增弹窗*/}
                 <CreateModal visible={modalVisible}
-                             onModalVisible={this.handleModalVisible}
+                             onModalVisible={this.onClickCreateButton}
                              onDone={this.methods().handleAdd}/>
                 {/*更新弹窗*/}
                 {/*{stepFormValues && Object.keys(stepFormValues).length ? (*/}
@@ -908,7 +908,7 @@ class Index extends PureComponent {
                 {/*onDone={this.handleAdd}/>*/}
                 {/*) : null}{(*/}
                 <EditModal visible={updateModalVisible}
-                           onModalVisible={this.handleUpdateModalVisible}
+                           onModalVisible={this.onClickDetailButton}
                            onDone={this.methods().handleUpdate}
                            values={stepFormValues}/>
             </PageHeaderWrapper>

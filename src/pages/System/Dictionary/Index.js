@@ -28,6 +28,7 @@ import EditModal from './Modal/EditModal'
 import CreateModal from './Modal/CreateModal'
 
 import styles from './Index.less';
+import DetailModal from "./Modal/DetailModal";
 
 const getValue = obj =>
     Object.keys(obj)
@@ -52,39 +53,45 @@ const Expand = {
     // 发起请求
     mapDispatchToProps(dispatch) {
         return {
-            example() {
+            $example() {
             },
             // 查询
-            query(params) {
+            $query(params) {
                 dispatch({
                     type: 'dictionary/query',
-                    payload: params,
+                    payload: {
+                        ...params
+                    },
                 });
             },
-            remove(key, callback) {
+            /**
+             * 删除
+             * @param id [] 要删除的ID
+             * @param callback
+             */
+            $remove(id, callback) {
                 dispatch({
                     type: 'dictionary/remove',
                     payload: {
-                        key: key,
+                        id: id,
                     },
                     callback: callback,
                 });
             },
-            add(desc) {
+            $add(param) {
                 dispatch({
                     type: 'dictionary/add',
                     payload: {
-                        desc: desc,
+                        ...param
                     },
                 });
             },
-            update(name, desc, key) {
+            $update(id, param) {
                 dispatch({
                     type: 'dictionary/update',
                     payload: {
-                        name,
-                        desc,
-                        key
+                        id,
+                        ...param
                     },
                 });
             }
@@ -107,11 +114,17 @@ const Expand = {
 @Form.create()
 export default class Index extends PureComponent {
     state = {
-        modalVisible: false,
-        updateModalVisible: false,
         // 是否展开多项搜索框
         expandForm: false,
+        // 更新 Modal
+        editModalVisible: false,
+        // 创建 Modal
+        createModalVisible: false,
+        // 详情 Modal
+        detailModalVisible: false,
+        // 选中的行
         selectedRows: [],
+
         formValues: {},
         // 新建临时保存的值
         stepFormValues: {},
@@ -137,7 +150,8 @@ export default class Index extends PureComponent {
             width: 200,
             render: (text, record) => {
                 const menu = (
-                    <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
+                    <Menu>
+                        <Menu.Item key="remove" onClick={() => this.onClickDeleteButton(record)}>删除</Menu.Item>
                         <Menu.Item key="edit">修改</Menu.Item>
                         <Menu.Item key="on">启用</Menu.Item>
                         <Menu.Item key="off">禁用</Menu.Item>
@@ -145,7 +159,7 @@ export default class Index extends PureComponent {
                 );
                 return (
                     <Fragment>
-                        <a onClick={() => this.handleUpdateModalVisible(true, record)}>查看详情</a>
+                        <a onClick={() => this.onClickDetailButton(true, record)}>查看详情</a>
                         <Divider type="vertical"/>
                         <Dropdown overlay={menu}>
                             <a className="ant-dropdown-link" href="#">
@@ -170,37 +184,44 @@ export default class Index extends PureComponent {
         const {
             renderSimpleForm,
             renderForm,
-            renderAdvancedForm
+            renderAdvancedForm,
+            showRemoveModal,
         } = this.rendering();
         this.renderAdvancedForm = renderAdvancedForm;
         this.renderForm = renderForm;
         this.renderSimpleForm = renderSimpleForm;
+        this.showRemoveModal = showRemoveModal;
 
         const {
             handleFormReset,
             handleStandardTableChange,
             toggleForm,
             handleMenuClick,
-            handleSelectRows,
-            handleSearch,
-            handleModalVisible,
-            handleUpdateModalVisible,
+            onSelectRows,
+            onClickSearchButton,
+            onClickCreateButton,
+            onClickDetailButton,
+            onClickEditButton,
+            onClickDeleteButton,
         } = this.listener();
         this.handleFormReset = handleFormReset;
         this.handleStandardTableChange = handleStandardTableChange;
         this.toggleForm = toggleForm;
         this.handleMenuClick = handleMenuClick;
-        this.handleSelectRows = handleSelectRows;
-        this.handleSearch = handleSearch;
-        this.handleModalVisible = handleModalVisible;
-        this.handleUpdateModalVisible = handleUpdateModalVisible;
+
+        this.onClickSearchButton = onClickSearchButton;
+        this.onSelectRows = onSelectRows;
+        this.onClickCreateButton = onClickCreateButton;
+        this.onClickDetailButton = onClickDetailButton;
+        this.onClickEditButton = onClickEditButton;
+        this.onClickDeleteButton = onClickDeleteButton;
     }
 
     /**
      * @组件挂载后
      */
     componentDidMount() {
-        this.props.query();
+        this.props.$query();
     }
 
     render() {
@@ -211,8 +232,9 @@ export default class Index extends PureComponent {
 
         const {
             selectedRows,
-            modalVisible,
-            updateModalVisible,
+            createModalVisible,
+            editModalVisible,
+            detailModalVisible,
             stepFormValues
         } = this.state;
         const menu = (
@@ -229,15 +251,14 @@ export default class Index extends PureComponent {
                         <div className={styles.tableListForm}>{this.renderForm()}</div>
                         {/*工具栏(新建/批量操作)层*/}
                         <div className={styles.tableListOperator}>
-                            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                            <Button icon="plus" type="primary" onClick={() => this.onClickCreateButton(true)}>
                                 新建
                             </Button>
                             {selectedRows.length > 0 && (
                                 <span>
-                                  <Button>批量操作</Button>
                                   <Dropdown overlay={menu}>
                                     <Button>
-                                      更多操作 <Icon type="down"/>
+                                      批量操作 <Icon type="down"/>
                                     </Button>
                                   </Dropdown>
                                 </span>
@@ -250,14 +271,14 @@ export default class Index extends PureComponent {
                             loading={loading}
                             data={data}
                             columns={this.columns}
-                            onSelectRow={this.handleSelectRows}
+                            onSelectRow={this.onSelectRows}
                             onChange={this.handleStandardTableChange}
                         />
                     </div>
                 </Card>
                 {/*新增弹窗*/}
-                <CreateModal visible={modalVisible}
-                             onModalVisible={this.handleModalVisible}
+                <CreateModal visible={createModalVisible}
+                             onModalVisible={this.onClickCreateButton}
                              onDone={this.methods().handleAdd}/>
                 {/*更新弹窗*/}
                 {/*{stepFormValues && Object.keys(stepFormValues).length ? (*/}
@@ -265,10 +286,16 @@ export default class Index extends PureComponent {
                 {/*onModalVisible={this.handleModalVisible}*/}
                 {/*onDone={this.handleAdd}/>*/}
                 {/*) : null}{(*/}
-                <EditModal visible={updateModalVisible}
-                           onModalVisible={this.handleUpdateModalVisible}
+                <EditModal visible={editModalVisible}
+                           onModalVisible={this.onClickEditButton}
                            onDone={this.methods().handleUpdate}
                            values={stepFormValues}/>
+                <DetailModal
+                    visible={detailModalVisible}
+                    onModalVisible={this.onClickDetailButton}
+                    onDone={this.methods().handleUpdate}
+                    values={stepFormValues}
+                />
             </PageHeaderWrapper>
         );
     }
@@ -287,7 +314,7 @@ export default class Index extends PureComponent {
                 that.props.add(fields.desc);
 
                 message.success('添加成功');
-                that.handleModalVisible();
+                that.onClickCreateButton();
             },
             /**
              * 处理更改请求
@@ -301,7 +328,7 @@ export default class Index extends PureComponent {
                 });
 
                 message.success('配置成功');
-                that.handleUpdateModalVisible();
+                that.onClickDetailButton();
             }
         };
     };
@@ -312,12 +339,19 @@ export default class Index extends PureComponent {
     rendering = () => {
         const that = this;
         return {
+            /**
+             * 根据情况渲染搜索框
+             */
+            renderForm() {
+                const {expandForm} = that.state;
+                return expandForm ? that.renderAdvancedForm() : that.renderSimpleForm();
+            },
             renderSimpleForm() {
                 const {
                     form: {getFieldDecorator},
                 } = that.props;
                 return (
-                    <Form onSubmit={that.handleSearch} layout="inline">
+                    <Form onSubmit={that.onClickSearchButton} layout="inline">
                         <Row gutter={{md: 8, lg: 24, xl: 48}}>
                             <Col md={8} sm={24}>
                                 <Form.Item label="角色名称">
@@ -356,14 +390,6 @@ export default class Index extends PureComponent {
                 );
             },
             /**
-             * 根据情况渲染搜索框
-             */
-            renderForm() {
-                const {expandForm} = that.state;
-                return expandForm ? that.renderAdvancedForm() : that.renderSimpleForm();
-            },
-
-            /**
              * 渲染搜索框展开状态
              */
             renderAdvancedForm() {
@@ -371,7 +397,7 @@ export default class Index extends PureComponent {
                     form: {getFieldDecorator},
                 } = that.props;
                 return (
-                    <Form onSubmit={that.handleSearch} layout="inline">
+                    <Form onSubmit={that.onClickSearchButton} layout="inline">
                         <Row gutter={{md: 8, lg: 24, xl: 48}}>
                             <Col md={8} sm={24}>
                                 <Form.Item label="角色名称">
@@ -415,7 +441,25 @@ export default class Index extends PureComponent {
                         </div>
                     </Form>
                 );
-            }
+            },
+
+            showRemoveModal(id = []) {
+                id.length !== 0 && Modal.confirm({
+                    title: '警告',
+                    content: '确定删除?',
+                    okText: '确定',
+                    okType: 'danger',
+                    cancelText: '取消',
+                    onOk() {
+                        that.props.$remove(id, () => {
+                            message.success('删除成功');
+                            that.setState({
+                                selectedRows: [],
+                            });
+                        });
+                    }
+                });
+            },
         };
     };
 
@@ -434,7 +478,7 @@ export default class Index extends PureComponent {
                 that.setState({
                     formValues: {},
                 });
-                that.props.query({});
+                that.props.$query({});
             },
 
             /**
@@ -459,7 +503,7 @@ export default class Index extends PureComponent {
                     params.sorter = `${sorter.field}_${sorter.order}`;
                 }
 
-                that.props.query();
+                that.props.$query();
             },
             /**
              * 处理展开/收起
@@ -477,16 +521,12 @@ export default class Index extends PureComponent {
             handleMenuClick(e) {
                 const {selectedRows} = that.state;
 
-                if (!selectedRows) return;
+                if (!selectedRows) {
+                    return;
+                }
                 switch (e.key) {
                     case 'remove':
-                        that.props.remove(
-                            selectedRows.map(row => row.key),
-                            () => {
-                                that.setState({
-                                    selectedRows: [],
-                                });
-                            });
+                        that.showRemoveModal(selectedRows.map(row => row.id));
                         break;
                     default:
                         break;
@@ -496,15 +536,15 @@ export default class Index extends PureComponent {
              * 处理选中行
              * @param rows
              */
-            handleSelectRows(rows) {
-                this.setState({
+            onSelectRows(rows) {
+                that.setState({
                     selectedRows: rows,
                 });
             },
             /**
              * 处理查询按钮的点击
              */
-            handleSearch(e) {
+            onClickSearchButton(e) {
                 e.preventDefault();
 
                 const {form} = that.props;
@@ -520,25 +560,44 @@ export default class Index extends PureComponent {
                     that.setState({
                         formValues: values,
                     });
-                    that.props.query(values);
+                    that.props.$query(values);
                 });
             },
             /**
              * 处理[新建]按钮的点击
              */
-            handleModalVisible(flag) {
+            onClickCreateButton(flag) {
                 that.setState({
-                    modalVisible: !!flag,
+                    createModalVisible: !!flag,
                 });
             },
             /**
              * 处理[配置]按钮的点击
              */
-            handleUpdateModalVisible(flag, record) {
+            onClickDetailButton(flag, record) {
+                if (record) {
+                    console.log('发送详情请求', record.id);
+                }
                 that.setState({
-                    updateModalVisible: !!flag,
-                    stepFormValues: record || {},
+                    detailModalVisible: !!flag
                 });
+            },
+            /**
+             * 处理[修改]按钮的点击
+             */
+            onClickEditButton(flag, record) {
+                if (record) {
+                    console.log('发送修改请求', record.id);
+                }
+                that.setState({
+                    editModalVisible: !!flag
+                });
+            },
+            /**
+             * 处理[删除]按钮的点击
+             */
+            onClickDeleteButton(record) {
+                that.showRemoveModal(record.id);
             },
         };
     };

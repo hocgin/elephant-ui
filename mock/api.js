@@ -272,7 +272,14 @@ export default {
                 current: 1
             },
         }));
+    },
+    'DELETE /api/dictionary': (req, res) => {
+        console.log('DELETE', ok(null));
+        setTimeout(() => {
+            res.json(ok(null));
+        }, 1000);
     }
+
 
 
 };

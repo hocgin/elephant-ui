@@ -203,7 +203,7 @@ class UpdateForm extends PureComponent {
   };
 
   renderFooter = currentStep => {
-    const { handleUpdateModalVisible } = this.props;
+    const { onClickDetailButton } = this.props;
     if (currentStep === 1) {
       return [
         <Button key="back" style={{ float: 'left' }} onClick={this.backward}>
@@ -241,7 +241,7 @@ class UpdateForm extends PureComponent {
   };
 
   render() {
-    const { updateModalVisible, handleUpdateModalVisible } = this.props;
+    const { updateModalVisible, onClickDetailButton } = this.props;
     const { currentStep, formVals } = this.state;
 
     return (
@@ -334,7 +334,7 @@ class TableList extends PureComponent {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a>
+          <a onClick={() => this.onClickDetailButton(true, record)}>配置</a>
           <Divider type="vertical" />
           <a href="">订阅警报</a>
         </Fragment>
@@ -471,7 +471,7 @@ class TableList extends PureComponent {
     });
 
     message.success('添加成功');
-    this.handleModalVisible();
+    this.onClickCreateButton();
   };
 
   handleUpdate = fields => {
@@ -486,7 +486,7 @@ class TableList extends PureComponent {
     });
 
     message.success('配置成功');
-    this.handleUpdateModalVisible();
+    this.onClickDetailButton();
   };
 
   renderSimpleForm() {
@@ -494,7 +494,7 @@ class TableList extends PureComponent {
       form: { getFieldDecorator },
     } = this.props;
     return (
-      <Form onSubmit={this.handleSearch} layout="inline">
+      <Form onSubmit={this.onClickSearchButton} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="规则名称">
@@ -534,7 +534,7 @@ class TableList extends PureComponent {
       form: { getFieldDecorator },
     } = this.props;
     return (
-      <Form onSubmit={this.handleSearch} layout="inline">
+      <Form onSubmit={this.onClickSearchButton} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="规则名称">
@@ -623,10 +623,10 @@ class TableList extends PureComponent {
 
     const parentMethods = {
       handleAdd: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
+      onClickCreateButton: this.onClickCreateButton,
     };
     const updateMethods = {
-      handleUpdateModalVisible: this.handleUpdateModalVisible,
+      onClickDetailModel: this.onClickDetailButton,
       handleUpdate: this.handleUpdate,
     };
     return (
@@ -635,7 +635,7 @@ class TableList extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+              <Button icon="plus" type="primary" onClick={() => this.onClickCreateButton(true)}>
                 新建
               </Button>
               {selectedRows.length > 0 && (
@@ -654,7 +654,7 @@ class TableList extends PureComponent {
               loading={loading}
               data={data}
               columns={this.columns}
-              onSelectRow={this.handleSelectRows}
+              onSelectRow={this.onSelectRows}
               onChange={this.handleStandardTableChange}
             />
           </div>
