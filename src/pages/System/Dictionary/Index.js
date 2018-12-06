@@ -24,16 +24,13 @@ import {
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+
 import EditModal from './Modal/EditModal'
 import CreateModal from './Modal/CreateModal'
-
-import styles from './Index.less';
 import DetailModal from "./Modal/DetailModal";
+import styles from './Index.less';
 
-const getValue = obj =>
-    Object.keys(obj)
-        .map(key => obj[key])
-        .join(',');
+import Sup from "@/utils/supplement";
 
 const Expand = {
     // 标题
@@ -488,7 +485,7 @@ export default class Index extends PureComponent {
 
                 const filters = Object.keys(filtersArg).reduce((obj, key) => {
                     const newObj = {...obj};
-                    newObj[key] = getValue(filtersArg[key]);
+                    newObj[key] = Sup().JSON.toString(filtersArg[key], ',');
                     return newObj;
                 }, {});
 
