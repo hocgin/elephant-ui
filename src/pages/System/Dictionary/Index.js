@@ -239,8 +239,7 @@ export default class Index extends PureComponent {
         } = this.state;
         const menu = (
             <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-                <Menu.Item key="remove">删除</Menu.Item>
-                <Menu.Item key="approval">批量审批</Menu.Item>
+                <Menu.Item key="remove">批量删除</Menu.Item>
             </Menu>
         );
         return (
