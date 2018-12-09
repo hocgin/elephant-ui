@@ -16,3 +16,10 @@ export async function remove(params){
         },
     });
 }
+
+/**
+ * 查询单条
+ */
+export async function fetch(params) {
+    return request(`/api/dictionary/1`);
+}

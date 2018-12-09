@@ -379,7 +379,7 @@ class TableList extends PureComponent {
     const { form, dispatch } = this.props;
     form.resetFields();
     this.setState({
-      formValues: {},
+      createModalValues: {},
     });
     dispatch({
       type: 'rule/fetch',
@@ -438,7 +438,7 @@ class TableList extends PureComponent {
       };
 
       this.setState({
-        formValues: values,
+        createModalValues: values,
       });
 
       dispatch({
@@ -457,7 +457,7 @@ class TableList extends PureComponent {
   handleUpdateModalVisible = (flag, record) => {
     this.setState({
       updateModalVisible: !!flag,
-      stepFormValues: record || {},
+      editModalValues: record || {},
     });
   };
 

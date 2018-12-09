@@ -1,6 +1,7 @@
 import {
     query,
-    remove
+    remove,
+    fetch,
 } from '@/services/dictionary';
 import {message} from "antd";
 
@@ -15,7 +16,7 @@ export default {
     },
 
     effects: {
-        * query({payload}, {call, put}) {
+        *query({payload}, {call, put}) {
             const result = yield call(query, payload);
             console.log('result', result);
             yield put({
@@ -33,7 +34,16 @@ export default {
                 callback();
             }
         },
-        * fetch(_, {call, put}) {
+        *fetch({payload, callback}, {call, put}) {
+            const result = yield call(fetch, payload);
+            console.log(result);
+            if (result.code !== 200) {
+                message.error(result.message);
+                return;
+            }
+            if (callback) {
+                callback(result.data);
+            }
         },
     },
 

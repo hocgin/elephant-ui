@@ -1,4 +1,3 @@
-
 const ok = (data) => {
     return {
         code: 200,
@@ -273,13 +272,33 @@ export default {
             },
         }));
     },
+    'GET /api/dictionary/1': (req, res) => {
+        const data = ok({
+            id: Math.random(),
+            label: "gender",
+            describe: "性别",
+            default: 2,
+            list: [
+                {
+                    key: 1,
+                    value: "女"
+                }, {
+                    key: 2,
+                    value: "男"
+                }
+            ]
+        });
+
+        setTimeout(() => {
+            res.json(data);
+        }, 1000);
+    },
     'DELETE /api/dictionary': (req, res) => {
         console.log('DELETE', ok(null));
         setTimeout(() => {
             res.json(ok(null));
         }, 1000);
     }
-
 
 
 };

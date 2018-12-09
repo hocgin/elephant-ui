@@ -52,19 +52,38 @@ const Expand = {
         return {
             $example() {
             },
-            // 查询
-            $query(params) {
+            /**
+             * 查询
+             * @param params
+             * @param callback 回调
+             */
+            $query(params, callback) {
                 dispatch({
                     type: 'dictionary/query',
                     payload: {
                         ...params
                     },
+                    callback
+                });
+            },
+            /**
+             * 详情
+             * @param params
+             * @param callback 回调
+             */
+            $fetch(params, callback) {
+                dispatch({
+                    type: `dictionary/fetch`,
+                    payload: {
+                        ...params
+                    },
+                    callback
                 });
             },
             /**
              * 删除
              * @param id [] 要删除的ID
-             * @param callback
+             * @param callback 回调
              */
             $remove(id, callback) {
                 dispatch({
@@ -72,24 +91,35 @@ const Expand = {
                     payload: {
                         id: id,
                     },
-                    callback: callback,
+                    callback,
                 });
             },
-            $add(param) {
+            /**
+             * 新增
+             * @param param
+             * @param callback 回调
+             */
+            $add(param, callback) {
                 dispatch({
                     type: 'dictionary/add',
                     payload: {
                         ...param
                     },
+                    callback
                 });
             },
-            $update(id, param) {
+            /**
+             * 更新
+             * @param param
+             * @param callback 回调
+             */
+            $update(param, callback) {
                 dispatch({
                     type: 'dictionary/update',
                     payload: {
-                        id,
                         ...param
                     },
+                    callback
                 });
             }
         };
@@ -122,9 +152,12 @@ export default class Index extends PureComponent {
         // 选中的行
         selectedRows: [],
 
-        formValues: {},
-        // 新建临时保存的值
-        stepFormValues: {},
+        // 创建弹窗的值
+        // createModalValues: {},
+        // 编辑弹窗的值
+        editModalValues: {},
+        // 详情弹窗的值
+        detailModalValues: {},
     };
 
     // 字段
@@ -149,7 +182,7 @@ export default class Index extends PureComponent {
                 const menu = (
                     <Menu>
                         <Menu.Item key="remove" onClick={() => this.onClickDeleteButton(record)}>删除</Menu.Item>
-                        <Menu.Item key="edit">修改</Menu.Item>
+                        <Menu.Item key="edit" onClick={() => this.onClickEditButton(true, record)}>修改</Menu.Item>
                         <Menu.Item key="on">启用</Menu.Item>
                         <Menu.Item key="off">禁用</Menu.Item>
                     </Menu>
@@ -232,7 +265,9 @@ export default class Index extends PureComponent {
             createModalVisible,
             editModalVisible,
             detailModalVisible,
-            stepFormValues
+
+            editModalValues,
+            detailModalValues,
         } = this.state;
         const menu = (
             <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
@@ -277,21 +312,17 @@ export default class Index extends PureComponent {
                              onModalVisible={this.onClickCreateButton}
                              onDone={this.methods().handleAdd}/>
                 {/*更新弹窗*/}
-                {/*{stepFormValues && Object.keys(stepFormValues).length ? (*/}
-                {/*<EditModal visible={modalVisible}*/}
-                {/*onModalVisible={this.handleModalVisible}*/}
-                {/*onDone={this.handleAdd}/>*/}
-                {/*) : null}{(*/}
-                <EditModal visible={editModalVisible}
-                           onModalVisible={this.onClickEditButton}
-                           onDone={this.methods().handleUpdate}
-                           values={stepFormValues}/>
-                <DetailModal
-                    visible={detailModalVisible}
-                    onModalVisible={this.onClickDetailButton}
-                    onDone={this.methods().handleUpdate}
-                    values={stepFormValues}
-                />
+                {editModalValues && Object.keys(editModalValues).length ?
+                    <EditModal visible={editModalVisible}
+                               onModalVisible={this.onClickEditButton}
+                               onDone={this.methods().handleUpdate}
+                               values={editModalValues}/> : null}
+                {/*详情弹窗*/}
+                {detailModalValues && Object.keys(detailModalValues).length ?
+                    <DetailModal
+                        visible={detailModalVisible}
+                        onModalVisible={this.onClickDetailButton}
+                        values={detailModalValues}/> : null}
             </PageHeaderWrapper>
         );
     }
@@ -307,7 +338,7 @@ export default class Index extends PureComponent {
              * @param fields
              */
             handleAdd(fields) {
-                that.props.add(fields.desc);
+                that.props.$add(fields.desc);
 
                 message.success('添加成功');
                 that.onClickCreateButton();
@@ -317,7 +348,7 @@ export default class Index extends PureComponent {
              * @param fields
              */
             handleUpdate(fields) {
-                that.props.update({
+                that.props.$update({
                     name: fields.name,
                     desc: fields.desc,
                     key: fields.key,
@@ -472,7 +503,7 @@ export default class Index extends PureComponent {
                 const {form} = that.props;
                 form.resetFields();
                 that.setState({
-                    formValues: {},
+                    createModalValues: {},
                 });
                 that.props.$query({});
             },
@@ -481,7 +512,7 @@ export default class Index extends PureComponent {
              * 处理标题条件变更, 如[排序, 过滤]
              */
             handleStandardTableChange(pagination, filtersArg, sorter) {
-                const {formValues} = that.state;
+                const {createModalValues} = that.state;
 
                 const filters = Object.keys(filtersArg).reduce((obj, key) => {
                     const newObj = {...obj};
@@ -492,7 +523,7 @@ export default class Index extends PureComponent {
                 const params = {
                     currentPage: pagination.current,
                     pageSize: pagination.pageSize,
-                    ...formValues,
+                    ...createModalValues,
                     ...filters,
                 };
                 if (sorter.field) {
@@ -554,7 +585,7 @@ export default class Index extends PureComponent {
                     };
 
                     that.setState({
-                        formValues: values,
+                        createModalValues: values,
                     });
                     that.props.$query(values);
                 });
@@ -568,11 +599,19 @@ export default class Index extends PureComponent {
                 });
             },
             /**
-             * 处理[配置]按钮的点击
+             * 处理[详情]按钮的点击
              */
             onClickDetailButton(flag, record) {
                 if (record) {
-                    console.log('发送详情请求', record.id);
+                    const {$fetch} = that.props;
+                    that.setState({
+                        detailModalValues: {}
+                    });
+                    $fetch({id: record.id}, (data) => {
+                        that.setState({
+                            detailModalValues: data
+                        });
+                    });
                 }
                 that.setState({
                     detailModalVisible: !!flag
@@ -582,8 +621,17 @@ export default class Index extends PureComponent {
              * 处理[修改]按钮的点击
              */
             onClickEditButton(flag, record) {
+                console.log('修改？', record);
                 if (record) {
-                    console.log('发送修改请求', record.id);
+                    const {$fetch} = that.props;
+                    that.setState({
+                        editModalValues: {}
+                    });
+                    $fetch({id: record.id}, (data) => {
+                        that.setState({
+                            editModalValues: data
+                        });
+                    });
                 }
                 that.setState({
                     editModalVisible: !!flag

@@ -30,7 +30,7 @@ export default class EditModal extends PureComponent {
      * 步骤渲染
      */
     steps = () => {
-        const {step, formValue} = this.state;
+        const {step} = this.state;
         const {form, onModalVisible} = this.props;
         const that = this;
 
@@ -135,6 +135,9 @@ export default class EditModal extends PureComponent {
         const {backward, forward} = this.listener();
         this.forward = forward;
         this.backward = backward;
+
+        const {renderContent} = this.rendering();
+        this.renderContent = renderContent;
     }
 
     /**
@@ -144,7 +147,7 @@ export default class EditModal extends PureComponent {
      */
     render() {
         const {visible, onModalVisible} = this.props;
-        const {step, form} = this.state;
+        const {step} = this.state;
         return (<Modal
             width={640}
             bodyStyle={{padding: '32px 40px 48px'}}
@@ -154,12 +157,7 @@ export default class EditModal extends PureComponent {
             footer={this.steps()[step].footer()}
             onCancel={() => onModalVisible()}
         >
-            <Steps style={{marginBottom: 28}} size="small" current={step}>
-                {this.steps().map((step, index) => {
-                    return step.title(index);
-                })}
-            </Steps>
-            {this.steps()[step].content()}
+            {this.renderContent()}
         </Modal>);
     }
 
@@ -200,7 +198,20 @@ export default class EditModal extends PureComponent {
      */
     rendering = () => {
         const that = this;
-        return {};
+        return {
+            renderContent() {
+                const {values} = that.props;
+                const {step} = this.state;
+                return ([
+                    <Steps key={1} style={{marginBottom: 28}} size="small" current={step}>
+                        {that.steps().map((step, index) => {
+                            return step.title(index);
+                        })}
+                    </Steps>,
+                    that.steps()[step].content()
+                ]);
+            }
+        };
     };
 
     /**

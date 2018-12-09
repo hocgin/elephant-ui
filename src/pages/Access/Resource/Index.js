@@ -508,9 +508,9 @@ class Index extends PureComponent {
         updateModalVisible: false,
         expandForm: false,
         selectedRows: [],
-        formValues: {},
+        createModalValues: {},
         // 新建临时保存的值
-        stepFormValues: {},
+        editModalValues: {},
     };
 
     // 字段
@@ -617,7 +617,7 @@ class Index extends PureComponent {
         const {form} = this.props;
         form.resetFields();
         this.setState({
-            formValues: {},
+            createModalValues: {},
         });
         this.props.query({});
     };
@@ -680,7 +680,7 @@ class Index extends PureComponent {
             };
 
             this.setState({
-                formValues: values,
+                createModalValues: values,
             });
             this.props.query(values);
         });
@@ -704,7 +704,7 @@ class Index extends PureComponent {
     handleUpdateModalVisible = (flag, record) => {
         this.setState({
             updateModalVisible: !!flag,
-            stepFormValues: record || {},
+            editModalValues: record || {},
         });
     };
 
