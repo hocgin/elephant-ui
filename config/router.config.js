@@ -276,7 +276,7 @@ export default [
                     name: "角色管理",
                     component: './Access/Role/Index',
                     path: "/access/role"
-                },{
+                }, {
                     name: "资源管理",
                     component: './Access/Resource/Index',
                     path: "/access/resource"
@@ -291,11 +291,11 @@ export default [
                     component: './System/Dictionary/Index',
                     path: "/system/dictionary"
                 },
-                //     {
-                //     name: "变量配置",
-                //     component: './System/Property/Index',
-                //     path: "/system/property"
-                // }
+                    //     {
+                    //     name: "变量配置",
+                    //     component: './System/Property/Index',
+                    //     path: "/system/property"
+                    // }
                 ]
             },
             {

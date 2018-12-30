@@ -1,17 +1,11 @@
-const ok = (data) => {
-    return {
-        code: 200,
-        message: "ok",
-        data: data
-    }
-};
+import {success} from "./utils/result";
 
 export default {
     /**
      * 用户菜单资源
      */
     'GET /api/user/menu': (req, res) => {
-        return res.json(ok([{
+        return res.json(success([{
             icon: "dashboard",
             locale: "menu.dashboard",
             name: "dashboard",
@@ -203,7 +197,7 @@ export default {
      * - status [禁用/启用]
      */
     'GET /api/role': (req, res) => {
-        return res.json(ok({
+        return res.json(success({
             list: [{
                 id: 1,
                 name: "管理员",
@@ -231,7 +225,7 @@ export default {
         } = params;
 
 
-        return res.json(ok([{
+        return res.json(success([{
             id: 1,
             name: "仪表盘",
             uri: "/dashboard",
@@ -253,7 +247,7 @@ export default {
 
     'GET /api/dictionary': (req, res) => {
         const {query: {params}} = req;
-        return res.json(ok({
+        return res.json(success({
             list: [{
                 id: 1,
                 label: "gender",
@@ -273,7 +267,7 @@ export default {
         }));
     },
     'GET /api/dictionary/1': (req, res) => {
-        const data = ok({
+        const data = success({
             id: Math.random(),
             label: "gender",
             describe: "性别",
@@ -294,11 +288,9 @@ export default {
         }, 1000);
     },
     'DELETE /api/dictionary': (req, res) => {
-        console.log('DELETE', ok(null));
+        console.log('DELETE', success(null));
         setTimeout(() => {
-            res.json(ok(null));
+            res.json(success(null));
         }, 1000);
     }
-
-
 };
