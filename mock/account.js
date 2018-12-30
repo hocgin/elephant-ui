@@ -1,10 +1,10 @@
-import {success} from "./utils/result";
+import { success } from './utils/result';
 
 /**
  * 账号相关
  */
 export default {
-    'POST /account/login': (req, res) => {
-        return res(success());
-    }
-}
+  'POST /account/login': (req, res) => {
+    return res.json(success());
+  },
+};

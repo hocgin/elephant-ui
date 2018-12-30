@@ -182,7 +182,7 @@ class Register extends Component {
         <h3>
           <FormattedMessage id="app.register.register" />
         </h3>
-        <Form onSubmit={this.handleSubmit}>
+        <Form onSubmit={this.onSubmit}>
           <FormItem>
             {getFieldDecorator('mail', {
               rules: [

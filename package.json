@@ -1,5 +1,5 @@
 {
-  "name": "ant-design-pro",
+  "name": "manager-ui",
   "version": "2.1.0",
   "description": "An out-of-box UI solution for enterprise applications",
   "private": true,
@@ -27,6 +27,7 @@
   "dependencies": {
     "@antv/data-set": "^0.9.6",
     "@babel/runtime": "^7.1.2",
+    "ant-design-pro": "^2.1.1",
     "antd": "^3.10.0",
     "bizcharts": "^3.2.2",
     "bizcharts-plugin-slider": "^2.0.3",

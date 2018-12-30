@@ -100,7 +100,7 @@ class Login extends Component {
     return (
       <LoginContext.Provider value={this.getContext()}>
         <div className={classNames(className, styles.login)}>
-          <Form onSubmit={this.handleSubmit}>
+          <Form onSubmit={this.onSubmit}>
             {tabs.length ? (
               <React.Fragment>
                 <Tabs
