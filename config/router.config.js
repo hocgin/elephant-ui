@@ -267,6 +267,16 @@ export default [
                     path: "/test/data-table"
                 }]
             },
+            {
+                icon: "warning",
+                name: "测试专用2",
+                path: "/template",
+                routes: [{
+                    name: "例子",
+                    component: './.Template/Index',
+                    path: "/template/index"
+                }]
+            },
             // test
             {
                 icon: "warning",
