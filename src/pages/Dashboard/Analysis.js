@@ -70,9 +70,10 @@ class Analysis extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     this.reqRef = requestAnimationFrame(() => {
-      dispatch({
-        type: 'chart/fetch',
-      });
+      // todo 暂时关闭
+      // dispatch({
+      //   type: 'chart/fetch',
+      // });
       this.timeoutId = setTimeout(() => {
         this.setState({
           loading: false,
