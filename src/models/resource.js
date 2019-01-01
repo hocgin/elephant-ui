@@ -23,7 +23,7 @@ export default {
             }
         },
         // 新增资源
-        * save({payload, callback}, {call, put}) {
+        * save({payload}, {call, put}) {
             const {code, message, data} = yield call(insert, payload);
             if (code === 200) {
                 // 发送刷新请求
