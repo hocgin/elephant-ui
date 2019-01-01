@@ -1,19 +1,37 @@
-import { PureComponent } from 'react';
+import React, { PureComponent } from 'react';
+import { Form, Select, Button, Modal, Steps, TreeSelect, Switch, Icon, Input } from 'antd';
+import { connect } from 'dva';
+import getIcons from '@/services/data';
 
+const type = () => {
+  return [
+    {
+      value: 0,
+      text: '菜单',
+    },
+    {
+      value: 1,
+      text: '按钮',
+    },
+  ];
+};
 /**
  * 新增弹窗
- * - visible 是否可见
- * - value 更新时携带的原值
- * - onModalVisible 取消时触发
- * - onDone 完成时触发
  */
+@connect(({ resource, loading }) => ({
+  nodes: resource.result,
+  // data 数据的加载状态
+  loading: loading.models.result,
+}))
 @Form.create()
-class CreateModal extends PureComponent {
+export default class CreateModal extends PureComponent {
   state = {
     // 当前步骤
-    step: 0,
+    step: 1,
     // 待提交的值
     formValue: {},
+    // 可选节点
+    nodes: [],
   };
   formLayout = {
     labelCol: { span: 7 },
@@ -24,9 +42,6 @@ class CreateModal extends PureComponent {
     super(props);
     /**
      * 挂载函数
-     * - methods() =>
-     * - rendering() => renderXX
-     * - listener() => onXX
      */
     [this.methods(), this.rendering(), this.listener()]
       .map(item => {
@@ -40,20 +55,27 @@ class CreateModal extends PureComponent {
       .forEach(func => {
         this[func.name] = func;
       });
+    console.log(this.props);
+  }
+
+  /**
+   * @组件挂载后
+   */
+  componentDidMount() {
+    console.log('请求数据');
   }
 
   render() {
-    const { visible, onModalVisible } = this.props;
-    const { step, form } = this.state;
+    const { visible, nodes } = this.props;
+    const { step } = this.state;
     return (
       <Modal
         width={640}
         bodyStyle={{ padding: '32px 40px 48px' }}
         destroyOnClose
-        title="规则配置"
+        title="新增资源"
         visible={visible}
         footer={this.renderSteps()[step].footer()}
-        onCancel={() => onModalVisible()}
       >
         <Steps style={{ marginBottom: 28 }} size="small" current={step}>
           {this.renderSteps().map((step, index) => {
@@ -65,7 +87,7 @@ class CreateModal extends PureComponent {
     );
   }
 
-  methods = () => {
+  methods() {
     const that = this;
     return {
       // 分步面板, 下一步 ->
@@ -83,38 +105,34 @@ class CreateModal extends PureComponent {
         that.setState({ step });
       },
     };
-  };
+  }
 
-  rendering = () => {
+  rendering() {
     const that = this;
     return {
       // 渲染步骤内容
       renderSteps() {
-        const { step, formValue } = that.state;
-        const { form, onModalVisible } = that.props;
-
+        const { step } = that.state;
+        const { form, onCancel, nodes } = that.props;
         return [
           {
             title(key = '') {
-              return <Steps.Step key={key} title="基本信息" />;
+              return <Steps.Step key={key} title="选择父节点" />;
             },
             content() {
               return [
-                <Form.Item key="target" {...that.formLayout} label="监控对象">
+                <Form.Item key="target" {...that.formLayout} label="父节点">
                   {form.getFieldDecorator('target', {
-                    initialValue: 1,
+                    initialValue: nodes.length ? nodes[0].id : '',
                   })(
-                    <Select style={{ width: '100%' }}>
-                      <Select.Option value="0">表一</Select.Option>
-                      <Select.Option value="1">表二</Select.Option>
-                    </Select>
+                    <TreeSelect style={{ width: '100%' }}>{that.renderTreeNode(nodes)}</TreeSelect>
                   )}
                 </Form.Item>,
               ];
             },
             footer() {
               return [
-                <Button key="cancel" onClick={() => onModalVisible()}>
+                <Button key="cancel" onClick={() => onCancel()}>
                   取消
                 </Button>,
                 <Button key="forward" type="primary" onClick={() => that.onClickNext(step)}>
@@ -125,18 +143,81 @@ class CreateModal extends PureComponent {
           },
           {
             title(key = '') {
-              return <Steps.Step key={key} title="配置规则属性" />;
+              return <Steps.Step key={key} title="基本信息" />;
             },
             content() {
               return [
-                <Form.Item key="target" {...that.formLayout} label="监控对象">
-                  {form.getFieldDecorator('target', {
-                    initialValue: 1,
+                <Form.Item key="1" {...that.formLayout} label="名称">
+                  {form.getFieldDecorator('name', {
+                    rules: [{ required: true, message: '请输入资源名称' }],
+                  })(<Input style={{ width: '100%' }} />)}
+                </Form.Item>,
+                <Form.Item key="2" {...that.formLayout} label="类型">
+                  {form.getFieldDecorator('type', {
+                    rules: [{ required: true, message: '请选择资源类型' }],
+                    initialValue: 0,
                   })(
                     <Select style={{ width: '100%' }}>
-                      <Select.Option value="0">表一</Select.Option>
-                      <Select.Option value="1">表二</Select.Option>
+                      {type().map((item, index) => {
+                        return (
+                          <Select.Option key={index} value={item.value}>
+                            {item.text}
+                          </Select.Option>
+                        );
+                      })}
                     </Select>
+                  )}
+                </Form.Item>,
+                <Form.Item key="4" {...that.formLayout} label="请求">
+                  {form.getFieldDecorator('uri', {
+                    rules: [{ required: true, message: '请输入请求URI' }],
+                  })(
+                    <Input
+                      style={{ width: '100%' }}
+                      addonBefore={form.getFieldDecorator('method', {
+                        rules: [{ required: true, message: '请选择请求类型' }],
+                        initialValue: 'GET',
+                      })(
+                        <Select>
+                          {['GET', 'POST', 'DELETE', 'PUT'].map((method, index) => {
+                            return (
+                              <Select.Option key={index} value={method}>
+                                {method}
+                              </Select.Option>
+                            );
+                          })}
+                        </Select>
+                      )}
+                    />
+                  )}
+                </Form.Item>,
+                <Form.Item key="5" {...that.formLayout} label="图标">
+                  {form.getFieldDecorator('icon', {
+                    rules: [{ required: true, message: '请选择图标' }],
+                    initialValue: 'down',
+                  })(
+                    <Select
+                      style={{ width: '100%' }}
+                      showSearch
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        option.props.value.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      }
+                      placeholder="选择图标"
+                    >
+                      {that.renderIconOptions()}
+                    </Select>
+                  )}
+                </Form.Item>,
+                <Form.Item key="6" {...that.formLayout} label="状态">
+                  {form.getFieldDecorator('status', {
+                    rules: [{ required: true, message: '请选择状态' }],
+                    valuePropName: 'checked',
+                  })(<Switch checkedChildren="开" unCheckedChildren="关" defaultChecked />)}
+                </Form.Item>,
+                <Form.Item key="7" {...that.formLayout} label="描述">
+                  {form.getFieldDecorator('description', {})(
+                    <Input style={{ width: '100%' }} rows={4} />
                   )}
                 </Form.Item>,
               ];
@@ -146,7 +227,7 @@ class CreateModal extends PureComponent {
                 <Button key="back" style={{ float: 'left' }} onClick={that.backward}>
                   上一步
                 </Button>,
-                <Button key="cancel" onClick={() => onModalVisible()}>
+                <Button key="cancel" onClick={() => onCancel()}>
                   取消
                 </Button>,
                 <Button key="forward" type="primary" onClick={() => that.onClickNext(step)}>
@@ -178,7 +259,7 @@ class CreateModal extends PureComponent {
                 <Button key="back" style={{ float: 'left' }} onClick={that.backward}>
                   上一步
                 </Button>,
-                <Button key="cancel" onClick={() => onModalVisible()}>
+                <Button key="cancel" onClick={() => onCancel()}>
                   取消
                 </Button>,
                 <Button key="submit" type="primary" onClick={() => that.onClickNext(step)}>
@@ -189,10 +270,37 @@ class CreateModal extends PureComponent {
           },
         ];
       },
-    };
-  };
+      /**
+       * 渲染树级节点
+       * @param nodes
+       * @returns {any[]}
+       */
+      renderTreeNode(nodes) {
+        return (nodes || []).map(node => {
+          return (
+            <TreeSelect.TreeNode title={node.name} key={node.id} value={node.id}>
+              {node.children && node.children.length ? that.renderTreeNode(node.children) : null}
+            </TreeSelect.TreeNode>
+          );
+        });
+      },
 
-  listener = () => {
+      /**
+       * 渲染待选择图标
+       */
+      renderIconOptions() {
+        return (getIcons() || []).map((icon, index) => {
+          return (
+            <Select.Option key={index} value={icon}>
+              <Icon type={icon} /> {icon}
+            </Select.Option>
+          );
+        });
+      },
+    };
+  }
+
+  listener() {
     const that = this;
     return {
       // 点击 下一页 触发
@@ -212,5 +320,5 @@ class CreateModal extends PureComponent {
         });
       },
     };
-  };
+  }
 }

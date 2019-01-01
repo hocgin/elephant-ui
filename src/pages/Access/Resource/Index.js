@@ -12,19 +12,13 @@ import {
   Button,
   Dropdown,
   Menu,
-  InputNumber,
   DatePicker,
-  Modal,
-  message,
   Badge,
   Divider,
-  Steps,
-  Radio,
-  Switch,
   Tree,
 } from 'antd';
-import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import CreateModal from './Modal/CreateModal';
 
 import styles from './Index.less';
 
@@ -154,8 +148,8 @@ export default class Index extends PureComponent {
   }
 
   render() {
-    const { result, loading } = this.props;
-    const { selectedRows } = this.state;
+    const { result } = this.props;
+    const { selectedRows, createModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.onClickMenus} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
@@ -171,7 +165,13 @@ export default class Index extends PureComponent {
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             {/*工具栏(新建/批量操作)层*/}
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.onClickCreateButton(true)}>
+              <Button
+                icon="plus"
+                type="primary"
+                onClick={() => {
+                  this.onShow('createModalVisible');
+                }}
+              >
                 新建
               </Button>
               {selectedRows.length > 0 && (
@@ -197,6 +197,12 @@ export default class Index extends PureComponent {
             </Tree>
           </div>
         </Card>
+        <CreateModal
+          visible={createModalVisible}
+          onCancel={() => {
+            this.onHidden('createModalVisible');
+          }}
+        />
       </PageHeaderWrapper>
     );
   }
@@ -350,6 +356,7 @@ export default class Index extends PureComponent {
     const that = this;
     return {
       onShow(key) {
+        console.log(key, 'show');
         that.setState({
           [key]: true,
         });
