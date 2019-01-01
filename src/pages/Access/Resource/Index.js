@@ -16,6 +16,7 @@ import {
   Badge,
   Divider,
   Tree,
+  message,
 } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import CreateModal from './Modal/CreateModal';
@@ -148,7 +149,7 @@ export default class Index extends PureComponent {
   }
 
   render() {
-    const { result } = this.props;
+    const { result, dispatch } = this.props;
     const { selectedRows, createModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.onClickMenus} selectedKeys={[]}>
@@ -186,11 +187,11 @@ export default class Index extends PureComponent {
               )}
             </div>
             <Tree
+              showIcon
               multiple
-              defaultExpandAll
               onSelect={this.onSelectTreeNodeRow}
               onRightClick={({ event, node }) => {
-                console.log(arguments);
+                console.log('右键点击');
               }}
             >
               {this.renderTreeNode(result)}
@@ -202,6 +203,16 @@ export default class Index extends PureComponent {
           nodes={result}
           onCancel={() => {
             this.onHidden('createModalVisible');
+          }}
+          onDone={formVals => {
+            dispatch({
+              type: 'resource/save',
+              payload: formVals,
+              callback: () => {
+                this.onHidden('createModalVisible');
+                message.success('新增成功');
+              },
+            });
           }}
         />
       </PageHeaderWrapper>
@@ -236,7 +247,7 @@ export default class Index extends PureComponent {
       renderTreeNode(nodes) {
         return (nodes || []).map(node => {
           return (
-            <Tree.TreeNode title={node.name} key={node.id}>
+            <Tree.TreeNode title={node.name} key={node.id} icon={<Icon type={node.icon} />}>
               {node.children && node.children.length ? that.renderTreeNode(node.children) : null}
             </Tree.TreeNode>
           );

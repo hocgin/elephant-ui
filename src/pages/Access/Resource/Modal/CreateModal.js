@@ -19,7 +19,6 @@ const type = () => {
  * 新增弹窗
  */
 @connect(({ resource, loading }) => ({
-  // nodes: resource.result,
   // data 数据的加载状态
   submitting: loading.effects['resource/save'],
 }))
@@ -30,8 +29,6 @@ export default class CreateModal extends PureComponent {
     step: 0,
     // 待提交的值
     formVals: {},
-    // 可选节点
-    nodes: [],
   };
   formLayout = {
     labelCol: { span: 7 },
@@ -55,18 +52,15 @@ export default class CreateModal extends PureComponent {
       .forEach(func => {
         this[func.name] = func;
       });
-    console.log(this.props);
   }
 
   /**
    * @组件挂载后
    */
-  componentDidMount() {
-    console.log('请求数据');
-  }
+  componentDidMount() {}
 
   render() {
-    const { visible, nodes } = this.props;
+    const { visible } = this.props;
     const { step } = this.state;
     return (
       <Modal
@@ -123,7 +117,7 @@ export default class CreateModal extends PureComponent {
               return [
                 <Form.Item key="parent" {...that.formLayout} label="父节点">
                   {form.getFieldDecorator('parent', {
-                    initialValue: nodes.length ? nodes[0].id : '',
+                    initialValue: nodes.length ? nodes[0].id : null,
                   })(
                     <TreeSelect style={{ width: '100%' }}>{that.renderTreeNode(nodes)}</TreeSelect>
                   )}
@@ -170,7 +164,7 @@ export default class CreateModal extends PureComponent {
                 </Form.Item>,
                 <Form.Item key="4" {...that.formLayout} label="请求" hasFeedback>
                   {form.getFieldDecorator('path', {
-                    rules: [{ required: true, message: '请输入请求链接' }],
+                    rules: [{ required: true, message: '请输入链接' }],
                   })(
                     <Input
                       style={{ width: '100%' }}
@@ -191,7 +185,7 @@ export default class CreateModal extends PureComponent {
                     />
                   )}
                 </Form.Item>,
-                <Form.Item key="5" {...that.formLayout} label="图标" hasFeedback>
+                <Form.Item key="5" {...that.formLayout} label="图标">
                   {form.getFieldDecorator('icon', {
                     rules: [{ required: true, message: '请选择图标' }],
                     initialValue: 'down',
@@ -281,7 +275,7 @@ export default class CreateModal extends PureComponent {
     return {
       // 点击 下一页 触发
       onClickNext(step) {
-        const { form, dispatch } = that.props;
+        const { form, onDone } = that.props;
         const { formVals: oldValue } = that.state;
         form.validateFields((err, fieldsValue) => {
           if (err) return;
@@ -291,10 +285,7 @@ export default class CreateModal extends PureComponent {
               that.forward();
             } else {
               // 保存
-              dispatch({
-                type: 'resource/save',
-                payload: formVals,
-              });
+              onDone(formVals);
             }
           });
         });
