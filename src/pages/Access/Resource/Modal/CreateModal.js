@@ -19,17 +19,17 @@ const type = () => {
  * 新增弹窗
  */
 @connect(({ resource, loading }) => ({
-  nodes: resource.result,
+  // nodes: resource.result,
   // data 数据的加载状态
-  loading: loading.models.result,
+  submitting: loading.effects['resource/save'],
 }))
 @Form.create()
 export default class CreateModal extends PureComponent {
   state = {
     // 当前步骤
-    step: 1,
+    step: 0,
     // 待提交的值
-    formValue: {},
+    formVals: {},
     // 可选节点
     nodes: [],
   };
@@ -113,7 +113,7 @@ export default class CreateModal extends PureComponent {
       // 渲染步骤内容
       renderSteps() {
         const { step } = that.state;
-        const { form, onCancel, nodes } = that.props;
+        const { form, onCancel, nodes, submitting } = that.props;
         return [
           {
             title(key = '') {
@@ -121,8 +121,8 @@ export default class CreateModal extends PureComponent {
             },
             content() {
               return [
-                <Form.Item key="target" {...that.formLayout} label="父节点">
-                  {form.getFieldDecorator('target', {
+                <Form.Item key="parent" {...that.formLayout} label="父节点">
+                  {form.getFieldDecorator('parent', {
                     initialValue: nodes.length ? nodes[0].id : '',
                   })(
                     <TreeSelect style={{ width: '100%' }}>{that.renderTreeNode(nodes)}</TreeSelect>
@@ -147,7 +147,7 @@ export default class CreateModal extends PureComponent {
             },
             content() {
               return [
-                <Form.Item key="1" {...that.formLayout} label="名称">
+                <Form.Item key="1" {...that.formLayout} label="名称" hasFeedback>
                   {form.getFieldDecorator('name', {
                     rules: [{ required: true, message: '请输入资源名称' }],
                   })(<Input style={{ width: '100%' }} />)}
@@ -168,9 +168,9 @@ export default class CreateModal extends PureComponent {
                     </Select>
                   )}
                 </Form.Item>,
-                <Form.Item key="4" {...that.formLayout} label="请求">
-                  {form.getFieldDecorator('uri', {
-                    rules: [{ required: true, message: '请输入请求URI' }],
+                <Form.Item key="4" {...that.formLayout} label="请求" hasFeedback>
+                  {form.getFieldDecorator('path', {
+                    rules: [{ required: true, message: '请输入请求链接' }],
                   })(
                     <Input
                       style={{ width: '100%' }}
@@ -191,7 +191,7 @@ export default class CreateModal extends PureComponent {
                     />
                   )}
                 </Form.Item>,
-                <Form.Item key="5" {...that.formLayout} label="图标">
+                <Form.Item key="5" {...that.formLayout} label="图标" hasFeedback>
                   {form.getFieldDecorator('icon', {
                     rules: [{ required: true, message: '请选择图标' }],
                     initialValue: 'down',
@@ -210,14 +210,17 @@ export default class CreateModal extends PureComponent {
                   )}
                 </Form.Item>,
                 <Form.Item key="6" {...that.formLayout} label="状态">
-                  {form.getFieldDecorator('status', {
-                    rules: [{ required: true, message: '请选择状态' }],
+                  {form.getFieldDecorator('enabled', {
+                    initialValue: true,
                     valuePropName: 'checked',
-                  })(<Switch checkedChildren="开" unCheckedChildren="关" defaultChecked />)}
+                  })(<Switch checkedChildren="开" unCheckedChildren="关" />)}
                 </Form.Item>,
                 <Form.Item key="7" {...that.formLayout} label="描述">
                   {form.getFieldDecorator('description', {})(
-                    <Input style={{ width: '100%' }} rows={4} />
+                    <Input.TextArea
+                      style={{ width: '100%' }}
+                      autosize={{ minRows: 3, maxRows: 6 }}
+                    />
                   )}
                 </Form.Item>,
               ];
@@ -230,39 +233,12 @@ export default class CreateModal extends PureComponent {
                 <Button key="cancel" onClick={() => onCancel()}>
                   取消
                 </Button>,
-                <Button key="forward" type="primary" onClick={() => that.onClickNext(step)}>
-                  下一步
-                </Button>,
-              ];
-            },
-          },
-          {
-            title(key = '') {
-              return <Steps.Step key={key} title="设定调度周期" />;
-            },
-            content() {
-              return [
-                <Form.Item key="target" {...that.formLayout} label="监控对象">
-                  {form.getFieldDecorator('target', {
-                    initialValue: 1,
-                  })(
-                    <Select style={{ width: '100%' }}>
-                      <Select.Option value="0">表一</Select.Option>
-                      <Select.Option value="1">表二</Select.Option>
-                    </Select>
-                  )}
-                </Form.Item>,
-              ];
-            },
-            footer() {
-              return [
-                <Button key="back" style={{ float: 'left' }} onClick={that.backward}>
-                  上一步
-                </Button>,
-                <Button key="cancel" onClick={() => onCancel()}>
-                  取消
-                </Button>,
-                <Button key="submit" type="primary" onClick={() => that.onClickNext(step)}>
+                <Button
+                  key="submit"
+                  type="primary"
+                  loading={submitting}
+                  onClick={() => that.onClickNext(step)}
+                >
                   完成
                 </Button>,
               ];
@@ -305,8 +281,8 @@ export default class CreateModal extends PureComponent {
     return {
       // 点击 下一页 触发
       onClickNext(step) {
-        const { form, onDone } = that.props;
-        const { formValue: oldValue } = that.state;
+        const { form, dispatch } = that.props;
+        const { formVals: oldValue } = that.state;
         form.validateFields((err, fieldsValue) => {
           if (err) return;
           const formVals = { ...oldValue, ...fieldsValue };
@@ -314,7 +290,11 @@ export default class CreateModal extends PureComponent {
             if (step < that.renderSteps().length - 1) {
               that.forward();
             } else {
-              onDone(formVals);
+              // 保存
+              dispatch({
+                type: 'resource/save',
+                payload: formVals,
+              });
             }
           });
         });

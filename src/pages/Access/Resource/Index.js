@@ -199,6 +199,7 @@ export default class Index extends PureComponent {
         </Card>
         <CreateModal
           visible={createModalVisible}
+          nodes={result}
           onCancel={() => {
             this.onHidden('createModalVisible');
           }}

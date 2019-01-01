@@ -10,11 +10,11 @@ export async function query(query) {
   return request(`${uri}${stringify(query)}`);
 }
 
-// export async function operatingPOST(params) {
-//     return request(`/operating`, {
-//         method: 'DELETE',
-//         body: {
-//             ...params
-//         },
-//     });
-// }
+export async function insert(body) {
+  return request(`/resource`, {
+    method: 'POST',
+    body: {
+      ...body,
+    },
+  });
+}
