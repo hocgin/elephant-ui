@@ -30,6 +30,7 @@ let xxStatus = ['开启', '关闭'];
 @Form.create()
 export default class Index extends PureComponent {
   state = {};
+
   constructor(props) {
     super(props);
     /**
@@ -77,6 +78,17 @@ export default class Index extends PureComponent {
    */
   listener = () => {
     const that = this;
-    return {};
+    return {
+      onShow(key) {
+        that.setState({
+          [key]: true,
+        });
+      },
+      onHidden(key) {
+        that.setState({
+          [key]: false,
+        });
+      },
+    };
   };
 }

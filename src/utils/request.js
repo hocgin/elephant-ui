@@ -139,7 +139,6 @@ export default function request(url, option) {
       sessionStorage.removeItem(`${hashcode}:timestamp`);
     }
   }
-  console.log(newOptions);
   return fetch(`${config.API_HOST}${url}`, newOptions)
     .then(checkStatus)
     .then(response => cachedSave(response, hashcode))
