@@ -23,7 +23,6 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import CreateModal from './Modal/CreateModal';
 
 import styles from './Index.less';
-import { Menu } from 'antd/lib/menu';
 
 const status = () => {
   return [
@@ -263,9 +262,10 @@ export default class Index extends PureComponent {
         return (nodes || []).map(node => {
           return (
             <Tree.TreeNode
+              disabled={!node.enabled}
               title={
                 <span>
-                  {node.name} <span>666</span>
+                  {node.name} <span>{node.enabled ? '启用' : '禁用'}</span>
                 </span>
               }
               key={node.id}
@@ -400,22 +400,39 @@ export default class Index extends PureComponent {
           top: `${pageY}px`,
         };
         return (
-          <Menu style={tmpStyle}>
+          <Menu
+            style={tmpStyle}
+            onMouseLeave={() => {
+              that.setState({ rightEvent: null });
+            }}
+          >
             <Menu.Item key="1">
-              <Icon type="plus-circle" />
-              {'加同级'}
+              <Icon type="edit" />
+              {'启用'}
             </Menu.Item>
             <Menu.Item key="2">
-              <Icon type="plus-circle-o" />
-              {'加下级'}
+              <Icon type="edit" />
+              {'禁用'}
             </Menu.Item>
-            <Menu.Item key="4">
+            <Menu.Item key="3">
               <Icon type="edit" />
               {'修改'}
             </Menu.Item>
-            <Menu.Item key="3">
+            <Menu.Item key="4">
+              <Icon type="plus-circle" />
+              {'加同级'}
+            </Menu.Item>
+            <Menu.Item key="5">
+              <Icon type="plus-circle-o" />
+              {'加下级'}
+            </Menu.Item>
+            <Menu.Item key="6">
               <Icon type="minus-circle-o" />
               {'删除目录'}
+            </Menu.Item>
+            <Menu.Item key="7">
+              <Icon type="minus-circle-o" />
+              {'移除该节点'}
             </Menu.Item>
           </Menu>
         );
