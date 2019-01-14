@@ -51,7 +51,10 @@ export default class Index extends PureComponent {
         selectedRows: [],
         // 右键位置
         rightEvent: null,
-        rightNode: null
+        rightNode: null,
+        // 新建时默认节点
+        createDefaultParent: null,
+        createStep: null
     };
 
     constructor(props) {
@@ -86,7 +89,8 @@ export default class Index extends PureComponent {
 
     render() {
         const {result, dispatch} = this.props;
-        const {selectedRows, createModalVisible} = this.state;
+        console.log(result);
+        const {selectedRows, createModalVisible, createDefaultParent} = this.state;
         const menu = (
             <Menu onClick={this.onClickMenus} selectedKeys={[]}>
                 <Menu.Item key="remove">删除</Menu.Item>
@@ -125,13 +129,14 @@ export default class Index extends PureComponent {
                               onSelect={this.onSelectTreeNodeRow}
                               onRightClick={this.onRightClickNode}
                         >
-                            {this.renderTreeNode(result)}
+                            {this.renderTreeNode(null, result)}
                         </Tree>
                     </div>
                 </Card>
-                <CreateModal
+                {result.length > 0 ? <CreateModal
                     visible={createModalVisible}
                     nodes={result}
+                    defaultParent={createDefaultParent}
                     onCancel={() => {
                         this.onHidden('createModalVisible');
                     }}
@@ -145,7 +150,7 @@ export default class Index extends PureComponent {
                             },
                         });
                     }}
-                />
+                /> : null}
                 {this.renderRightPanel()}
             </PageHeaderWrapper>
         );
@@ -153,15 +158,7 @@ export default class Index extends PureComponent {
 
     methods() {
         const that = this;
-        return {
-            getContainer() {
-                if (!this.cmContainer) {
-                    this.cmContainer = document.createElement('div');
-                    document.body.appendChild(this.cmContainer);
-                }
-                return this.cmContainer;
-            }
-        };
+        return {};
     }
 
     rendering() {
@@ -182,22 +179,22 @@ export default class Index extends PureComponent {
              * path: "/"
              * rgt: 12
              * type: 0
+             * @param parent
              * @param nodes
              */
-            renderTreeNode(nodes) {
+            renderTreeNode(parent, nodes) {
                 return (nodes || []).map(node => {
-                    return (
-                        <Tree.TreeNode
-                            disabled={!node.enabled}
-                            title={(<span>
+                    return (<Tree.TreeNode
+                        disabled={!node.enabled}
+                        title={(<span>
                                   {node.name} <span>{node.enabled ? '启用' : '禁用'}</span>
                                 </span>)}
-                            key={node.id}
-                            icon={<Icon type={node.icon}/>}
-                        >
-                            {node.children && node.children.length ? that.renderTreeNode(node.children) : null}
-                        </Tree.TreeNode>
-                    );
+                        key={node.id}
+                        parentKey={parent}
+                        icon={<Icon type={node.icon}/>}
+                    >
+                        {node.children && node.children.length ? that.renderTreeNode(node.id, node.children) : null}
+                    </Tree.TreeNode>);
                 });
             },
             /**
@@ -420,12 +417,24 @@ export default class Index extends PureComponent {
 
                         break;
                     }
-                    case 'appendNode': {
-
+                    case 'appendNode': { // 新建同级节点
+                        const {rightNode} = that.state;
+                        that.setState({
+                            createDefaultParent: rightNode.props.parentKey,
+                            createDefaultStep: 1
+                        }, () => {
+                            that.onShow('createModalVisible');
+                        });
                         break;
                     }
-                    case 'addChild': {
-
+                    case 'addChild': { // 新建子节点
+                        const {rightNode} = that.state;
+                        that.setState({
+                            createDefaultParent: rightNode.props.eventKey,
+                            createDefaultStep: 1
+                        }, () => {
+                            that.onShow('createModalVisible');
+                        });
                         break;
                     }
                     case 'deleteGroup': {

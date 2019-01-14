@@ -107,7 +107,7 @@ export default class CreateModal extends PureComponent {
       // 渲染步骤内容
       renderSteps() {
         const { step } = that.state;
-        const { form, onCancel, nodes, submitting } = that.props;
+        const { form, onCancel, nodes, defaultParent, submitting } = that.props;
         return [
           {
             title(key = '') {
@@ -117,7 +117,7 @@ export default class CreateModal extends PureComponent {
               return [
                 <Form.Item key="parent" {...that.formLayout} label="父节点">
                   {form.getFieldDecorator('parent', {
-                    initialValue: nodes.length ? nodes[0].id : null,
+                    initialValue: (defaultParent != null) ? defaultParent : nodes[0].id,
                   })(
                     <TreeSelect style={{ width: '100%' }}>{that.renderTreeNode(nodes)}</TreeSelect>
                   )}
@@ -166,8 +166,7 @@ export default class CreateModal extends PureComponent {
                   {form.getFieldDecorator('path', {
                     rules: [{ required: true, message: '请输入链接' }],
                   })(
-                    <Input
-                      style={{ width: '100%' }}
+                    <Input style={{ width: '100%' }}
                       addonBefore={form.getFieldDecorator('method', {
                         rules: [{ required: true, message: '请选择请求类型' }],
                         initialValue: 'GET',
