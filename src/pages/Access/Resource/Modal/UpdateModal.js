@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Form, Select, Button, Modal, Steps, TreeSelect, Switch, Icon, Input } from 'antd';
+import { Form, Select, Button, Modal, Steps, TreeSelect, Switch, Icon, Input, Tooltip } from 'antd';
 import { connect } from 'dva';
 import getIcons from '@/services/data';
 
@@ -21,16 +21,18 @@ const type = () => {
 @connect(({ resource, loading }) => ({
   // data 数据的加载状态
   // result: resource.result,
-  submitting: loading.effects['resource/save'],
+  // submitting: loading.effects['resource/save'],
 }))
 @Form.create()
-export default class CreateModal extends PureComponent {
+export default class UpdateModal extends PureComponent {
   state = {
+    id: this.props.id,
     // 当前步骤
-    step: 0,
+    step: 1,
     // 待提交的值
     formVals: {},
   };
+
   formLayout = {
     labelCol: { span: 7 },
     wrapperCol: { span: 13 },
@@ -60,9 +62,17 @@ export default class CreateModal extends PureComponent {
    */
   componentDidMount() {
     const { dispatch } = this.props;
-    // dispatch({
-    //     type: 'resource/query',
-    // });
+    const { id } = this.state;
+    console.log(this.props, this.state);
+    dispatch({
+      type: 'resource/selectOne',
+      payload: {
+        id,
+      },
+      callback: data => {
+        this.setState({ formVals: data });
+      },
+    });
   }
 
   render() {
@@ -73,7 +83,7 @@ export default class CreateModal extends PureComponent {
         width={640}
         bodyStyle={{ padding: '32px 40px 48px' }}
         destroyOnClose
-        title="新增资源"
+        title="更新资源"
         visible={visible}
         footer={this.renderSteps()[step].footer()}
       >
@@ -112,7 +122,7 @@ export default class CreateModal extends PureComponent {
     return {
       // 渲染步骤内容
       renderSteps() {
-        const { step } = that.state;
+        const { step, formVals } = that.state;
         const { form, onCancel, nodes, defaultParent, submitting } = that.props;
         return [
           {
@@ -150,12 +160,13 @@ export default class CreateModal extends PureComponent {
                 <Form.Item key="1" {...that.formLayout} label="名称" hasFeedback>
                   {form.getFieldDecorator('name', {
                     rules: [{ required: true, message: '请输入资源名称' }],
+                    initialValue: formVals.name,
                   })(<Input style={{ width: '100%' }} />)}
                 </Form.Item>,
                 <Form.Item key="2" {...that.formLayout} label="类型">
                   {form.getFieldDecorator('type', {
                     rules: [{ required: true, message: '请选择资源类型' }],
-                    initialValue: 0,
+                    initialValue: formVals.type,
                   })(
                     <Select style={{ width: '100%' }}>
                       {type().map((item, index) => {
@@ -171,12 +182,13 @@ export default class CreateModal extends PureComponent {
                 <Form.Item key="4" {...that.formLayout} label="请求" hasFeedback>
                   {form.getFieldDecorator('path', {
                     rules: [{ required: true, message: '请输入链接' }],
+                    initialValue: formVals.path,
                   })(
                     <Input
                       style={{ width: '100%' }}
                       addonBefore={form.getFieldDecorator('method', {
                         rules: [{ required: true, message: '请选择请求类型' }],
-                        initialValue: 'GET',
+                        initialValue: formVals.method,
                       })(
                         <Select>
                           {['GET', 'POST', 'DELETE', 'PUT'].map((method, index) => {
@@ -194,7 +206,7 @@ export default class CreateModal extends PureComponent {
                 <Form.Item key="5" {...that.formLayout} label="图标">
                   {form.getFieldDecorator('icon', {
                     rules: [{ required: true, message: '请选择图标' }],
-                    initialValue: 'down',
+                    initialValue: formVals.icon,
                   })(
                     <Select
                       style={{ width: '100%' }}
@@ -211,12 +223,14 @@ export default class CreateModal extends PureComponent {
                 </Form.Item>,
                 <Form.Item key="6" {...that.formLayout} label="状态">
                   {form.getFieldDecorator('enabled', {
-                    initialValue: true,
+                    initialValue: formVals.enabled,
                     valuePropName: 'checked',
                   })(<Switch checkedChildren="开" unCheckedChildren="关" />)}
                 </Form.Item>,
                 <Form.Item key="7" {...that.formLayout} label="描述">
-                  {form.getFieldDecorator('description', {})(
+                  {form.getFieldDecorator('description', {
+                    initialValue: formVals.description,
+                  })(
                     <Input.TextArea
                       style={{ width: '100%' }}
                       autosize={{ minRows: 3, maxRows: 6 }}
@@ -227,14 +241,23 @@ export default class CreateModal extends PureComponent {
             },
             footer() {
               return [
-                <Button key="back" style={{ float: 'left' }} onClick={that.backward}>
-                  上一步
-                </Button>,
-                <Button key="cancel" onClick={() => onCancel()}>
+                <Tooltip placement="topLeft" title="修改父节点稍后开放, 可暂时用增删替代">
+                  <Button
+                    htmlType="button"
+                    disabled
+                    key="back"
+                    style={{ float: 'left' }}
+                    onClick={that.backward}
+                  >
+                    上一步
+                  </Button>
+                </Tooltip>,
+                <Button htmlType="button" key="cancel" onClick={() => onCancel()}>
                   取消
                 </Button>,
                 <Button
                   key="submit"
+                  htmlType="submit"
                   type="primary"
                   loading={submitting}
                   onClick={() => that.onClickNext(step)}
@@ -282,7 +305,7 @@ export default class CreateModal extends PureComponent {
       // 点击 下一页 触发
       onClickNext(step) {
         const { form, onDone } = that.props;
-        const { formVals: oldValue } = that.state;
+        const { id, formVals: oldValue } = that.state;
         form.validateFields((err, fieldsValue) => {
           if (err) return;
           const formVals = { ...oldValue, ...fieldsValue };
@@ -291,7 +314,7 @@ export default class CreateModal extends PureComponent {
               that.forward();
             } else {
               // 保存
-              onDone(formVals);
+              onDone(id, formVals);
             }
           });
         });

@@ -1,23 +1,24 @@
-import {stringify} from 'qs';
+import { stringify } from 'qs';
+import fetch from 'dva/fetch';
 import request from '@/utils/request';
-import {toString} from '@/utils/utils';
+import { toString } from '@/utils/utils';
 
-export async function query(query) {
-    const search = stringify(query);
-    let uri = '/resource';
-    if (search.length) {
-        uri += `?${search}`;
-    }
-    return request(`${uri}${stringify(query)}`);
+export async function selectBy(query) {
+  const search = stringify(query);
+  let uri = '/resource';
+  if (search.length) {
+    uri += `?${search}`;
+  }
+  return request(`${uri}${stringify(query)}`);
 }
 
 export async function insert(body) {
-    return request(`/resource`, {
-        method: 'POST',
-        body: {
-            ...body,
-        },
-    });
+  return request(`/resource`, {
+    method: 'POST',
+    body: {
+      ...body,
+    },
+  });
 }
 
 /**
@@ -36,9 +37,24 @@ export async function insert(body) {
  * @param body
  * @returns {Promise<void>}
  */
-export async function deletes({id, mode}) {
-    const IDs = toString([...id]);
-    return request(`/resource?id=${IDs}&mode=${mode || 0}`, {
-        method: 'DELETE'
-    });
+export async function deletes({ id, mode }) {
+  const IDs = toString([...id]);
+  return request(`/resource?id=${IDs}&mode=${mode || 0}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function selectOne({ id }) {
+  return request(`/resource/${id}`, {
+    method: 'GET',
+  });
+}
+
+export async function updateOne({ id, body }) {
+  return request(`/resource/${id}`, {
+    method: 'PUT',
+    body: {
+      ...body,
+    },
+  });
 }
