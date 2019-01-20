@@ -371,7 +371,6 @@ export default class Index extends PureComponent {
         return result.length > 0 ? (
           <CreateModal
             visible={createModalVisible}
-            nodes={result}
             defaultParent={createDefaultParent}
             onCancel={() => {
               this.onHidden('createModalVisible');

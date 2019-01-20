@@ -246,7 +246,7 @@ export default class UpdateModal extends PureComponent {
             },
             footer() {
               return [
-                <Tooltip placement="topLeft" title="修改父节点稍后开放, 可暂时用增删替代">
+                <Tooltip key={0} placement="topLeft" title="修改父节点稍后开放, 可暂时用增删替代">
                   <Button
                     htmlType="button"
                     disabled
@@ -257,7 +257,7 @@ export default class UpdateModal extends PureComponent {
                     上一步
                   </Button>
                 </Tooltip>,
-                <Button htmlType="button" key="cancel" onClick={() => onCancel()}>
+                <Button key="cancel" htmlType="button" onClick={() => onCancel()}>
                   取消
                 </Button>,
                 <Button
