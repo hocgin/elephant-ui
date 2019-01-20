@@ -25,15 +25,34 @@ import CreateModal from './Modal/CreateModal';
 import styles from './Index.less';
 import UpdateModal from './Modal/UpdateModal';
 
-const status = () => {
+// 启用状态
+const enabled = () => {
   return [
     {
-      status: 'error',
+      value: 'false',
       text: '禁用',
     },
     {
-      status: 'success',
+      value: 'true',
       text: '启用',
+    },
+  ];
+};
+
+// 资源类型
+const type = () => {
+  return [
+    {
+      value: 0,
+      text: '目录',
+    },
+    {
+      value: 1,
+      text: '按钮',
+    },
+    {
+      value: 2,
+      text: '链接',
     },
   ];
 };
@@ -50,6 +69,9 @@ export default class Index extends PureComponent {
     expandForm: false,
     // 选中行的ID
     selectedRows: [],
+    // 展开的节点
+    expandedKeys: [],
+    autoExpandParent: false,
     // 右键位置
     rightEvent: null,
     rightNode: null,
@@ -92,7 +114,7 @@ export default class Index extends PureComponent {
 
   render() {
     const { result, dispatch } = this.props;
-    const { selectedRows, createModalVisible, createDefaultParent } = this.state;
+    const { selectedRows, expandedKeys, autoExpandParent } = this.state;
     // const menu = (
     //     <Menu onClick={this.onClickMenus} selectedKeys={[]}>
     //         <Menu.Item key="remove">删除</Menu.Item>
@@ -134,6 +156,9 @@ export default class Index extends PureComponent {
             <Tree
               showIcon
               multiple
+              onExpand={this.onExpand}
+              expandedKeys={expandedKeys}
+              autoExpandParent={autoExpandParent}
               onSelect={this.onSelectTreeNodeRow}
               onRightClick={this.onRightClickNode}
             >
@@ -150,7 +175,16 @@ export default class Index extends PureComponent {
 
   methods() {
     const that = this;
-    return {};
+    return {
+      iteration: (parent, children, handle) => {
+        (children || []).forEach((item, index, self) => {
+          if (handle) {
+            handle(parent, item);
+          }
+          that.iteration(item, item.children, handle);
+        });
+      },
+    };
   }
 
   rendering() {
@@ -179,11 +213,7 @@ export default class Index extends PureComponent {
           return (
             <Tree.TreeNode
               disabled={!node.enabled}
-              title={
-                <span>
-                  {node.name} <span>{node.enabled ? '启用' : '禁用'}</span>
-                </span>
-              }
+              title={<span>{node.name}</span>}
               key={node.id}
               parentKey={parent}
               icon={<Icon type={node.icon} />}
@@ -199,95 +229,74 @@ export default class Index extends PureComponent {
        * 根据情况渲染搜索框
        */
       renderForm() {
+        const {
+          form: { getFieldDecorator },
+        } = that.props;
         const { expandForm } = that.state;
-        return expandForm ? that.renderAdvancedForm() : that.renderSimpleForm();
-      },
-      /**
-       * 渲染搜索框展开状态
-       */
-      renderAdvancedForm() {
-        const {
-          form: { getFieldDecorator },
-        } = this.props;
+
+        const items = [
+          <Col key={0} md={8} sm={24}>
+            <Form.Item label="资源名称">
+              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+            </Form.Item>
+          </Col>,
+          <Col key={1} md={8} sm={24}>
+            <Form.Item label="启用状态">
+              {getFieldDecorator('enabled')(
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  {enabled().map(({ value, text }) => {
+                    return (
+                      <Select.Option key={value} value={value}>
+                        {text}
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+              )}
+            </Form.Item>
+          </Col>,
+          <Col key={2} md={8} sm={24}>
+            <Form.Item label="资源类型">
+              {getFieldDecorator('type')(
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  {type().map(({ value, text }) => {
+                    return (
+                      <Select.Option key={value} value={value}>
+                        {text}
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+              )}
+            </Form.Item>
+          </Col>,
+        ];
+
         return (
           <Form onSubmit={that.onClickSearchButton} layout="inline">
             <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-              <Col md={8} sm={24}>
-                <Form.Item label="角色名称">
-                  {getFieldDecorator('name')(<Input placeholder="请输入" />)}
-                </Form.Item>
-              </Col>
-              <Col md={8} sm={24}>
-                <Form.Item label="使用状态">
-                  {getFieldDecorator('status')(
-                    <Select placeholder="请选择" style={{ width: '100%' }}>
-                      {status().map(({ status, text }) => {
-                        return (
-                          <Select.Option key={status} value={status}>
-                            {text}
-                          </Select.Option>
-                        );
-                      })}
-                    </Select>
-                  )}
-                </Form.Item>
-              </Col>
-              <Col md={8} sm={24}>
-                <Form.Item label="创建日期">
-                  {getFieldDecorator('createdAt')(
-                    <DatePicker style={{ width: '100%' }} placeholder="请输入更新日期" />
-                  )}
-                </Form.Item>
-              </Col>
+              {!!expandForm ? items : [items[0], items[1]]}
+              {/*收起状态*/}
+              {!expandForm && (
+                <Col md={8} sm={24}>
+                  <span className={styles.submitButtons}>
+                    <Button type="primary" htmlType="submit">
+                      查询
+                    </Button>
+                    <Button style={{ marginLeft: 8 }} onClick={that.onClickResetSearch}>
+                      重置
+                    </Button>
+                    <a style={{ marginLeft: 8 }} onClick={that.onClickToggleSearchMode}>
+                      展开 <Icon type="down" />
+                    </a>
+                  </span>
+                </Col>
+              )}
             </Row>
-            <div style={{ overflow: 'hidden' }}>
-              <div style={{ float: 'right', marginBottom: 24 }}>
-                <Button type="primary" htmlType="submit">
-                  查询
-                </Button>
-                <Button style={{ marginLeft: 8 }} onClick={that.handleFormReset}>
-                  重置
-                </Button>
-                <a style={{ marginLeft: 8 }} onClick={that.onClickToggleSearchMode}>
-                  收起 <Icon type="up" />
-                </a>
-              </div>
-            </div>
-          </Form>
-        );
-      },
-      /**
-       * 渲染搜索框收起状态
-       */
-      renderSimpleForm() {
-        const {
-          form: { getFieldDecorator },
-        } = this.props;
-        return (
-          <Form onSubmit={that.onClickSearchButton} layout="inline">
-            <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-              <Col md={8} sm={24}>
-                <Form.Item label="角色名称">
-                  {getFieldDecorator('name')(<Input placeholder="请输入" />)}
-                </Form.Item>
-              </Col>
-              <Col md={8} sm={24}>
-                <Form.Item label="使用状态">
-                  {getFieldDecorator('status')(
-                    <Select placeholder="请选择" style={{ width: '100%' }}>
-                      {status().map(({ status, text }) => {
-                        return (
-                          <Select.Option key={status} value={status}>
-                            {text}
-                          </Select.Option>
-                        );
-                      })}
-                    </Select>
-                  )}
-                </Form.Item>
-              </Col>
-              <Col md={8} sm={24}>
-                <span className={styles.submitButtons}>
+            {/*展开状态*/}
+            {expandForm && (
+              <div style={{ overflow: 'hidden' }}>
+                <div style={{ float: 'right', marginBottom: 24 }}>
                   <Button type="primary" htmlType="submit">
                     查询
                   </Button>
@@ -295,17 +304,16 @@ export default class Index extends PureComponent {
                     重置
                   </Button>
                   <a style={{ marginLeft: 8 }} onClick={that.onClickToggleSearchMode}>
-                    展开 <Icon type="down" />
+                    收起 <Icon type="up" />
                   </a>
-                </span>
-              </Col>
-            </Row>
+                </div>
+              </div>
+            )}
           </Form>
         );
       },
       /**
-       * 渲染树节点菜单
-       * @param e
+       * 渲染树节点右键菜单
        */
       renderRightPanel() {
         const { rightEvent, rightNode } = that.state;
@@ -316,8 +324,8 @@ export default class Index extends PureComponent {
         let { pageX, pageY } = rightEvent;
         const tmpStyle = {
           position: 'absolute',
-          left: `${pageX}px`,
-          top: `${pageY}px`,
+          left: `${pageX - 10}px`,
+          top: `${pageY - 5}px`,
         };
         return (
           <Menu
@@ -387,7 +395,6 @@ export default class Index extends PureComponent {
       renderUpdateModal() {
         const { result, dispatch } = that.props;
         const { updateModalVisible, updateId } = that.state;
-        console.log('renderUpdateModal', updateId);
         return updateId && updateModalVisible ? (
           <UpdateModal
             visible={updateModalVisible}
@@ -429,6 +436,16 @@ export default class Index extends PureComponent {
         });
       },
       /**
+       * 点击展开触发
+       * @param expandedKeys
+       */
+      onExpand(expandedKeys) {
+        that.setState({
+          expandedKeys,
+          autoExpandParent: false,
+        });
+      },
+      /**
        * 批量删除
        */
       onClickBatchDelete() {
@@ -463,9 +480,35 @@ export default class Index extends PureComponent {
         const { dispatch } = that.props;
         switch (key) {
           case 'enable': {
+            const { rightNode } = that.state;
+            dispatch({
+              type: 'resource/updateOne',
+              payload: {
+                id: rightNode.props.eventKey,
+                body: {
+                  enabled: true,
+                },
+              },
+              callback: () => {
+                message.success('更新成功');
+              },
+            });
             break;
           }
           case 'disable': {
+            const { rightNode } = that.state;
+            dispatch({
+              type: 'resource/updateOne',
+              payload: {
+                id: rightNode.props.eventKey,
+                body: {
+                  enabled: false,
+                },
+              },
+              callback: () => {
+                message.success('更新成功');
+              },
+            });
             break;
           }
           case 'edit': {
@@ -558,7 +601,6 @@ export default class Index extends PureComponent {
        * 选择树节点
        */
       onSelectTreeNodeRow(selectedKeys, e) {
-        console.log(selectedKeys);
         that.setState({
           selectedRows: selectedKeys,
         });
@@ -569,7 +611,6 @@ export default class Index extends PureComponent {
        * @param node
        */
       onRightClickNode({ event, node }) {
-        console.log(event, node);
         const { pageX, pageY } = event;
         that.setState({
           rightNode: node,
@@ -594,6 +635,35 @@ export default class Index extends PureComponent {
       onClickResetSearch() {
         const { form } = that.props;
         form.resetFields();
+      },
+      /**
+       * 点击搜索按钮
+       * @param e
+       */
+      onClickSearchButton(e) {
+        e.preventDefault();
+        const { form, result } = that.props;
+
+        form.validateFields((err, fieldsValue) => {
+          if (err) return;
+          const { name, enabled, type } = fieldsValue;
+
+          let expandedKeys = [];
+          that.iteration(result[0], result[0].children, (parent, item) => {
+            if (
+              (name === undefined || item.name.indexOf(name) > -1) &&
+              (enabled === undefined || `${item.enabled}` === enabled) &&
+              (type === undefined || item.type === type)
+            ) {
+              expandedKeys.push(parent.id);
+            }
+          });
+
+          that.setState({
+            expandedKeys,
+            autoExpandParent: true,
+          });
+        });
       },
     };
   }

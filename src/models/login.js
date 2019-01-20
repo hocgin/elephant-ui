@@ -1,9 +1,11 @@
 import { routerRedux } from 'dva/router';
+import { login } from '@/services/account';
 import { stringify } from 'qs';
 import { fakeAccountLogin, getFakeCaptcha } from '@/services/api';
-import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
-import { reloadAuthorized } from '@/utils/Authorized';
+import { LOCAL_STORAGE_TOKEN } from '../utils/custom';
+import router from 'umi/router';
+import { message } from 'antd';
 
 export default {
   namespace: 'login',
@@ -13,18 +15,19 @@ export default {
   },
 
   effects: {
+    // 登陆
     *login({ payload }, { call, put }) {
-      const response = yield call(fakeAccountLogin, payload);
-      yield put({
-        type: 'changeLoginStatus',
-        payload: response,
-      });
-      // Login successfully
-      if (response.status === 'ok') {
-        reloadAuthorized();
+      const result = yield call(login, payload);
+      console.log('[登陆]', result);
+      if (result.code === 200) {
+        const { token } = result.data;
+        // 存储token
+        localStorage.setItem(LOCAL_STORAGE_TOKEN, token);
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
         let { redirect } = params;
+
+        // 如果含有跳转URL则进行跳转。例如,?redirect=[url]
         if (redirect) {
           const redirectUrlParams = new URL(redirect);
           if (redirectUrlParams.origin === urlParams.origin) {
@@ -37,25 +40,26 @@ export default {
             return;
           }
         }
-        yield put(routerRedux.replace(redirect || '/'));
+        yield put(router.replace(redirect || '/system/dictionary'));
+      } else {
+        message.error(result.message);
       }
     },
 
     *getCaptcha({ payload }, { call }) {
-      yield call(getFakeCaptcha, payload);
+      console.log('TODO: 获取验证码');
+      // yield call(getFakeCaptcha, payload);
     },
 
     *logout(_, { put }) {
-      yield put({
-        type: 'changeLoginStatus',
-        payload: {
-          status: false,
-          currentAuthority: 'guest',
-        },
-      });
-      reloadAuthorized();
+      // yield put({
+      //     type: 'changeLoginStatus',
+      //     payload: {
+      //         status: false,
+      //     },
+      // });
       yield put(
-        routerRedux.push({
+        router.push({
           pathname: '/user/login',
           search: stringify({
             redirect: window.location.href,
@@ -65,14 +69,5 @@ export default {
     },
   },
 
-  reducers: {
-    changeLoginStatus(state, { payload }) {
-      setAuthority(payload.currentAuthority);
-      return {
-        ...state,
-        status: payload.status,
-        type: payload.type,
-      };
-    },
-  },
+  reducers: {},
 };

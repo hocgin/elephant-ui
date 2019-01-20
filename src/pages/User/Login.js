@@ -38,8 +38,8 @@ export default class LoginPage extends Component {
       .forEach(func => {
         this[func.name] = func;
       });
-    console.log('绑定函数', this);
-    console.log('更新时间', new Date());
+    console.log('绑定函数', this, document.referrer, opener && opener.location.href);
+    console.log('更新时间', new Date(), this.state.type);
   }
 
   render() {
@@ -57,7 +57,7 @@ export default class LoginPage extends Component {
         >
           <Tab key="account" tab={formatMessage({ id: 'app.login.tab-login-credentials' })}>
             {login.status === 'error' &&
-              login.type === 'account' &&
+              type === 'account' &&
               !submitting &&
               this.renderMessage(formatMessage({ id: 'app.login.message-invalid-credentials' }))}
             <UserName
@@ -84,7 +84,7 @@ export default class LoginPage extends Component {
           </Tab>
           <Tab key="mobile" tab={formatMessage({ id: 'app.login.tab-login-mobile' })}>
             {login.status === 'error' &&
-              login.type === 'mobile' &&
+              type === 'mobile' &&
               !submitting &&
               this.renderMessage(
                 formatMessage({ id: 'app.login.message-invalid-verification-code' })
@@ -156,6 +156,7 @@ export default class LoginPage extends Component {
         });
       },
       onTabChange(type) {
+        console.log(type);
         return that.setState({ type });
       },
 
@@ -183,11 +184,11 @@ export default class LoginPage extends Component {
        * @param values
        */
       onSubmitLogin(err, values) {
-        const { type } = that.state;
         if (!err) {
+          const { type } = that.state;
           const { dispatch } = that.props;
           dispatch({
-            type: 'account/login',
+            type: 'login/login',
             payload: {
               ...values,
               type,

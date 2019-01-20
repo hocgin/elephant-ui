@@ -1,8 +1,8 @@
 import { login, getCurrentUserInfo, getMenus } from '@/services/account';
 import { message } from 'antd';
-import * as routerRedux from 'react-router-redux';
 import { getPageQuery } from '../utils/utils';
 import { LOCAL_STORAGE_TOKEN } from '../utils/custom';
+import router from 'umi/router';
 
 export default {
   namespace: 'account',
@@ -13,34 +13,6 @@ export default {
   },
 
   effects: {
-    // 登陆
-    *login({ payload }, { call, put }) {
-      const result = yield call(login, payload);
-      if (result.code === 200) {
-        const { token } = result.data;
-        // 存储token
-        localStorage.setItem(LOCAL_STORAGE_TOKEN, token);
-        const urlParams = new URL(window.location.href);
-        const params = getPageQuery();
-        let { redirect } = params;
-        // 如果含有跳转URL则进行跳转。例如,?redirect=[url]
-        if (redirect) {
-          const redirectUrlParams = new URL(redirect);
-          if (redirectUrlParams.origin === urlParams.origin) {
-            redirect = redirect.substr(urlParams.origin.length);
-            if (redirect.startsWith('/#')) {
-              redirect = redirect.substr(2);
-            }
-          } else {
-            window.location.href = redirect;
-            return;
-          }
-        }
-        yield put(routerRedux.replace(redirect || '/'));
-      } else {
-        message.error(result.message);
-      }
-    },
     // 查询当前账号信息
     *getCurrentUserInfo({ payload }, { call, put }) {
       const result = yield call(getCurrentUserInfo, payload);

@@ -3,15 +3,20 @@ import { Form, Select, Button, Modal, Steps, TreeSelect, Switch, Icon, Input } f
 import { connect } from 'dva';
 import getIcons from '@/services/data';
 
+// 资源类型
 const type = () => {
   return [
     {
       value: 0,
-      text: '菜单',
+      text: '目录',
     },
     {
       value: 1,
       text: '按钮',
+    },
+    {
+      value: 2,
+      text: '链接',
     },
   ];
 };
