@@ -1,7 +1,7 @@
 import moment from 'moment';
 import React from 'react';
 import nzh from 'nzh/cn';
-import {parse, stringify} from 'qs';
+import { parse, stringify } from 'qs';
 
 export function fixedZero(val) {
     return val * 1 < 10 ? `0${val}` : val;
@@ -159,7 +159,7 @@ export function formatWan(val) {
         result = Math.floor(val / 10000);
         result = (
             <span>
-        {result}
+                {result}
                 <span
                     styles={{
                         position: 'relative',
@@ -170,9 +170,9 @@ export function formatWan(val) {
                         marginLeft: 2,
                     }}
                 >
-          万
-        </span>
-      </span>
+                    万
+                </span>
+            </span>
         );
     }
     return result;
@@ -182,8 +182,11 @@ export function isAntdPro() {
     return window.location.hostname === 'preview.pro.ant.design';
 }
 
-export function toString(array) {
+/**
+ * [a,b,c,d]    ==>   a,b,c,d
+ */
+export function toString(array, separator = ',') {
     return Object.keys(array)
         .map(key => array[key])
-        .join(',');
+        .join(separator);
 }

@@ -1,6 +1,4 @@
-import {} from 'antd';
 import { selectBy, insert, deletes, selectOne, updateOne } from '@/services/resource';
-import { message } from 'antd';
 
 export default {
     namespace: 'resource',
