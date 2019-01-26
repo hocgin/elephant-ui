@@ -5,7 +5,7 @@ import getIcons from '@/services/data';
 import { Types } from '../constant/constant';
 
 /**
- * 新增弹窗
+ * 更新弹窗
  */
 @connect(({ resource, loading }) => ({
     // data 数据的加载状态
