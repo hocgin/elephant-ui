@@ -1,4 +1,4 @@
-import { success } from './utils/result';
+import { success } from './util/result';
 
 /**
  * 账号相关 API

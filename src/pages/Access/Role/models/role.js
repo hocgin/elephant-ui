@@ -1,4 +1,4 @@
-import { page } from '@/services/api';
+import { page } from '@/services/role';
 import { message } from 'antd';
 import { ResultCode } from '../../../../utils/Constant';
 
@@ -16,15 +16,15 @@ export default {
         /**
          * 分页查询
          */ *page({ payload }, { call, put }) {
+            let result = yield call(page, payload);
             console.log(result);
-            let { code, message: msg, data } = yield call(page, payload);
-            if (code === ResultCode.SUCCESS) {
+            if (result.code === ResultCode.SUCCESS) {
                 yield put({
                     type: 'updateRole',
-                    payload: data,
+                    payload: result.data,
                 });
             } else {
-                message.error(msg);
+                message.error(result.message);
             }
         },
     },

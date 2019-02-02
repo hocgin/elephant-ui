@@ -1,7 +1,5 @@
-import { Form } from 'antd/lib/form';
 import { PureComponent } from 'react';
-import { Button, Modal, Steps } from 'antd';
-import { Select } from 'antd/lib/select';
+import { Button, Modal, Steps, Form, Select } from 'antd';
 import React from 'react';
 
 /**

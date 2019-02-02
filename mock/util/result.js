@@ -3,9 +3,9 @@
  */
 export default function result(code, message, data) {
     return {
-        code: code,
-        message: message,
-        data: data,
+        code,
+        message,
+        data,
     };
 }
 
@@ -23,7 +23,7 @@ export function success(data = null) {
  * - records 数据
  * @returns {{}}
  */
-export function pageBody({ records = [], current = 1, pages = 1, total = 10, size = 10 }) {
+export function pageWrapper({ records = [], current = 1, pages = 1, total = 10, size = 10 }) {
     return {
         records,
         total,
