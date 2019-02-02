@@ -1,5 +1,4 @@
 import { stringify } from 'qs';
-import fetch from 'dva/fetch';
 import request from '@/utils/request';
 import { toString } from '@/utils/utils';
 
