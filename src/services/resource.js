@@ -3,22 +3,30 @@ import fetch from 'dva/fetch';
 import request from '@/utils/request';
 import { toString } from '@/utils/utils';
 
+/**
+ * 查询节点信息
+ * @param query
+ */
 export async function selectBy(query) {
-  const search = stringify(query);
-  let uri = '/resource';
-  if (search.length) {
-    uri += `?${search}`;
-  }
-  return request(`${uri}${stringify(query)}`);
+    const search = stringify(query);
+    let uri = '/resource';
+    if (search.length) {
+        uri += `?${search}`;
+    }
+    return request(`${uri}${stringify(query)}`);
 }
 
+/**
+ * 增加节点
+ * @param body
+ */
 export async function insert(body) {
-  return request(`/resource`, {
-    method: 'POST',
-    body: {
-      ...body,
-    },
-  });
+    return request(`/resource`, {
+        method: 'POST',
+        body: {
+            ...body,
+        },
+    });
 }
 
 /**
@@ -38,23 +46,23 @@ export async function insert(body) {
  * @returns {Promise<void>}
  */
 export async function deletes({ id, mode }) {
-  const IDs = toString([...id]);
-  return request(`/resource?id=${IDs}&mode=${mode || 0}`, {
-    method: 'DELETE',
-  });
+    const IDs = toString([...id]);
+    return request(`/resource?id=${IDs}&mode=${mode || 0}`, {
+        method: 'DELETE',
+    });
 }
 
 export async function selectOne({ id }) {
-  return request(`/resource/${id}`, {
-    method: 'GET',
-  });
+    return request(`/resource/${id}`, {
+        method: 'GET',
+    });
 }
 
 export async function updateOne({ id, body }) {
-  return request(`/resource/${id}`, {
-    method: 'PUT',
-    body: {
-      ...body,
-    },
-  });
+    return request(`/resource/${id}`, {
+        method: 'PUT',
+        body: {
+            ...body,
+        },
+    });
 }

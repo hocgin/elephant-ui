@@ -4,10 +4,10 @@ export default [
         path: '/user',
         component: '../layouts/UserLayout',
         routes: [
-            {path: '/user', redirect: '/user/login'},
-            {path: '/user/login', component: './User/Login'},
-            {path: '/user/register', component: './User/Register'},
-            {path: '/user/register-result', component: './User/RegisterResult'},
+            { path: '/user', redirect: '/user/login' },
+            { path: '/user/login', component: './User/Login' },
+            { path: '/user/register', component: './User/Register' },
+            { path: '/user/register-result', component: './User/RegisterResult' },
         ],
     },
     // app
@@ -18,7 +18,7 @@ export default [
         authority: ['admin', 'user'],
         routes: [
             // dashboard
-            {path: '/', redirect: '/dashboard/analysis'},
+            { path: '/', redirect: '/dashboard/analysis' },
             {
                 path: '/dashboard',
                 name: 'dashboard',
@@ -167,7 +167,7 @@ export default [
                         name: 'success',
                         component: './Result/Success',
                     },
-                    {path: '/result/fail', name: 'fail', component: './Result/Error'},
+                    { path: '/result/fail', name: 'fail', component: './Result/Error' },
                 ],
             },
             {
@@ -258,55 +258,67 @@ export default [
             },
             // test
             {
-                icon: "warning",
-                name: "测试专用",
-                path: "/test",
-                routes: [{
-                    name: "例子",
-                    component: './Test/DataTable/Index',
-                    path: "/test/data-table"
-                }]
+                icon: 'warning',
+                name: '测试专用',
+                path: '/test',
+                routes: [
+                    {
+                        name: '例子',
+                        component: './Test/DataTable/Index',
+                        path: '/test/data-table',
+                    },
+                ],
             },
             {
-                icon: "warning",
-                name: "测试专用2",
-                path: "/template",
-                routes: [{
-                    name: "例子",
-                    component: './.Template/Index',
-                    path: "/template/index"
-                }]
+                icon: 'warning',
+                name: '测试专用2',
+                path: '/template',
+                routes: [
+                    {
+                        name: '例子',
+                        component: './.Template/Index',
+                        path: '/template/index',
+                    },
+                ],
             },
-            // test
+            /**
+             * =========================================================
+             *                         正式环境
+             * =========================================================
+             */
             {
-                icon: "warning",
-                name: "访问控制",
-                path: "/access",
-                routes: [{
-                    name: "角色管理",
-                    component: './Access/Role/Index',
-                    path: "/access/role"
-                }, {
-                    name: "资源管理",
-                    component: './Access/Resource/Index',
-                    path: "/access/resource"
-                }]
+                icon: 'warning',
+                name: '访问控制',
+                path: '/access',
+                routes: [
+                    {
+                        name: '角色管理',
+                        component: './Access/Role/Index',
+                        path: '/access/role',
+                    },
+                    {
+                        name: '资源管理',
+                        component: './Access/Resource/Index',
+                        path: '/access/resource',
+                    },
+                ],
             },
             {
-                icon: "warning",
-                name: "系统配置",
-                path: "/system",
-                routes: [{
-                    name: "数据字典",
-                    component: './System/Dictionary/Index',
-                    path: "/system/dictionary"
-                },
+                icon: 'warning',
+                name: '系统配置',
+                path: '/system',
+                routes: [
+                    {
+                        name: '数据字典',
+                        component: './System/Dictionary/Index',
+                        path: '/system/dictionary',
+                    },
                     //     {
                     //     name: "变量配置",
                     //     component: './System/Property/Index',
                     //     path: "/system/property"
                     // }
-                ]
+                ],
             },
             {
                 component: '404',
