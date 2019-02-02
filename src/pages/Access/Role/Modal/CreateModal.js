@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Button, Modal, Steps, Form } from 'antd';
-import { Select } from 'antd/lib/select';
+import { Button, Modal, Steps, Form, Select } from 'antd';
 
 /**
  * 新增弹窗
