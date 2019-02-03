@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Button, Modal, Steps, Form, Select } from 'antd';
+import { Button, Form, Modal, Select, Steps } from 'antd';
 
 /**
  * 新增弹窗
@@ -20,19 +20,64 @@ export default class CreateModal extends PureComponent {
         labelCol: { span: 7 },
         wrapperCol: { span: 13 },
     };
+
     /**
      * 步骤渲染
      */
-    steps = () => {
-        const { step, formValue } = this.state;
-        const { form, onModalVisible } = this.props;
+    renderSteps = () => {
+        const { step } = this.state;
+        const { form } = this.props;
         const that = this;
+
+        // 上一页
+        const onPrevious = () => {
+                that.setState({
+                    step: step - 1,
+                });
+            },
+            // 下一页
+            onNext = () => {
+                that.setState({
+                    step: step + 1,
+                });
+            },
+            // 取消
+            onCancel = () => {},
+            // 完成
+            onDone = () => {
+                const { form } = that.props;
+                const value = form.getFieldsValue();
+                console.log(value);
+                console.log('Done');
+            };
+        const previousBtn = (
+                <Button
+                    key="previous"
+                    htmlType="button"
+                    style={{ float: 'left' }}
+                    onClick={onPrevious}
+                >
+                    上一步
+                </Button>
+            ),
+            nextBtn = (
+                <Button key="next" type="primary" htmlType="button" onClick={onNext}>
+                    下一步
+                </Button>
+            ),
+            cancelBtn = (
+                <Button key="cancel" htmlType="button" onClick={onCancel}>
+                    取消
+                </Button>
+            ),
+            doneBtn = (
+                <Button key="submit" htmlType="button" type="primary" onClick={onDone}>
+                    完成
+                </Button>
+            );
 
         return [
             {
-                title(key = '') {
-                    return <Steps.Step key={key} title="基本信息" />;
-                },
                 content() {
                     return [
                         <Form.Item key="target" {...that.formLayout} label="监控对象">
@@ -48,20 +93,10 @@ export default class CreateModal extends PureComponent {
                     ];
                 },
                 footer() {
-                    return [
-                        <Button key="cancel" onClick={() => onModalVisible()}>
-                            取消
-                        </Button>,
-                        <Button key="forward" type="primary" onClick={() => that.onClickNext(step)}>
-                            下一步
-                        </Button>,
-                    ];
+                    return [cancelBtn, nextBtn];
                 },
             },
             {
-                title(key = '') {
-                    return <Steps.Step key={key} title="配置规则属性" />;
-                },
                 content() {
                     return [
                         <Form.Item key="target" {...that.formLayout} label="监控对象">
@@ -77,23 +112,10 @@ export default class CreateModal extends PureComponent {
                     ];
                 },
                 footer() {
-                    return [
-                        <Button key="back" style={{ float: 'left' }} onClick={that.backward}>
-                            上一步
-                        </Button>,
-                        <Button key="cancel" onClick={() => onModalVisible()}>
-                            取消
-                        </Button>,
-                        <Button key="forward" type="primary" onClick={() => that.onClickNext(step)}>
-                            下一步
-                        </Button>,
-                    ];
+                    return [previousBtn, cancelBtn, nextBtn];
                 },
             },
             {
-                title(key = '') {
-                    return <Steps.Step key={key} title="设定调度周期" />;
-                },
                 content() {
                     return [
                         <Form.Item key="target" {...that.formLayout} label="监控对象">
@@ -109,17 +131,7 @@ export default class CreateModal extends PureComponent {
                     ];
                 },
                 footer() {
-                    return [
-                        <Button key="back" style={{ float: 'left' }} onClick={that.backward}>
-                            上一步
-                        </Button>,
-                        <Button key="cancel" onClick={() => onModalVisible()}>
-                            取消
-                        </Button>,
-                        <Button key="submit" type="primary" onClick={() => that.onClickNext(step)}>
-                            完成
-                        </Button>,
-                    ];
+                    return [previousBtn, cancelBtn, doneBtn];
                 },
             },
         ];
@@ -127,6 +139,21 @@ export default class CreateModal extends PureComponent {
 
     constructor(props) {
         super(props);
+        /**
+         * 挂载函数
+         */
+        [this.methods(), this.rendering(), this.listener()]
+            .map(item => {
+                return Object.keys(item).map(key => {
+                    return item[key];
+                });
+            })
+            .reduce((func1, func2) => {
+                return [...func1, ...func2];
+            })
+            .forEach(func => {
+                this[func.name] = func;
+            });
     }
 
     /**
@@ -135,8 +162,10 @@ export default class CreateModal extends PureComponent {
      * =====================================
      */
     render() {
-        const { visible, onModalVisible } = this.props;
-        const { step, form } = this.state;
+        const { visible, ...rest } = this.props;
+        const { step } = this.state;
+        const Step = this.renderSteps()[step];
+        console.log(step, Step);
         return (
             <Modal
                 width={640}
@@ -144,65 +173,28 @@ export default class CreateModal extends PureComponent {
                 destroyOnClose
                 title="规则配置"
                 visible={visible}
-                footer={this.steps()[step].footer()}
-                onCancel={() => onModalVisible()}
+                {...rest}
+                footer={Step.footer()}
             >
-                <Steps style={{ marginBottom: 28 }} size="small" current={step}>
-                    {this.steps().map((step, index) => {
-                        return step.title(index);
-                    })}
+                <Steps size="small" current={step} style={{ marginBottom: 28 }}>
+                    <Steps.Step title="基本信息" />
+                    <Steps.Step title="基本信息" />
+                    <Steps.Step title="基本信息" />
                 </Steps>
-                {this.steps()[step].content()}
+                {Step.content()}
             </Modal>
         );
     }
 
-    /**
-     * =====================================
-     *                  函数
-     * =====================================
-     */
-    /**
-     * 后退
-     */
-    backward = () => {
-        const { step } = this.state;
-        this.setState({
-            step: step - 1,
-        });
-    };
-
-    /**
-     * 前进
-     */
-    forward() {
-        const { step } = this.state;
-        this.setState({
-            step: step + 1,
-        });
+    rendering() {
+        return {};
     }
 
-    /**
-     * @下一页
-     */
-    onClickNext = step => {
-        const { form, onDone } = this.props;
-        const { formValue: oldValue } = this.state;
-        form.validateFields((err, fieldsValue) => {
-            if (err) return;
-            const formVals = { ...oldValue, ...fieldsValue };
-            this.setState(
-                {
-                    formVals,
-                },
-                () => {
-                    if (step < this.steps().length - 1) {
-                        this.forward();
-                    } else {
-                        onDone(formVals);
-                    }
-                }
-            );
-        });
-    };
+    methods() {
+        return {};
+    }
+
+    listener() {
+        return {};
+    }
 }

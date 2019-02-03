@@ -14,28 +14,25 @@ import {
     Input,
     Menu,
     message,
+    Modal,
     Row,
     Select,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import styles from './Index.less';
+import * as LangKit from '../../../utils/LangKit';
 import CreateModal from './Modal/CreateModal';
 import UpdateModal from './Modal/UpdateModal';
 
-import styles from './Index.less';
-
 const Expand = {
-    // 标题
-    title() {
-        return '角色管理';
-    },
     // 发起请求
     mapDispatchToProps(dispatch) {
         return {
             example() {},
             page(params) {
                 dispatch({
-                    type: 'role/page',
+                    type: 'roles/page',
                     payload: params,
                 });
             },
@@ -90,11 +87,12 @@ const Expand = {
     },
 };
 
+const TITLE = '角色管理';
 /* eslint react/no-multi-comp:0 */
 @connect(({ role, loading }) => ({
     result: role,
     // data 数据的加载状态
-    // loading: loading.models.role,
+    loading: loading.models.role,
 }))
 @Form.create()
 export default class Index extends PureComponent {
@@ -110,7 +108,18 @@ export default class Index extends PureComponent {
 
     constructor(props) {
         super(props);
-        console.log('构造函数');
+        [this.methods(), this.rendering(), this.listener()]
+            .map(item => {
+                return Object.keys(item).map(key => {
+                    return item[key];
+                });
+            })
+            .reduce((func1, func2) => {
+                return [...func1, ...func2];
+            })
+            .forEach(func => {
+                this[func.name] = func;
+            });
     }
 
     // 字段
@@ -121,28 +130,28 @@ export default class Index extends PureComponent {
         },
         {
             title: '角色标识',
-            dataIndex: 'role',
+            dataIndex: 'mark',
         },
         {
             title: '描述',
-            dataIndex: 'desc',
+            dataIndex: 'description',
         },
         {
             title: '状态',
-            dataIndex: 'status',
-            filters: [
-                {
-                    text: Expand.status()[0].text,
-                    value: 0,
-                },
-                {
-                    text: Expand.status()[1].text,
-                    value: 1,
-                },
-            ],
+            dataIndex: 'enabled',
+            //     filters: [
+            //         {
+            //             text: Expand.status()[0].text,
+            //             value: 0,
+            //         },
+            //         {
+            //             text: Expand.status()[1].text,
+            //             value: 1,
+            //         },
+            //     ],
             render(val) {
-                let { status, text } = Expand.status()[val];
-                return <Badge status={status} text={text} />;
+                // let {status, text} = Expand.status()[val];
+                return <Badge status="success" text="启用" />;
             },
         },
         {
@@ -182,11 +191,10 @@ export default class Index extends PureComponent {
      */
     componentDidMount() {
         const { dispatch } = this.props;
-        console.debug('组件挂载后');
-        // dispatch({
-        //     type: 'role/page',
-        //     payload: {},
-        // });
+        dispatch({
+            type: 'roles/page',
+            payload: {},
+        });
     }
 
     /**
@@ -312,9 +320,92 @@ export default class Index extends PureComponent {
         });
     };
 
-    methods() {
+    render() {
+        const { result, loading } = this.props;
+        const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
+        const menu = (
+            <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
+                <Menu.Item key="remove">删除</Menu.Item>
+                <Menu.Item key="approval">批量审批</Menu.Item>
+            </Menu>
+        );
+
+        return (
+            <PageHeaderWrapper title={TITLE}>
+                <Card bordered={false}>
+                    <div className={styles.tableList}>
+                        {/*搜索层*/}
+                        <div className={styles.tableListForm}>{this.renderSearchBar()}</div>
+                        {/*工具栏(新建/批量操作)层*/}
+                        <div className={styles.tableListOperator}>
+                            <Button
+                                htmlType="button"
+                                icon="plus"
+                                onClick={() => this.onClickCreateButton(true)}
+                                type="primary"
+                            >
+                                新建
+                            </Button>
+                            {selectedRows.length > 0 && (
+                                <span>
+                                    <Button htmlType="button">批量操作</Button>
+                                    <Dropdown overlay={menu}>
+                                        <Button htmlType="button">
+                                            更多操作 <Icon type="down" />
+                                        </Button>
+                                    </Dropdown>
+                                </span>
+                            )}
+                        </div>
+                        {/*数据表格层*/}
+                        <StandardTable
+                            rowKey="id"
+                            selectedRows={selectedRows}
+                            loading={loading}
+                            data={LangKit.toAntProPage(result)}
+                            columns={this.columns}
+                            onSelectRow={this.onSelectRows}
+                            onChange={this.handleStandardTableChange}
+                        />
+                    </div>
+                </Card>
+                {/*新增弹窗*/}
+                {/*<CreateModal*/}
+                {/*visible={modalVisible}*/}
+                {/*onModalVisible={this.onClickCreateButton}*/}
+                {/*onDone={this.methods().handleAdd}*/}
+                {/*/>*/}
+                {/*新增弹窗*/}
+                {/*<div>55</div>*/}
+                {/*<Modal visible={true} title={"ok"}/>*/}
+                <CreateModal visible={true} />
+                {/*/!*更新弹窗*!/*/}
+                {/*<CreateModal*/}
+                {/*visible={updateModalVisible}*/}
+                {/*onModalVisible={this.onClickDetailButton}*/}
+                {/*onDone={this.methods().handleUpdate}*/}
+                {/*values={stepFormValues}*/}
+                {/*/>*/}
+            </PageHeaderWrapper>
+        );
+    }
+
+    /**
+     * 自定义函数
+     */
+    methods = () => {
         const that = this;
         return {
+            onShow(key) {
+                that.setState({
+                    [key]: true,
+                });
+            },
+            onHidden(key) {
+                that.setState({
+                    [key]: false,
+                });
+            },
             /**
              * 处理新增请求
              * @param fields
@@ -340,24 +431,30 @@ export default class Index extends PureComponent {
                 that.onClickDetailButton();
             },
         };
-    }
+    };
 
     /**
-     * 渲染搜索框收起状态
+     * 渲染函数
      */
-    renderSimpleForm() {
-        const {
-            form: { getFieldDecorator },
-        } = this.props;
-        return (
-            <Form onSubmit={this.onClickSearchButton} layout="inline">
-                <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-                    <Col md={8} sm={24}>
+    rendering = () => {
+        const that = this;
+        return {
+            /**
+             * 根据情况渲染搜索框
+             */
+            renderSearchBar() {
+                const {
+                    form: { getFieldDecorator },
+                } = that.props;
+                const { expandForm } = that.state;
+
+                const items = [
+                    <Col key={0} md={8} sm={24}>
                         <Form.Item label="角色名称">
                             {getFieldDecorator('name')(<Input placeholder="请输入" />)}
                         </Form.Item>
-                    </Col>
-                    <Col md={8} sm={24}>
+                    </Col>,
+                    <Col key={1} md={8} sm={24}>
                         <Form.Item label="使用状态">
                             {getFieldDecorator('status')(
                                 <Select placeholder="请选择" style={{ width: '100%' }}>
@@ -371,56 +468,8 @@ export default class Index extends PureComponent {
                                 </Select>
                             )}
                         </Form.Item>
-                    </Col>
-                    <Col md={8} sm={24}>
-                        <span className={styles.submitButtons}>
-                            <Button type="primary" htmlType="submit">
-                                查询
-                            </Button>
-                            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                                重置
-                            </Button>
-                            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                                展开 <Icon type="down" />
-                            </a>
-                        </span>
-                    </Col>
-                </Row>
-            </Form>
-        );
-    }
-
-    /**
-     * 渲染搜索框展开状态
-     */
-    renderAdvancedForm() {
-        const {
-            form: { getFieldDecorator },
-        } = this.props;
-        return (
-            <Form onSubmit={this.onClickSearchButton} layout="inline">
-                <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-                    <Col md={8} sm={24}>
-                        <Form.Item label="角色名称">
-                            {getFieldDecorator('name')(<Input placeholder="请输入" />)}
-                        </Form.Item>
-                    </Col>
-                    <Col md={8} sm={24}>
-                        <Form.Item label="使用状态">
-                            {getFieldDecorator('status')(
-                                <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    {Expand.status().map(({ status, text }) => {
-                                        return (
-                                            <Select.Option key={status} value={status}>
-                                                {text}
-                                            </Select.Option>
-                                        );
-                                    })}
-                                </Select>
-                            )}
-                        </Form.Item>
-                    </Col>
-                    <Col md={8} sm={24}>
+                    </Col>,
+                    <Col key={2} md={8} sm={24}>
                         <Form.Item label="创建日期">
                             {getFieldDecorator('createdAt')(
                                 <DatePicker
@@ -429,98 +478,104 @@ export default class Index extends PureComponent {
                                 />
                             )}
                         </Form.Item>
-                    </Col>
-                </Row>
-                <div style={{ overflow: 'hidden' }}>
-                    <div style={{ float: 'right', marginBottom: 24 }}>
-                        <Button type="primary" htmlType="submit">
-                            查询
-                        </Button>
-                        <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                            重置
-                        </Button>
-                        <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                            收起 <Icon type="up" />
-                        </a>
-                    </div>
-                </div>
-            </Form>
-        );
-    }
+                    </Col>,
+                ];
+
+                /**
+                 * 处理展开/收起
+                 */
+                let onClickToggleSearchMode = () => {
+                    const { expandForm } = that.state;
+                    that.setState({
+                        expandForm: !expandForm,
+                    });
+                };
+                /**
+                 * 处理搜索条件重置
+                 */
+                let onClickResetSearch = () => {
+                    const { form } = that.props;
+                    form.resetFields();
+                };
+
+                /**
+                 * 点击搜索按钮
+                 * @param e
+                 */
+                let onClickSearchButton = e => {
+                    e.preventDefault();
+                    const { form, result } = that.props;
+
+                    form.validateFields((err, fieldsValue) => {
+                        if (err) return;
+                        console.log('[搜索]', fieldsValue);
+                        // todo: fetch query
+                    });
+                };
+                return (
+                    <Form onSubmit={onClickSearchButton} layout="inline">
+                        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+                            {!!expandForm ? items : [items[0], items[1]]}
+                            {/*收起状态*/}
+                            {!expandForm && (
+                                <Col md={8} sm={24}>
+                                    <span className={styles.submitButtons}>
+                                        <Button type="primary" htmlType="submit">
+                                            查询
+                                        </Button>
+                                        <Button
+                                            htmlType="button"
+                                            style={{ marginLeft: 8 }}
+                                            onClick={onClickResetSearch}
+                                        >
+                                            重置
+                                        </Button>
+                                        <a
+                                            style={{ marginLeft: 8 }}
+                                            onClick={onClickToggleSearchMode}
+                                        >
+                                            展开 <Icon type="down" />
+                                        </a>
+                                    </span>
+                                </Col>
+                            )}
+                        </Row>
+                        {/*展开状态*/}
+                        {expandForm && (
+                            <div style={{ overflow: 'hidden' }}>
+                                <div style={{ float: 'right', marginBottom: 24 }}>
+                                    <Button type="primary" htmlType="submit">
+                                        查询
+                                    </Button>
+                                    <Button
+                                        htmlType="button"
+                                        style={{ marginLeft: 8 }}
+                                        onClick={onClickResetSearch}
+                                    >
+                                        重置
+                                    </Button>
+                                    <a style={{ marginLeft: 8 }} onClick={onClickToggleSearchMode}>
+                                        收起 <Icon type="up" />
+                                    </a>
+                                </div>
+                            </div>
+                        )}
+                    </Form>
+                );
+            },
+            /**
+             * =====
+             */
+        };
+    };
 
     /**
-     * 根据情况渲染搜索框
+     * 事件监听函数
      */
-    renderForm() {
-        const { expandForm } = this.state;
-        return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
-    }
-
-    render() {
-        return <div>ok</div>;
-        const {
-            result: { data },
-            loading,
-        } = this.props;
-        const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
-        const menu = (
-            <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-                <Menu.Item key="remove">删除</Menu.Item>
-                <Menu.Item key="approval">批量审批</Menu.Item>
-            </Menu>
-        );
-        return (
-            <PageHeaderWrapper title={Expand.title()}>
-                <Card bordered={false}>
-                    <div className={styles.tableList}>
-                        {/*搜索层*/}
-                        <div className={styles.tableListForm}>{this.renderForm()}</div>
-                        {/*工具栏(新建/批量操作)层*/}
-                        <div className={styles.tableListOperator}>
-                            <Button
-                                icon="plus"
-                                type="primary"
-                                onClick={() => this.onClickCreateButton(true)}
-                            >
-                                新建
-                            </Button>
-                            {selectedRows.length > 0 && (
-                                <span>
-                                    <Button>批量操作</Button>
-                                    <Dropdown overlay={menu}>
-                                        <Button>
-                                            更多操作 <Icon type="down" />
-                                        </Button>
-                                    </Dropdown>
-                                </span>
-                            )}
-                        </div>
-                        {/*数据表格层*/}
-                        <StandardTable
-                            rowKey="id"
-                            selectedRows={selectedRows}
-                            loading={loading}
-                            data={data}
-                            columns={this.columns}
-                            onSelectRow={this.onSelectRows}
-                            onChange={this.handleStandardTableChange}
-                        />
-                    </div>
-                </Card>
-                {/*新增弹窗*/}
-                <CreateModal
-                    visible={modalVisible}
-                    onModalVisible={this.onClickCreateButton}
-                    onDone={this.methods().handleAdd}
-                />
-                {/*更新弹窗*/}
-                <UpdateModal
-                    visible={updateModalVisible}
-                    onModalVisible={this.onClickDetailButton}
-                    onDone={this.methods().handleUpdate}
-                    values={stepFormValues}
-                />
-            </PageHeaderWrapper>
-        );
-    }
+    listener = () => {
+        const that = this;
+        return {
+            onClickUpdateButton() {},
+        };
+    };
 }

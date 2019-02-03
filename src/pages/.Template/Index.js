@@ -1,11 +1,5 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import moment from 'moment';
-import {} from 'antd';
-
-import styles from './Index.less';
-
-import Sup from '@/utils/supplement';
 
 const Expand = {
     // 取数据
@@ -60,7 +54,18 @@ export default class Index extends PureComponent {
      */
     methods = () => {
         const that = this;
-        return {};
+        return {
+            onShow(key) {
+                that.setState({
+                    [key]: true,
+                });
+            },
+            onHidden(key) {
+                that.setState({
+                    [key]: false,
+                });
+            },
+        };
     };
 
     /**
@@ -76,17 +81,6 @@ export default class Index extends PureComponent {
      */
     listener = () => {
         const that = this;
-        return {
-            onShow(key) {
-                that.setState({
-                    [key]: true,
-                });
-            },
-            onHidden(key) {
-                that.setState({
-                    [key]: false,
-                });
-            },
-        };
+        return {};
     };
 }

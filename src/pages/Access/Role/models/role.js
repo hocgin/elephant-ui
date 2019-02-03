@@ -1,4 +1,4 @@
-import { page } from '@/services/role';
+import { page } from '@/services/api';
 import { message } from 'antd';
 import { ResultCode } from '../../../../utils/Constant';
 
