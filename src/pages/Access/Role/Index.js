@@ -14,7 +14,6 @@ import {
     Input,
     Menu,
     message,
-    Modal,
     Row,
     Select,
 } from 'antd';
@@ -23,7 +22,6 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Index.less';
 import * as LangKit from '../../../utils/LangKit';
 import CreateModal from './Modal/CreateModal';
-import UpdateModal from './Modal/UpdateModal';
 
 const Expand = {
     // 发起请求
@@ -85,6 +83,9 @@ const Expand = {
             },
         ];
     },
+};
+const Constant = {
+    CREATE_MODAL_VISIBLE: 'createModalVisible',
 };
 
 const TITLE = '角色管理';
@@ -321,8 +322,9 @@ export default class Index extends PureComponent {
     };
 
     render() {
+        const that = this;
         const { result, loading } = this.props;
-        const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
+        const { selectedRows, createModalVisible, updateModalVisible } = this.state;
         const menu = (
             <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
                 <Menu.Item key="remove">删除</Menu.Item>
@@ -341,7 +343,7 @@ export default class Index extends PureComponent {
                             <Button
                                 htmlType="button"
                                 icon="plus"
-                                onClick={() => this.onClickCreateButton(true)}
+                                onClick={() => this.onShow(Constant.CREATE_MODAL_VISIBLE)}
                                 type="primary"
                             >
                                 新建
@@ -370,16 +372,12 @@ export default class Index extends PureComponent {
                     </div>
                 </Card>
                 {/*新增弹窗*/}
-                {/*<CreateModal*/}
-                {/*visible={modalVisible}*/}
-                {/*onModalVisible={this.onClickCreateButton}*/}
-                {/*onDone={this.methods().handleAdd}*/}
-                {/*/>*/}
-                {/*新增弹窗*/}
-                {/*<div>55</div>*/}
-                {/*<Modal visible={true} title={"ok"}/>*/}
-                <CreateModal visible={true} />
-                {/*/!*更新弹窗*!/*/}
+                <CreateModal
+                    visible={createModalVisible}
+                    onCancel={() => this.onClose(Constant.CREATE_MODAL_VISIBLE)}
+                    onDone={() => this.onClose(Constant.CREATE_MODAL_VISIBLE)}
+                />
+                {/*更新弹窗*/}
                 {/*<CreateModal*/}
                 {/*visible={updateModalVisible}*/}
                 {/*onModalVisible={this.onClickDetailButton}*/}
@@ -401,7 +399,7 @@ export default class Index extends PureComponent {
                     [key]: true,
                 });
             },
-            onHidden(key) {
+            onClose(key) {
                 that.setState({
                     [key]: false,
                 });

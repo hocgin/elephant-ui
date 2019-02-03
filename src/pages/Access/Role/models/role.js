@@ -1,4 +1,4 @@
-import { page } from '@/services/api';
+import { insertOne, page } from '@/services/role';
 import { message } from 'antd';
 import { ResultCode } from '../../../../utils/Constant';
 
@@ -13,16 +13,28 @@ export default {
         searchCount: true,
     },
     effects: {
-        /**
-         * 分页查询
-         */ *page({ payload }, { call, put }) {
+        // 分页查询
+        *page({ payload }, { call, put }) {
             let result = yield call(page, payload);
-            console.log(result);
             if (result.code === ResultCode.SUCCESS) {
                 yield put({
                     type: 'updateRole',
                     payload: result.data,
                 });
+            } else {
+                message.error(result.message);
+            }
+        },
+        // 创建角色
+        *insertOne({ payload, callback }, { call, put }) {
+            let result = yield call(insertOne, payload);
+            if (result.code === ResultCode.SUCCESS) {
+                yield put({
+                    type: 'page',
+                });
+                if (callback) {
+                    callback();
+                }
             } else {
                 message.error(result.message);
             }
