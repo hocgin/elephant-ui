@@ -59,7 +59,8 @@ export default class CreateModal extends PureComponent {
                                 type: 'role/insertOne',
                                 payload: formVals,
                                 callback: () => {
-                                    message.success('创建成功');
+                                    message.success('提交成功');
+                                    form.resetFields();
                                     that.props.onDone();
                                 },
                             });
