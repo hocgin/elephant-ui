@@ -64,9 +64,7 @@ export function buildTree(root, children) {
  * @returns {*}
  */
 export function buildTree2(nodes) {
-    const tree = buildTree(nodes[0], nodes);
-    console.log('tree', tree);
-    return tree;
+    return buildTree(nodes[0], nodes);
 }
 
 /**

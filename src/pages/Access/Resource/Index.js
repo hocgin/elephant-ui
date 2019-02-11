@@ -87,7 +87,6 @@ export default class Index extends PureComponent {
             allResource,
         } = this.props;
         const { selectedRows, expandedKeys, autoExpandParent } = this.state;
-
         return (
             allResource.length && (
                 <PageHeaderWrapper title={name}>
@@ -116,6 +115,7 @@ export default class Index extends PureComponent {
                             <Tree
                                 showIcon
                                 multiple
+                                defaultExpandAll={true}
                                 onExpand={this.onExpand}
                                 expandedKeys={expandedKeys}
                                 autoExpandParent={autoExpandParent}
@@ -588,7 +588,6 @@ export default class Index extends PureComponent {
                 form.validateFields((err, fieldsValue) => {
                     if (err) return;
                     const { name, enabled, type } = fieldsValue;
-
                     let expandedKeys = [];
                     that.iteration(allResource[0], allResource[0].children, (parent, item) => {
                         if (
