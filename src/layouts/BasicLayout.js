@@ -15,6 +15,7 @@ import logo from '../assets/logo.svg';
 import Footer from './Footer';
 import Header from './Header';
 import Context from './MenuContext';
+import * as LangKit from "../utils/LangKit";
 
 const query = {
     'screen-xs': {
@@ -76,6 +77,8 @@ const Expand = {
     // 获取数据 => props
     mapStateToProps(states) {
         const { global, setting, account } = states;
+
+
         return {
             collapsed: global.collapsed,
             menuData: account.menus,

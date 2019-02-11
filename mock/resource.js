@@ -1,8 +1,31 @@
-import { success } from './util/result';
-import { createdAt, deletedAt, updatedAt } from './util/mock';
+import {success} from './util/result';
+import {createdAt, deletedAt, updatedAt} from './util/mock';
+
+// 填充 lft rgt depth
+let fillLftRgtAndDepth = (nodes, lft, depth) => {
+    (nodes || []).forEach((node) => {
+        node.lft = (lft + 1);
+        node.rgt = node.lft + treeToArray(node.children).length * 2 + 1;
+        node.depth = depth;
+        fillLftRgtAndDepth(node.children, node.lft, depth + 1);
+    });
+};
+
+// 树型 => 数组型
+let treeToArray = (nodes) => {
+    let arr = [];
+    (nodes || []).forEach((node) => {
+        if (node.children && node.children.length > 0) {
+            arr = [...arr, ...treeToArray(node.children)]
+        }
+        arr = [node, ...arr];
+    });
+    return arr;
+};
 
 let i = 0;
-export let resource = (name, type, method, path, enabled, children) => {
+// 构建单个节点
+let resource = (name, type, method, path, enabled, children) => {
     return {
         id: `uuid_resource_${i++}`,
         name,
@@ -19,93 +42,23 @@ export let resource = (name, type, method, path, enabled, children) => {
     };
 };
 
-let _createResource = ({
-    name,
-    type = 0,
-    method = 'GET',
-    path,
-    enabled = true,
-    lft,
-    rgt,
-    depth,
-}) => {
-    return {
-        id: `uuid_resource_${i++}`,
-        name,
-        description: '描述',
-        type,
-        method,
-        path,
-        icon: 'warning',
-        enabled,
-        lft,
-        rgt,
-        depth,
-        ...createdAt(),
-        ...updatedAt(),
-        ...deletedAt(),
-    };
+// 构建
+export let allResource = () => {
+    let i = 0;
+    const tree = resource('根节点', 0, 'GET', '/', true, [
+        resource('访问控制', 0, 'GET', '/access', true, [
+            resource('角色管理', 0, 'GET', '/access/role', true, []),
+            resource('资源管理', 0, 'GET', '/access/resource', true, []),
+        ]),
+        resource('系统配置', 0, 'GET', '/system', true, [
+            resource('数据字典', 0, 'GET', '/system/dictionary', true, []),
+        ]),
+    ]);
+    const nodes = [tree];
+    fillLftRgtAndDepth(nodes, 0, 0);
+    return treeToArray(nodes);
 };
 
-export let allResource = () => {
-    i = 0;
-    return [
-        _createResource({
-            name: '根',
-            type: 0,
-            method: 'GET',
-            path: '/',
-            lft: 1,
-            rgt: 12,
-            depth: 0,
-        }),
-        _createResource({
-            name: '访问控制',
-            type: 0,
-            method: 'GET',
-            path: '/access',
-            lft: 2,
-            rgt: 7,
-            depth: 1,
-        }),
-        _createResource({
-            name: '资源管理',
-            type: 0,
-            method: 'GET',
-            path: '/access/resource',
-            lft: 3,
-            rgt: 4,
-            depth: 2,
-        }),
-        _createResource({
-            name: '角色管理',
-            type: 0,
-            method: 'GET',
-            path: '/access/role',
-            lft: 5,
-            rgt: 6,
-            depth: 2,
-        }),
-        _createResource({
-            name: '系统配置',
-            type: 0,
-            method: 'GET',
-            path: '/system',
-            lft: 8,
-            rgt: 11,
-            depth: 1,
-        }),
-        _createResource({
-            name: '数据字典',
-            type: 0,
-            method: 'GET',
-            path: '/system/dictionary',
-            lft: 9,
-            rgt: 10,
-            depth: 2,
-        }),
-    ];
-};
 
 /**
  * 资源相关 API

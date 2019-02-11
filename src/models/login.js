@@ -40,7 +40,7 @@ export default {
                         return;
                     }
                 }
-                yield put(router.replace(redirect || '/system/dictionary'));
+                yield put(router.replace(redirect || '/'));
             } else {
                 message.error(result.message);
             }

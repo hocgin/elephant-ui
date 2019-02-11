@@ -1,7 +1,6 @@
-import { login, getCurrentUserInfo, getMenus } from '@/services/account';
-import { message } from 'antd';
-import { getPageQuery } from '../utils/utils';
-import router from 'umi/router';
+import {getCurrentUserInfo, getMenus, login} from '@/services/account';
+import {message} from 'antd';
+import * as LangKit from "../utils/LangKit";
 
 export default {
     namespace: 'account',
@@ -13,7 +12,7 @@ export default {
 
     effects: {
         // 查询当前账号信息
-        *getCurrentUserInfo({ payload }, { call, put }) {
+        * getCurrentUserInfo({payload}, {call, put}) {
             const result = yield call(getCurrentUserInfo, payload);
             if (result.code === 200) {
                 yield put({
@@ -25,12 +24,13 @@ export default {
             }
         },
         // 获取当前账号具备的菜单
-        *getMenus({ payload }, { call, put }) {
+        * getMenus({payload}, {call, put}) {
             const result = yield call(getMenus, payload);
             if (result.code === 200) {
+                const menus = result.data.length ? LangKit.buildTree2(result.data).children : [];
                 yield put({
-                    type: 'updateMenus',
-                    payload: result.data,
+                    type: 'fillMenus',
+                    payload: menus,
                 });
             } else {
                 message.error(result.message);
@@ -39,16 +39,17 @@ export default {
     },
 
     reducers: {
-        example2(state, { payload }) {},
+        example2(state, {payload}) {
+        },
         // 保存用户信息
-        saveCurrentUserInfo(state, { payload }) {
+        saveCurrentUserInfo(state, {payload}) {
             return {
                 ...state,
                 currentUser: payload || {},
             };
         },
         // 更新菜单列表
-        updateMenus(state, { payload }) {
+        fillMenus(state, {payload}) {
             return {
                 ...state,
                 menus: payload || [],

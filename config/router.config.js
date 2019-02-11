@@ -4,10 +4,10 @@ export default [
         path: '/user',
         component: '../layouts/UserLayout',
         routes: [
-            { path: '/user', redirect: '/user/login' },
-            { path: '/user/login', component: './User/Login' },
-            { path: '/user/register', component: './User/Register' },
-            { path: '/user/register-result', component: './User/RegisterResult' },
+            {path: '/user', redirect: '/user/login'},
+            {path: '/user/login', component: './User/Login'},
+            {path: '/user/register', component: './User/Register'},
+            {path: '/user/register-result', component: './User/RegisterResult'},
         ],
     },
     // app
@@ -17,30 +17,6 @@ export default [
         Routes: ['src/pages/Authorized'],
         authority: ['admin', 'user'],
         routes: [
-            // dashboard
-            { path: '/', redirect: '/dashboard/analysis' },
-            {
-                path: '/dashboard',
-                name: 'dashboard',
-                icon: 'dashboard',
-                routes: [
-                    {
-                        path: '/dashboard/analysis',
-                        name: 'analysis',
-                        component: './Dashboard/Analysis',
-                    },
-                    {
-                        path: '/dashboard/monitor',
-                        name: 'monitor',
-                        component: './Dashboard/Monitor',
-                    },
-                    {
-                        path: '/dashboard/workplace',
-                        name: 'workplace',
-                        component: './Dashboard/Workplace',
-                    },
-                ],
-            },
             // forms
             {
                 path: '/form',
@@ -167,7 +143,7 @@ export default [
                         name: 'success',
                         component: './Result/Success',
                     },
-                    { path: '/result/fail', name: 'fail', component: './Result/Error' },
+                    {path: '/result/fail', name: 'fail', component: './Result/Error'},
                 ],
             },
             {
@@ -286,6 +262,30 @@ export default [
              *                         正式环境
              * =========================================================
              */
+            // dashboard
+            {path: '/', redirect: '/dashboard/analysis'},
+            {
+                path: '/dashboard',
+                name: '仪表盘',
+                icon: 'dashboard',
+                routes: [
+                    {
+                        path: '/dashboard/analysis',
+                        name: '主页',
+                        component: './Dashboard/Analysis',
+                    },
+                    {
+                        path: '/dashboard/monitor',
+                        name: '系统监控',
+                        component: './Dashboard/Monitor',
+                    },
+                    {
+                        path: '/dashboard/workplace',
+                        name: 'workplace',
+                        component: './Dashboard/Workplace',
+                    },
+                ],
+            },
             {
                 icon: 'warning',
                 name: '访问控制',
@@ -329,6 +329,23 @@ export default [
                     //     component: './System/Property/Index',
                     //     path: "/system/property"
                     // }
+                ],
+            },
+            {
+                icon: 'warning',
+                name: '账号管理',
+                path: '/account',
+                routes: [
+                    {
+                        name: '员工管理',
+                        path: '/account/staff',
+                        component: './System/Dictionary/Index',
+                    },
+                    {
+                        name: '用户管理',
+                        path: '/account/user',
+                        component: './System/Dictionary/Index',
+                    },
                 ],
             },
             {

@@ -1,5 +1,5 @@
 import { success } from './util/result';
-import { resource } from './resource';
+import {allResource, resource} from './resource';
 
 /**
  * 账号相关 API
@@ -39,17 +39,7 @@ export default {
      */
     'GET /account/menus': (req, res) => {
         return res.json(
-            success(
-                resource('根节点', 0, 'GET', '/', true, [
-                    resource('访问控制', 0, 'GET', '/access', true, [
-                        resource('角色管理', 0, 'GET', '/access/role', true, []),
-                        resource('资源管理', 0, 'GET', '/access/resource', true, []),
-                    ]),
-                    resource('系统配置', 0, 'GET', '/system', true, [
-                        resource('数据字典', 0, 'GET', '/system/dictionary', true, []),
-                    ]),
-                ]).children
-            )
+            success(allResource())
         );
     },
 };
