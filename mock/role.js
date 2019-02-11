@@ -36,7 +36,7 @@ export default {
         return res.json(success());
     },
     /**
-     * 获取
+     * 分页获取
      */
     'GET /roles': (req, res) => {
         return res.json(
@@ -46,5 +46,11 @@ export default {
                 })
             )
         );
+    },
+    /**
+     * 获取单个
+     */
+    'GET /roles/:uuid': (req, res) => {
+        return res.json(success(create('管理员', 'ROLE_ADMIN')));
     },
 };

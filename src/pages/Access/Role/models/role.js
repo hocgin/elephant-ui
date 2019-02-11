@@ -1,4 +1,4 @@
-import { insertOne, page } from '@/services/role';
+import { insertOne, selectOne, page } from '@/services/role';
 import { message } from 'antd';
 import { ResultCode } from '../../../../utils/Constant';
 
@@ -34,6 +34,17 @@ export default {
                 });
                 if (callback) {
                     callback();
+                }
+            } else {
+                message.error(result.message);
+            }
+        },
+        // 查询单个
+        *selectOne({ payload, callback }, { call, put }) {
+            let result = yield call(selectOne, payload);
+            if (result.code === ResultCode.SUCCESS) {
+                if (callback) {
+                    callback(result.data);
                 }
             } else {
                 message.error(result.message);

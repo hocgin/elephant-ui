@@ -30,7 +30,7 @@ export default class CreateModal extends PureComponent {
     };
 
     /**
-     * 步骤渲染
+     * 渲染步骤内容
      */
     renderSteps = () => {
         const { step, formVals } = this.state;
@@ -69,9 +69,7 @@ export default class CreateModal extends PureComponent {
                 });
             },
             // 取消
-            onCancel = () => {
-                that.props.onCancel();
-            };
+            onCancel = that.props.onCancel;
         const previousBtn = (
                 <Button
                     key="previous"
@@ -186,7 +184,7 @@ export default class CreateModal extends PureComponent {
     componentDidMount() {
         const { dispatch } = this.props;
         dispatch({
-            type: 'resource/query',
+            type: 'role/page',
         });
     }
 
@@ -196,7 +194,7 @@ export default class CreateModal extends PureComponent {
      * =====================================
      */
     render() {
-        const { visible } = this.props;
+        const { visible, onCancel } = this.props;
         const { step } = this.state;
         const Step = this.renderSteps()[step];
         console.log(step, Step);
@@ -206,6 +204,7 @@ export default class CreateModal extends PureComponent {
                 bodyStyle={{ padding: '32px 40px 48px' }}
                 title="创建角色"
                 visible={visible}
+                onCancel={onCancel}
                 footer={Step.footer()}
             >
                 <Steps size="small" current={step} style={{ marginBottom: 28 }}>

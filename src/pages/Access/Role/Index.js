@@ -22,6 +22,8 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Index.less';
 import * as LangKit from '../../../utils/LangKit';
 import CreateModal from './Modal/CreateModal';
+import UpdateModal from './Modal/UpdateModal';
+import DetailModal from './Modal/DetailModal';
 
 const Expand = {
     // 发起请求
@@ -86,6 +88,8 @@ const Expand = {
 };
 const Constant = {
     CREATE_MODAL_VISIBLE: 'createModalVisible',
+    UPDATE_MODAL_VISIBLE: 'updateModalVisible',
+    DETAIL_MODAL_VISIBLE: 'detailModalVisible',
 };
 
 const TITLE = '角色管理';
@@ -98,13 +102,9 @@ const TITLE = '角色管理';
 @Form.create()
 export default class Index extends PureComponent {
     state = {
-        modalVisible: false,
-        updateModalVisible: false,
         expandForm: false,
         selectedRows: [],
-        createModalValues: {},
-        // 新建临时保存的值
-        editModalValues: {},
+        operationRow: null,
     };
 
     constructor(props) {
@@ -166,7 +166,7 @@ export default class Index extends PureComponent {
             key: 'operation',
             render: (text, record) => {
                 const menu = (
-                    <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
+                    <Menu onClick={this.onClickItemMenu.bind(this, record)}>
                         <Menu.Item key="edit">修改</Menu.Item>
                         <Menu.Item key="on">启用</Menu.Item>
                         <Menu.Item key="off">禁用</Menu.Item>
@@ -174,10 +174,12 @@ export default class Index extends PureComponent {
                 );
                 return (
                     <Fragment>
-                        <a onClick={() => this.onClickDetailButton(true, record)}>查看详情</a>
+                        <a key="detail" onClick={this.onClickItemMenu.bind(this, record)}>
+                            查看详情
+                        </a>
                         <Divider type="vertical" />
                         <Dropdown overlay={menu}>
-                            <a className="ant-dropdown-link" href="#">
+                            <a className="ant-dropdown-link">
                                 更多操作 <Icon type="down" />
                             </a>
                         </Dropdown>
@@ -198,133 +200,16 @@ export default class Index extends PureComponent {
         });
     }
 
-    /**
-     * 处理标题条件变更, 如[排序, 过滤]
-     * @param pagination
-     * @param filtersArg
-     * @param sorter
-     */
-    handleStandardTableChange = (pagination, filtersArg, sorter) => {
-        const { formValues } = this.state;
-
-        const filters = Object.keys(filtersArg).reduce((obj, key) => {
-            const newObj = { ...obj };
-            newObj[key] = toString(filtersArg[key]);
-            return newObj;
-        }, {});
-
-        const params = {
-            currentPage: pagination.current,
-            pageSize: pagination.pageSize,
-            ...formValues,
-            ...filters,
-        };
-        if (sorter.field) {
-            params.sorter = `${sorter.field}_${sorter.order}`;
-        }
-
-        this.props.query();
-    };
-
-    /**
-     * 处理搜索条件重置
-     */
-    handleFormReset = () => {
-        const { form } = this.props;
-        form.resetFields();
-        this.setState({
-            createModalValues: {},
-        });
-        this.props.query({});
-    };
-
-    /**
-     * 处理展开/收起
-     */
-    toggleForm = () => {
-        const { expandForm } = this.state;
-        this.setState({
-            expandForm: !expandForm,
-        });
-    };
-
-    /**
-     * 处理菜单按钮点击 [...删除]
-     */
-    handleMenuClick = e => {
-        const { selectedRows } = this.state;
-
-        if (!selectedRows) return;
-        switch (e.key) {
-            case 'remove':
-                this.props.remove(selectedRows.map(row => row.key), () => {
-                    this.setState({
-                        selectedRows: [],
-                    });
-                });
-                break;
-            default:
-                break;
-        }
-    };
-
-    /**
-     * 处理选中行
-     */
-    handleSelectRows = rows => {
-        this.setState({
-            selectedRows: rows,
-        });
-    };
-
-    /**
-     * 处理查询按钮的点击
-     */
-    handleSearch = e => {
-        e.preventDefault();
-
-        const { form } = this.props;
-
-        form.validateFields((err, fieldsValue) => {
-            if (err) return;
-
-            const values = {
-                ...fieldsValue,
-                updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
-            };
-
-            this.setState({
-                createModalValues: values,
-            });
-            this.props.query(values);
-        });
-    };
-
-    /**
-     * 处理[新建]按钮的点击
-     */
-    handleModalVisible = flag => {
-        this.setState({
-            modalVisible: !!flag,
-        });
-    };
-
-    /**
-     * 处理[配置]按钮的点击
-     * @param flag
-     * @param record
-     */
-    handleUpdateModalVisible = (flag, record) => {
-        this.setState({
-            updateModalVisible: !!flag,
-            editModalValues: record || {},
-        });
-    };
-
     render() {
         const that = this;
         const { result, loading } = this.props;
-        const { selectedRows, createModalVisible, updateModalVisible } = this.state;
+        const {
+            selectedRows,
+            operationRow,
+            createModalVisible,
+            updateModalVisible,
+            detailModalVisible,
+        } = this.state;
         const menu = (
             <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
                 <Menu.Item key="remove">删除</Menu.Item>
@@ -366,8 +251,8 @@ export default class Index extends PureComponent {
                             loading={loading}
                             data={LangKit.toAntProPage(result)}
                             columns={this.columns}
-                            onSelectRow={this.onSelectRows}
-                            onChange={this.handleStandardTableChange}
+                            onSelectRow={this.onClickSelectRows}
+                            onChange={this.onChangeStandardTableCondition}
                         />
                     </div>
                 </Card>
@@ -378,12 +263,23 @@ export default class Index extends PureComponent {
                     onDone={() => this.onClose(Constant.CREATE_MODAL_VISIBLE)}
                 />
                 {/*更新弹窗*/}
-                {/*<CreateModal*/}
-                {/*visible={updateModalVisible}*/}
-                {/*onModalVisible={this.onClickDetailButton}*/}
-                {/*onDone={this.methods().handleUpdate}*/}
-                {/*values={stepFormValues}*/}
-                {/*/>*/}
+                {operationRow ? (
+                    <UpdateModal
+                        visible={updateModalVisible}
+                        onCancel={() => this.onClose(Constant.UPDATE_MODAL_VISIBLE)}
+                        onDone={() => this.onClose(Constant.UPDATE_MODAL_VISIBLE)}
+                        id={operationRow}
+                    />
+                ) : null}
+                {/*详情弹窗*/}
+                {operationRow ? (
+                    <DetailModal
+                        visible={detailModalVisible}
+                        onCancel={() => this.onClose(Constant.DETAIL_MODAL_VISIBLE)}
+                        onDone={() => this.onClose(Constant.DETAIL_MODAL_VISIBLE)}
+                        id={operationRow}
+                    />
+                ) : null}
             </PageHeaderWrapper>
         );
     }
@@ -391,7 +287,7 @@ export default class Index extends PureComponent {
     /**
      * 自定义函数
      */
-    methods = () => {
+    methods() {
         const that = this;
         return {
             onShow(key) {
@@ -429,12 +325,12 @@ export default class Index extends PureComponent {
                 that.onClickDetailButton();
             },
         };
-    };
+    }
 
     /**
      * 渲染函数
      */
-    rendering = () => {
+    rendering() {
         const that = this;
         return {
             /**
@@ -496,22 +392,8 @@ export default class Index extends PureComponent {
                     form.resetFields();
                 };
 
-                /**
-                 * 点击搜索按钮
-                 * @param e
-                 */
-                let onClickSearchButton = e => {
-                    e.preventDefault();
-                    const { form, result } = that.props;
-
-                    form.validateFields((err, fieldsValue) => {
-                        if (err) return;
-                        console.log('[搜索]', fieldsValue);
-                        // todo: fetch query
-                    });
-                };
                 return (
-                    <Form onSubmit={onClickSearchButton} layout="inline">
+                    <Form onSubmit={that.onClickSearch} layout="inline">
                         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
                             {!!expandForm ? items : [items[0], items[1]]}
                             {/*收起状态*/}
@@ -561,19 +443,89 @@ export default class Index extends PureComponent {
                     </Form>
                 );
             },
-            /**
-             * =====
-             */
         };
-    };
+    }
 
     /**
      * 事件监听函数
      */
-    listener = () => {
+    listener() {
         const that = this;
         return {
             onClickUpdateButton() {},
+            // 单项菜单的点击
+            onClickItemMenu(data, e) {
+                console.log('点击::', data, e.key);
+                that.setState(
+                    {
+                        operationRow: data.id,
+                    },
+                    () => {
+                        switch (e.key) {
+                            // 修改
+                            case 'edit': {
+                                that.onShow(Constant.UPDATE_MODAL_VISIBLE);
+                                break;
+                            }
+                            // 查看详情
+                            case 'detail':
+                            default: {
+                                that.onShow(Constant.DETAIL_MODAL_VISIBLE);
+                            }
+                        }
+                    }
+                );
+            },
+            /**
+             * 处理选中行
+             */
+            onClickSelectRows(rows) {
+                that.setState({
+                    selectedRows: rows,
+                });
+            },
+            /**
+             * 处理标题条件变更, 如[排序, 过滤]
+             */
+            onChangeStandardTableCondition(pagination, filtersArg, sorter) {
+                const { formValues } = that.state;
+
+                const filters = Object.keys(filtersArg).reduce((obj, key) => {
+                    const newObj = { ...obj };
+                    newObj[key] = toString(filtersArg[key]);
+                    return newObj;
+                }, {});
+
+                const params = {
+                    currentPage: pagination.current,
+                    pageSize: pagination.pageSize,
+                    ...formValues,
+                    ...filters,
+                };
+                if (sorter.field) {
+                    params.sorter = `${sorter.field}_${sorter.order}`;
+                }
+
+                console.log('Table 搜索条件', params);
+                // this.props.query();
+            },
+            // 点击搜索按钮
+            onClickSearch(e) {
+                e.preventDefault();
+
+                const { form } = that.props;
+
+                form.validateFields((err, fieldsValue) => {
+                    if (err) return;
+
+                    const values = {
+                        ...fieldsValue,
+                        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
+                    };
+
+                    console.log('搜索 Bar 搜索条件', values);
+                });
+            },
         };
-    };
+    }
 }

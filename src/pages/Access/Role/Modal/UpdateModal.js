@@ -1,126 +1,159 @@
-import { PureComponent } from 'react';
-import { Button, Modal, Steps, Form, Select } from 'antd';
-import React from 'react';
+import React, { PureComponent } from 'react';
+import { Button, Form, Input, message, Modal, Steps, TreeSelect } from 'antd';
+import { connect } from 'dva';
+import { toAntTreeData } from '../../../../utils/LangKit';
 
 /**
  * 更新弹窗
  * - visible 是否可见
- * - value 更新时携带的原值
- * - onModalVisible 取消时触发
+ * - onCancel 取消时触发
  * - onDone 完成时触发
  */
+@connect(({ resource, loading }) => {
+    console.log(resource);
+    return {
+        // data 数据的加载状态
+        result: resource.result,
+    };
+})
 @Form.create()
 export default class UpdateModal extends PureComponent {
     state = {
         // 当前步骤
         step: 0,
         // 待提交的值
-        formValue: {},
+        formVals: {},
     };
     formLayout = {
         labelCol: { span: 7 },
         wrapperCol: { span: 13 },
     };
+
     /**
-     * 步骤渲染
+     * 渲染步骤内容
      */
-    steps = () => {
-        const { step, formValue } = this.state;
-        const { form, onModalVisible } = this.props;
+    renderSteps = () => {
+        const { step, formVals } = this.state;
+        const { form } = this.props;
         const that = this;
+
+        // 上一页
+        const onPrevious = () => {
+                that.setState({
+                    step: step - 1,
+                });
+            },
+            // 下一页 & 完成
+            onNextAndDone = () => {
+                const { dispatch, form } = that.props;
+                form.validateFields((err, fieldsValue) => {
+                    if (err) return;
+                    const formVals = { ...that.state.formVals, ...fieldsValue };
+                    that.setState({ formVals }, () => {
+                        if (step + 1 < that.renderSteps().length) {
+                            that.setState({
+                                step: step + 1,
+                            });
+                        } else {
+                            dispatch({
+                                type: 'role/insertOne',
+                                payload: formVals,
+                                callback: () => {
+                                    message.success('提交成功');
+                                    form.resetFields();
+                                    that.props.onDone();
+                                },
+                            });
+                        }
+                    });
+                });
+            },
+            // 取消
+            onCancel = that.props.onCancel;
+        const previousBtn = (
+                <Button
+                    key="previous"
+                    htmlType="button"
+                    style={{ float: 'left' }}
+                    onClick={onPrevious}
+                >
+                    上一步
+                </Button>
+            ),
+            nextBtn = (
+                <Button key="next" type="primary" htmlType="button" onClick={onNextAndDone}>
+                    下一步
+                </Button>
+            ),
+            cancelBtn = (
+                <Button key="cancel" htmlType="button" onClick={onCancel}>
+                    取消
+                </Button>
+            ),
+            doneBtn = (
+                <Button key="submit" htmlType="button" type="primary" onClick={onNextAndDone}>
+                    完成
+                </Button>
+            );
 
         return [
             {
-                title(key = '') {
-                    return <Steps.Step key={key} title="基本信息" />;
-                },
                 content() {
                     return [
-                        <Form.Item key="target" {...that.formLayout} label="监控对象">
-                            {form.getFieldDecorator('target', {
-                                initialValue: 1,
+                        <Form.Item key={0} {...that.formLayout} label="角色名称" hasFeedback>
+                            {form.getFieldDecorator('name', {
+                                initialValue: formVals.name,
+                                rules: [{ required: true, message: '请输入角色名称' }],
+                            })(<Input style={{ width: '100%' }} />)}
+                        </Form.Item>,
+                        <Form.Item
+                            key={1}
+                            {...that.formLayout}
+                            label="角色标识"
+                            hasFeedback
+                            extra={'请使用"ROLE_"开头的大写字符'}
+                        >
+                            {form.getFieldDecorator('mark', {
+                                initialValue: formVals.mark,
+                                rules: [{ required: true, message: '请输入角色唯一标识' }],
+                            })(<Input style={{ width: '100%' }} />)}
+                        </Form.Item>,
+                        <Form.Item key={2} {...that.formLayout} label="角色描述" hasFeedback>
+                            {form.getFieldDecorator('description', {
+                                initialValue: formVals.description,
                             })(
-                                <Select style={{ width: '100%' }}>
-                                    <Select.Option value="0">表一</Select.Option>
-                                    <Select.Option value="1">表二</Select.Option>
-                                </Select>
+                                <Input.TextArea
+                                    autosize={{ minRows: 3, maxRows: 6 }}
+                                    style={{ width: '100%' }}
+                                />
                             )}
                         </Form.Item>,
                     ];
                 },
                 footer() {
-                    return [
-                        <Button key="cancel" onClick={() => onModalVisible()}>
-                            取消
-                        </Button>,
-                        <Button key="forward" type="primary" onClick={() => that.onClickNext(step)}>
-                            下一步
-                        </Button>,
-                    ];
+                    return [cancelBtn, nextBtn];
                 },
             },
             {
-                title(key = '') {
-                    return <Steps.Step key={key} title="配置规则属性" />;
-                },
                 content() {
+                    const { result } = that.props;
                     return [
-                        <Form.Item key="target" {...that.formLayout} label="监控对象">
-                            {form.getFieldDecorator('target', {
-                                initialValue: 1,
+                        <Form.Item key={0} {...that.formLayout} label="分配资源">
+                            {form.getFieldDecorator('resources', {
+                                initialValue: formVals.resources,
                             })(
-                                <Select style={{ width: '100%' }}>
-                                    <Select.Option value="0">表一</Select.Option>
-                                    <Select.Option value="1">表二</Select.Option>
-                                </Select>
+                                <TreeSelect
+                                    treeCheckable
+                                    treeData={toAntTreeData(result)}
+                                    searchPlaceholder="请选择赋予角色资源权限"
+                                    style={{ width: '100%' }}
+                                />
                             )}
                         </Form.Item>,
                     ];
                 },
                 footer() {
-                    return [
-                        <Button key="back" style={{ float: 'left' }} onClick={that.backward}>
-                            上一步
-                        </Button>,
-                        <Button key="cancel" onClick={() => onModalVisible()}>
-                            取消
-                        </Button>,
-                        <Button key="forward" type="primary" onClick={() => that.onClickNext(step)}>
-                            下一步
-                        </Button>,
-                    ];
-                },
-            },
-            {
-                title(key = '') {
-                    return <Steps.Step key={key} title="设定调度周期" />;
-                },
-                content() {
-                    return [
-                        <Form.Item key="target" {...that.formLayout} label="监控对象">
-                            {form.getFieldDecorator('target', {
-                                initialValue: 1,
-                            })(
-                                <Select style={{ width: '100%' }}>
-                                    <Select.Option value="0">表一</Select.Option>
-                                    <Select.Option value="1">表二</Select.Option>
-                                </Select>
-                            )}
-                        </Form.Item>,
-                    ];
-                },
-                footer() {
-                    return [
-                        <Button key="back" style={{ float: 'left' }} onClick={that.backward}>
-                            上一步
-                        </Button>,
-                        <Button key="cancel" onClick={() => onModalVisible()}>
-                            取消
-                        </Button>,
-                        <Button key="submit" type="primary" onClick={() => that.onClickNext(step)}>
-                            完成
-                        </Button>,
-                    ];
+                    return [previousBtn, cancelBtn, doneBtn];
                 },
             },
         ];
@@ -128,6 +161,35 @@ export default class UpdateModal extends PureComponent {
 
     constructor(props) {
         super(props);
+        /**
+         * 挂载函数
+         */
+        [this.methods(), this.rendering(), this.listener()]
+            .map(item => {
+                return Object.keys(item).map(key => {
+                    return item[key];
+                });
+            })
+            .reduce((func1, func2) => {
+                return [...func1, ...func2];
+            })
+            .forEach(func => {
+                this[func.name] = func;
+            });
+    }
+
+    /**
+     * @组件挂载后
+     */
+    componentDidMount() {
+        const { dispatch } = this.props;
+        dispatch({
+            type: 'role/selectOne',
+            payload: {
+                id: this.props.id,
+            },
+            callback: data => this.setState({ formVals: data }),
+        });
     }
 
     /**
@@ -136,74 +198,37 @@ export default class UpdateModal extends PureComponent {
      * =====================================
      */
     render() {
-        const { visible, onModalVisible } = this.props;
-        const { step, form } = this.state;
+        const { visible, onCancel } = this.props;
+        const { step } = this.state;
+        const Step = this.renderSteps()[step];
+        console.log(step, Step);
         return (
             <Modal
                 width={640}
                 bodyStyle={{ padding: '32px 40px 48px' }}
-                destroyOnClose
-                title="规则配置"
+                title="创建角色"
                 visible={visible}
-                footer={this.steps()[step].footer()}
-                onCancel={() => onModalVisible()}
+                onCancel={onCancel}
+                footer={Step.footer()}
             >
-                <Steps style={{ marginBottom: 28 }} size="small" current={step}>
-                    {this.steps().map((step, index) => {
-                        return step.title(index);
-                    })}
+                <Steps size="small" current={step} style={{ marginBottom: 28 }}>
+                    <Steps.Step title="基本信息" />
+                    <Steps.Step title="分配资源" />
                 </Steps>
-                {this.steps()[step].content()}
+                {Step.content()}
             </Modal>
         );
     }
 
-    /**
-     * =====================================
-     *                  函数
-     * =====================================
-     */
-    /**
-     * 后退
-     */
-    backward = () => {
-        const { step } = this.state;
-        this.setState({
-            step: step - 1,
-        });
-    };
-
-    /**
-     * 前进
-     */
-    forward() {
-        const { step } = this.state;
-        this.setState({
-            step: step + 1,
-        });
+    rendering() {
+        return {};
     }
 
-    /**
-     * @下一页
-     */
-    onClickNext = step => {
-        const { form, onDone } = this.props;
-        const { formValue: oldValue } = this.state;
-        form.validateFields((err, fieldsValue) => {
-            if (err) return;
-            const formVals = { ...oldValue, ...fieldsValue };
-            this.setState(
-                {
-                    formVals,
-                },
-                () => {
-                    if (step < this.steps().length - 1) {
-                        this.forward();
-                    } else {
-                        onDone(formVals);
-                    }
-                }
-            );
-        });
-    };
+    methods() {
+        return {};
+    }
+
+    listener() {
+        return {};
+    }
 }

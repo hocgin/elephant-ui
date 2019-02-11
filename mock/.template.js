@@ -1,4 +1,4 @@
-import { success } from './util/result';
+import { pageWrapper, success } from './util/result';
 
 /**
  * API 相关描述
@@ -17,15 +17,21 @@ export default {
         return res.json(success());
     },
     /**
-     * 更新
-     */
-    'PUT /example/:uuid': (req, res) => {
-        return res.json(success());
-    },
-    /**
-     * 获取
+     * 分页获取
      */
     'GET /example': (req, res) => {
-        return res.json(success([{}]));
+        return res.json(
+            success(
+                pageWrapper({
+                    records: [],
+                })
+            )
+        );
+    },
+    /**
+     * 获取单个
+     */
+    'GET /example/:uuid': (req, res) => {
+        return res.json(success());
     },
 };
