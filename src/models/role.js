@@ -1,4 +1,4 @@
-import { insertOne, page, selectOne, updateOne } from '@/services/role';
+import { insertOne, _paging, selectOne, updateOne } from '@/services/role';
 import { message } from 'antd';
 import { ResultCode } from '../utils/Constant';
 
@@ -18,7 +18,7 @@ export default {
     effects: {
         // 分页查询
         *paging({ payload }, { call, put }) {
-            let result = yield call(page, payload);
+            let result = yield call(_paging, payload);
             if (result.code === ResultCode.SUCCESS) {
                 yield put({
                     type: 'fillPage',

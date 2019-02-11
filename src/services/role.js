@@ -1,10 +1,22 @@
 import request from '@/utils/request';
 
 /**
- * 列出所有角色
+ * 分页查询
  */
 export async function page(query) {
     return request('/roles');
+}
+
+/**
+ * 分页查询
+ */
+export async function _paging(query) {
+    return request('/roles/_paging', {
+        method: 'POST',
+        body: {
+            ...query,
+        },
+    });
 }
 
 /**
@@ -49,8 +61,6 @@ export async function selectOne({ id }) {
 export async function updateOne({ id, body }) {
     return request(`/roles/${id}`, {
         method: 'PUT',
-        body: {
-            ...body,
-        },
+        body,
     });
 }

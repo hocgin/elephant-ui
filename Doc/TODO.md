@@ -36,6 +36,8 @@ fillDetail, 填充详情数据
 ```shell
 // 分页查询
 paging
+// 分页查询(POST 方式)
+_paging
 // 更新单个
 updateOne
 // 新增单个

@@ -1,6 +1,6 @@
 import { pageWrapper, success } from './util/result';
 import { createdAt, deletedAt, updatedAt } from './util/mock';
-import { resource, allResource } from './resource';
+import { allResource } from './resource';
 
 let i = 0;
 let role = (name, mark) => {
@@ -48,6 +48,18 @@ export default {
      * 分页获取
      */
     'GET /roles': (req, res) => {
+        return res.json(
+            success(
+                pageWrapper({
+                    records: allRole(),
+                })
+            )
+        );
+    },
+    /**
+     * 分页获取
+     */
+    'POST /roles/_paging': (req, res) => {
         return res.json(
             success(
                 pageWrapper({

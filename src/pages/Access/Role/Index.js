@@ -450,17 +450,16 @@ export default class Index extends PureComponent {
             onClickSearch(e) {
                 e.preventDefault();
 
-                const { form } = that.props;
+                const { form, dispatch } = that.props;
 
                 form.validateFields((err, fieldsValue) => {
                     if (err) return;
-
-                    const values = {
-                        ...fieldsValue,
-                        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
-                    };
-
-                    console.log('搜索 Bar 搜索条件', values);
+                    dispatch({
+                        type: 'role/paging',
+                        payload: {
+                            ...fieldsValue,
+                        },
+                    });
                 });
             },
         };

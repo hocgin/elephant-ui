@@ -76,7 +76,10 @@ export default class UpdateModal extends PureComponent {
                         } else {
                             dispatch({
                                 type: 'role/updateOne',
-                                payload: formVals,
+                                payload: {
+                                    id: that.props.id,
+                                    body: formVals,
+                                },
                                 callback: () => {
                                     console.log('提交数据', formVals);
                                     message.success('提交成功');
