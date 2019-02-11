@@ -1,18 +1,26 @@
 import { pageWrapper, success } from './util/result';
-import { createdAt, updatedAt, deletedAt } from './util/mock';
+import { createdAt, deletedAt, updatedAt } from './util/mock';
+import { resource, allResource } from './resource';
 
 let i = 0;
-let create = (name, mark) => {
+let role = (name, mark) => {
     return {
-        id: `uuid_${new Date().getTime()}_${i++}`,
+        id: `uuid_role_${i++}`,
         name,
         mark,
+        enabled: true,
         description: '描述',
+        resources: allResource(),
         ...createdAt(),
         ...updatedAt(),
         ...deletedAt(),
     };
 };
+
+let allRole = () => {
+    return [role('管理员', 'ROLE_ADMIN'), role('超级管理员', 'ROLE_SUPPER_ADMIN')];
+};
+
 /**
  * 角色相关 API
  */
@@ -42,7 +50,7 @@ export default {
         return res.json(
             success(
                 pageWrapper({
-                    records: [create('管理员', 'ROLE_ADMIN')],
+                    records: allRole(),
                 })
             )
         );
@@ -51,6 +59,6 @@ export default {
      * 获取单个
      */
     'GET /roles/:uuid': (req, res) => {
-        return res.json(success(create('管理员', 'ROLE_ADMIN')));
+        return res.json(success(allRole()[0]));
     },
 };

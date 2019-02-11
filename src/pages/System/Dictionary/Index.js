@@ -1,45 +1,43 @@
-import React, {PureComponent, Fragment} from 'react';
-import {connect} from 'dva';
+import React, { Fragment, PureComponent } from 'react';
+import { connect } from 'dva';
 import moment from 'moment';
 import {
-    Row,
-    Col,
-    Card,
-    Form,
-    Input,
-    Select,
-    Icon,
     Button,
-    Dropdown,
-    Menu,
-    InputNumber,
+    Card,
+    Col,
     DatePicker,
-    Modal,
-    message,
-    Badge,
     Divider,
-    Steps,
-    Radio,
-    Switch,
+    Dropdown,
+    Form,
+    Icon,
+    Input,
+    Menu,
+    message,
+    Modal,
+    Row,
+    Select,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
-import EditModal from './Modal/EditModal'
-import CreateModal from './Modal/CreateModal'
-import DetailModal from "./Modal/DetailModal";
+import UpdateModal from './Modal/UpdateModal';
+import CreateModal from './Modal/CreateModal';
+import DetailModal from './Modal/DetailModal';
 import styles from './Index.less';
 
-import Sup from "@/utils/supplement";
+import Sup from '@/utils/supplement';
+import { Status } from '../../Access/Role/constant/constant';
+
+const Constant = {
+    CREATE_MODAL_VISIBLE: 'createModalVisible',
+    UPDATE_MODAL_VISIBLE: 'updateModalVisible',
+    DETAIL_MODAL_VISIBLE: 'detailModalVisible',
+};
 
 const Expand = {
-    // 标题
-    title() {
-        return '数据字典';
-    },
     // 取数据
     mapStateToProps(states) {
-        const {dictionary, loading} = states;
+        const { dictionary, loading } = states;
         console.log('mapStateToProps', dictionary);
         return {
             result: dictionary,
@@ -50,8 +48,7 @@ const Expand = {
     // 发起请求
     mapDispatchToProps(dispatch) {
         return {
-            $example() {
-            },
+            $example() {},
             /**
              * 查询
              * @param params
@@ -61,9 +58,9 @@ const Expand = {
                 dispatch({
                     type: 'dictionary/query',
                     payload: {
-                        ...params
+                        ...params,
                     },
-                    callback
+                    callback,
                 });
             },
             /**
@@ -75,9 +72,9 @@ const Expand = {
                 dispatch({
                     type: `dictionary/fetch`,
                     payload: {
-                        ...params
+                        ...params,
                     },
-                    callback
+                    callback,
                 });
             },
             /**
@@ -103,9 +100,9 @@ const Expand = {
                 dispatch({
                     type: 'dictionary/add',
                     payload: {
-                        ...param
+                        ...param,
                     },
-                    callback
+                    callback,
                 });
             },
             /**
@@ -117,134 +114,62 @@ const Expand = {
                 dispatch({
                     type: 'dictionary/update',
                     payload: {
-                        ...param
+                        ...param,
                     },
-                    callback
+                    callback,
                 });
-            }
+            },
         };
     },
     // 状态解析
     status() {
-        return [{
-            status: 'error',
-            text: '禁用'
-        }, {
-            status: 'success',
-            text: '启用'
-        }];
-    }
+        return [
+            {
+                status: 'error',
+                text: '禁用',
+            },
+            {
+                status: 'success',
+                text: '启用',
+            },
+        ];
+    },
 };
 
 /* eslint react/no-multi-comp:0 */
-@connect(Expand.mapStateToProps, Expand.mapDispatchToProps)
+@connect(
+    Expand.mapStateToProps,
+    Expand.mapDispatchToProps
+)
 @Form.create()
 export default class Index extends PureComponent {
     state = {
-        // 是否展开多项搜索框
-        expandForm: false,
-        // 更新 Modal
-        editModalVisible: false,
-        // 创建 Modal
-        createModalVisible: false,
-        // 详情 Modal
-        detailModalVisible: false,
         // 选中的行
         selectedRows: [],
-
-        // 创建弹窗的值
-        // createModalValues: {},
         // 编辑弹窗的值
         editModalValues: {},
         // 详情弹窗的值
         detailModalValues: {},
     };
 
-    // 字段
-    columns = [
-        {
-            title: '属性值',
-            dataIndex: 'label',
-        }, {
-            title: '描述',
-            dataIndex: 'description',
-        }, {
-            title: '创建时间',
-            dataIndex: 'createdAt',
-            sorter: true,
-            render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
-        }, {
-            title: '操作',
-            key: 'operation',
-            fixed: 'right',
-            width: 200,
-            render: (text, record) => {
-                const menu = (
-                    <Menu>
-                        <Menu.Item key="remove" onClick={() => this.onClickDeleteButton(record)}>删除</Menu.Item>
-                        <Menu.Item key="edit" onClick={() => this.onClickEditButton(true, record)}>修改</Menu.Item>
-                        <Menu.Item key="on">启用</Menu.Item>
-                        <Menu.Item key="off">禁用</Menu.Item>
-                    </Menu>
-                );
-                return (
-                    <Fragment>
-                        <a onClick={() => this.onClickDetailButton(true, record)}>查看详情</a>
-                        <Divider type="vertical"/>
-                        <Dropdown overlay={menu}>
-                            <a className="ant-dropdown-link" href="#">
-                                更多操作 <Icon type="down"/>
-                            </a>
-                        </Dropdown>
-                    </Fragment>
-                );
-            },
-        },
-    ];
-
     constructor(props) {
         super(props);
-        const {
-            handleAdd,
-            handleUpdate
-        } = this.methods();
-        this.handleUpdate = handleUpdate;
-        this.handleAdd = handleAdd;
 
-        const {
-            renderSimpleForm,
-            renderForm,
-            renderAdvancedForm,
-            showRemoveModal,
-        } = this.rendering();
-        this.renderAdvancedForm = renderAdvancedForm;
-        this.renderForm = renderForm;
-        this.renderSimpleForm = renderSimpleForm;
-        this.showRemoveModal = showRemoveModal;
-
-        const {
-            handleFormReset,
-            handleStandardTableChange,
-            toggleForm,
-            handleMenuClick,
-            onSelectRows,
-            onClickSearchButton,
-            onClickCreateButton,
-            onClickDetailButton,
-            onClickEditButton,
-            onClickDeleteButton,
-        } = this.listener();
-        this.handleFormReset = handleFormReset;
-        this.handleStandardTableChange = handleStandardTableChange;
-        this.toggleForm = toggleForm;
-        this.handleMenuClick = handleMenuClick;
-
-        this.onClickSearchButton = onClickSearchButton;
-        this.onSelectRows = onSelectRows;
-        this.onClickCreateButton = onClickCreateButton;
-        this.onClickDetailButton = onClickDetailButton;
-        this.onClickEditButton = onClickEditButton;
-        this.onClickDeleteButton = onClickDeleteButton;
+        /**
+         * 挂载函数
+         */
+        [this.methods(), this.rendering(), this.listener()]
+            .map(item => {
+                return Object.keys(item).map(key => {
+                    return item[key];
+                });
+            })
+            .reduce((func1, func2) => {
+                return [...func1, ...func2];
+            })
+            .forEach(func => {
+                this[func.name] = func;
+            });
     }
 
     /**
@@ -254,44 +179,90 @@ export default class Index extends PureComponent {
         this.props.$query();
     }
 
+    // 字段
+    columns = [
+        {
+            title: '属性值',
+            dataIndex: 'label',
+        },
+        {
+            title: '描述',
+            dataIndex: 'description',
+        },
+        {
+            title: '创建时间',
+            dataIndex: 'createdAt',
+            sorter: true,
+            render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
+        },
+        {
+            title: '操作',
+            key: 'operation',
+            fixed: 'right',
+            width: 200,
+            render: (text, record) => {
+                const menu = (
+                    <Menu>
+                        <Menu.Item key="remove" onClick={() => this.onClickDeleteButton(record)}>
+                            删除
+                        </Menu.Item>
+                        <Menu.Item key="edit" onClick={() => this.onClickEditButton(true, record)}>
+                            修改
+                        </Menu.Item>
+                        <Menu.Item key="on">启用</Menu.Item>
+                        <Menu.Item key="off">禁用</Menu.Item>
+                    </Menu>
+                );
+                return (
+                    <Fragment>
+                        <a onClick={() => this.onClickDetailButton(true, record)}>查看详情</a>
+                        <Divider type="vertical" />
+                        <Dropdown overlay={menu}>
+                            <a className="ant-dropdown-link" href="#">
+                                更多操作 <Icon type="down" />
+                            </a>
+                        </Dropdown>
+                    </Fragment>
+                );
+            },
+        },
+    ];
+
     render() {
         const {
-            result: {data},
+            route: { name },
+            result: { data },
             loading,
         } = this.props;
 
-        const {
-            selectedRows,
-            createModalVisible,
-            editModalVisible,
-            detailModalVisible,
-
-            editModalValues,
-            detailModalValues,
-        } = this.state;
+        const { selectedRows } = this.state;
         const menu = (
             <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
                 <Menu.Item key="remove">批量删除</Menu.Item>
             </Menu>
         );
         return (
-            <PageHeaderWrapper title={Expand.title()}>
+            <PageHeaderWrapper title={name}>
                 <Card bordered={false}>
                     <div className={styles.tableList}>
                         {/*搜索层*/}
-                        <div className={styles.tableListForm}>{this.renderForm()}</div>
+                        <div className={styles.tableListForm}>{this.renderSearchBar()}</div>
                         {/*工具栏(新建/批量操作)层*/}
                         <div className={styles.tableListOperator}>
-                            <Button icon="plus" type="primary" onClick={() => this.onClickCreateButton(true)}>
+                            <Button
+                                icon="plus"
+                                type="primary"
+                                onClick={() => this.onClickCreateButton(true)}
+                            >
                                 新建
                             </Button>
                             {selectedRows.length > 0 && (
                                 <span>
-                                  <Dropdown overlay={menu}>
-                                    <Button>
-                                      批量操作 <Icon type="down"/>
-                                    </Button>
-                                  </Dropdown>
+                                    <Dropdown overlay={menu}>
+                                        <Button>
+                                            批量操作 <Icon type="down" />
+                                        </Button>
+                                    </Dropdown>
                                 </span>
                             )}
                         </div>
@@ -307,22 +278,9 @@ export default class Index extends PureComponent {
                         />
                     </div>
                 </Card>
-                {/*新增弹窗*/}
-                <CreateModal visible={createModalVisible}
-                             onModalVisible={this.onClickCreateButton}
-                             onDone={this.methods().handleAdd}/>
-                {/*更新弹窗*/}
-                {editModalValues && Object.keys(editModalValues).length ?
-                    <EditModal visible={editModalVisible}
-                               onModalVisible={this.onClickEditButton}
-                               onDone={this.methods().handleUpdate}
-                               values={editModalValues}/> : null}
-                {/*详情弹窗*/}
-                {detailModalValues && Object.keys(detailModalValues).length ?
-                    <DetailModal
-                        visible={detailModalVisible}
-                        onModalVisible={this.onClickDetailButton}
-                        values={detailModalValues}/> : null}
+                {this.renderCreateModal()}
+                {this.renderUpdateModal()}
+                {this.renderDetailModal()}
             </PageHeaderWrapper>
         );
     }
@@ -333,6 +291,16 @@ export default class Index extends PureComponent {
     methods = () => {
         const that = this;
         return {
+            onShow(key) {
+                that.setState({
+                    [key]: true,
+                });
+            },
+            onClose(key) {
+                that.setState({
+                    [key]: false,
+                });
+            },
             /**
              * 处理新增请求
              * @param fields
@@ -356,7 +324,7 @@ export default class Index extends PureComponent {
 
                 message.success('配置成功');
                 that.onClickDetailButton();
-            }
+            },
         };
     };
 
@@ -369,123 +337,179 @@ export default class Index extends PureComponent {
             /**
              * 根据情况渲染搜索框
              */
-            renderForm() {
-                const {expandForm} = that.state;
-                return expandForm ? that.renderAdvancedForm() : that.renderSimpleForm();
-            },
-            renderSimpleForm() {
+            renderSearchBar() {
                 const {
-                    form: {getFieldDecorator},
+                    form: { getFieldDecorator },
                 } = that.props;
+                const { expandForm } = that.state;
+
+                const items = [
+                    <Col key={0} md={8} sm={24}>
+                        <Form.Item label="角色名称">
+                            {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+                        </Form.Item>
+                    </Col>,
+                    <Col key={1} md={8} sm={24}>
+                        <Form.Item label="使用状态">
+                            {getFieldDecorator('status')(
+                                <Select placeholder="请选择" style={{ width: '100%' }}>
+                                    {Status.map(({ value, text }, index) => {
+                                        return (
+                                            <Select.Option key={index} value={value}>
+                                                {text}
+                                            </Select.Option>
+                                        );
+                                    })}
+                                </Select>
+                            )}
+                        </Form.Item>
+                    </Col>,
+                    <Col key={2} md={8} sm={24}>
+                        <Form.Item label="创建日期">
+                            {getFieldDecorator('createdAt')(
+                                <DatePicker
+                                    style={{ width: '100%' }}
+                                    placeholder="请输入更新日期"
+                                />
+                            )}
+                        </Form.Item>
+                    </Col>,
+                ];
+
+                /**
+                 * 处理展开/收起
+                 */
+                let onClickToggleSearchMode = () => {
+                    const { expandForm } = that.state;
+                    that.setState({
+                        expandForm: !expandForm,
+                    });
+                };
+                /**
+                 * 处理搜索条件重置
+                 */
+                let onClickResetSearch = () => {
+                    const { form } = that.props;
+                    form.resetFields();
+                };
+
                 return (
-                    <Form onSubmit={that.onClickSearchButton} layout="inline">
-                        <Row gutter={{md: 8, lg: 24, xl: 48}}>
-                            <Col md={8} sm={24}>
-                                <Form.Item label="角色名称">
-                                    {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
-                                </Form.Item>
-                            </Col>
-                            <Col md={8} sm={24}>
-                                <Form.Item label="使用状态">
-                                    {getFieldDecorator('status')(
-                                        <Select placeholder="请选择" style={{width: '100%'}}>
-                                            {
-                                                Expand.status().map((({status, text}) => {
-                                                    return (<Select.Option key={status}
-                                                                           value={status}>{text}</Select.Option>);
-                                                }))
-                                            }
-                                        </Select>
-                                    )}
-                                </Form.Item>
-                            </Col>
-                            <Col md={8} sm={24}>
-                        <span className={styles.submitButtons}>
-                          <Button type="primary" htmlType="submit">
-                            查询
-                          </Button>
-                          <Button style={{marginLeft: 8}} onClick={this.handleFormReset}>
-                            重置
-                          </Button>
-                          <a style={{marginLeft: 8}} onClick={this.toggleForm}>
-                            展开 <Icon type="down"/>
-                          </a>
-                        </span>
-                            </Col>
+                    <Form onSubmit={that.onClickSearch} layout="inline">
+                        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+                            {!!expandForm ? items : [items[0], items[1]]}
+                            {/*收起状态*/}
+                            {!expandForm && (
+                                <Col md={8} sm={24}>
+                                    <span className={styles.submitButtons}>
+                                        <Button type="primary" htmlType="submit">
+                                            查询
+                                        </Button>
+                                        <Button
+                                            htmlType="button"
+                                            style={{ marginLeft: 8 }}
+                                            onClick={onClickResetSearch}
+                                        >
+                                            重置
+                                        </Button>
+                                        <a
+                                            style={{ marginLeft: 8 }}
+                                            onClick={onClickToggleSearchMode}
+                                        >
+                                            展开 <Icon type="down" />
+                                        </a>
+                                    </span>
+                                </Col>
+                            )}
                         </Row>
-                    </Form>
-                );
-            },
-            /**
-             * 渲染搜索框展开状态
-             */
-            renderAdvancedForm() {
-                const {
-                    form: {getFieldDecorator},
-                } = that.props;
-                return (
-                    <Form onSubmit={that.onClickSearchButton} layout="inline">
-                        <Row gutter={{md: 8, lg: 24, xl: 48}}>
-                            <Col md={8} sm={24}>
-                                <Form.Item label="角色名称">
-                                    {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
-                                </Form.Item>
-                            </Col>
-                            <Col md={8} sm={24}>
-                                <Form.Item label="使用状态">
-                                    {getFieldDecorator('status')(
-                                        <Select placeholder="请选择" style={{width: '100%'}}>
-                                            {
-                                                Expand.status().map((({status, text}) => {
-                                                    return (<Select.Option key={status}
-                                                                           value={status}>{text}</Select.Option>);
-                                                }))
-                                            }
-                                        </Select>
-                                    )}
-                                </Form.Item>
-                            </Col>
-                            <Col md={8} sm={24}>
-                                <Form.Item label="创建日期">
-                                    {getFieldDecorator('createdAt')(
-                                        <DatePicker style={{width: '100%'}} placeholder="请输入更新日期"/>
-                                    )}
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                        <div style={{overflow: 'hidden'}}>
-                            <div style={{float: 'right', marginBottom: 24}}>
-                                <Button type="primary" htmlType="submit">
-                                    查询
-                                </Button>
-                                <Button style={{marginLeft: 8}} onClick={that.handleFormReset}>
-                                    重置
-                                </Button>
-                                <a style={{marginLeft: 8}} onClick={that.toggleForm}>
-                                    收起 <Icon type="up"/>
-                                </a>
+                        {/*展开状态*/}
+                        {expandForm && (
+                            <div style={{ overflow: 'hidden' }}>
+                                <div style={{ float: 'right', marginBottom: 24 }}>
+                                    <Button type="primary" htmlType="submit">
+                                        查询
+                                    </Button>
+                                    <Button
+                                        htmlType="button"
+                                        style={{ marginLeft: 8 }}
+                                        onClick={onClickResetSearch}
+                                    >
+                                        重置
+                                    </Button>
+                                    <a style={{ marginLeft: 8 }} onClick={onClickToggleSearchMode}>
+                                        收起 <Icon type="up" />
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </Form>
                 );
             },
 
+            /**
+             * 渲染创建 Modal
+             */
+            renderCreateModal() {
+                const { createModalVisible } = that.state;
+                return (
+                    <CreateModal
+                        visible={createModalVisible}
+                        onCancel={() => this.onClose(Constant.CREATE_MODAL_VISIBLE)}
+                        onDone={() => this.onClose(Constant.CREATE_MODAL_VISIBLE)}
+                    />
+                );
+            },
+
+            /**
+             * 渲染更新 Modal
+             */
+            renderUpdateModal() {
+                const { updateModalVisible, editModalValues } = that.state;
+                return (
+                    editModalValues &&
+                    Object.keys(editModalValues).length && (
+                        <UpdateModal
+                            visible={updateModalVisible}
+                            onCancel={() => this.onClose(Constant.UPDATE_MODAL_VISIBLE)}
+                            onDone={() => this.onClose(Constant.UPDATE_MODAL_VISIBLE)}
+                        />
+                    )
+                );
+            },
+
+            /**
+             * 渲染详情 Modal
+             */
+            renderDetailModal() {
+                const { detailModalVisible, detailModalValues } = that.state;
+                return (
+                    detailModalValues &&
+                    Object.keys(detailModalValues).length && (
+                        <DetailModal
+                            visible={detailModalVisible}
+                            onCancel={() => this.onClose(Constant.DETAIL_MODAL_VISIBLE)}
+                            onDone={() => this.onClose(Constant.DETAIL_MODAL_VISIBLE)}
+                        />
+                    )
+                );
+            },
+
             showRemoveModal(id = []) {
-                id.length !== 0 && Modal.confirm({
-                    title: '警告',
-                    content: '确定删除?',
-                    okText: '确定',
-                    okType: 'danger',
-                    cancelText: '取消',
-                    onOk() {
-                        that.props.$remove(id, () => {
-                            message.success('删除成功');
-                            that.setState({
-                                selectedRows: [],
+                id.length !== 0 &&
+                    Modal.confirm({
+                        title: '警告',
+                        content: '确定删除?',
+                        okText: '确定',
+                        okType: 'danger',
+                        cancelText: '取消',
+                        onOk() {
+                            that.props.$remove(id, () => {
+                                message.success('删除成功');
+                                that.setState({
+                                    selectedRows: [],
+                                });
                             });
-                        });
-                    }
-                });
+                        },
+                    });
             },
         };
     };
@@ -500,7 +524,7 @@ export default class Index extends PureComponent {
              * 处理搜索条件重置
              */
             handleFormReset() {
-                const {form} = that.props;
+                const { form } = that.props;
                 form.resetFields();
                 that.setState({
                     createModalValues: {},
@@ -512,10 +536,10 @@ export default class Index extends PureComponent {
              * 处理标题条件变更, 如[排序, 过滤]
              */
             handleStandardTableChange(pagination, filtersArg, sorter) {
-                const {createModalValues} = that.state;
+                const { createModalValues } = that.state;
 
                 const filters = Object.keys(filtersArg).reduce((obj, key) => {
-                    const newObj = {...obj};
+                    const newObj = { ...obj };
                     newObj[key] = Sup().JSON.toString(filtersArg[key], ',');
                     return newObj;
                 }, {});
@@ -536,7 +560,7 @@ export default class Index extends PureComponent {
              * 处理展开/收起
              */
             toggleForm() {
-                const {expandForm} = that.state;
+                const { expandForm } = that.state;
                 that.setState({
                     expandForm: !expandForm,
                 });
@@ -546,7 +570,7 @@ export default class Index extends PureComponent {
              * @param e
              */
             handleMenuClick(e) {
-                const {selectedRows} = that.state;
+                const { selectedRows } = that.state;
 
                 if (!selectedRows) {
                     return;
@@ -574,7 +598,7 @@ export default class Index extends PureComponent {
             onClickSearchButton(e) {
                 e.preventDefault();
 
-                const {form} = that.props;
+                const { form } = that.props;
 
                 form.validateFields((err, fieldsValue) => {
                     if (err) return;
@@ -603,18 +627,18 @@ export default class Index extends PureComponent {
              */
             onClickDetailButton(flag, record) {
                 if (record) {
-                    const {$fetch} = that.props;
+                    const { $fetch } = that.props;
                     that.setState({
-                        detailModalValues: {}
+                        detailModalValues: {},
                     });
-                    $fetch({id: record.id}, (data) => {
+                    $fetch({ id: record.id }, data => {
                         that.setState({
-                            detailModalValues: data
+                            detailModalValues: data,
                         });
                     });
                 }
                 that.setState({
-                    detailModalVisible: !!flag
+                    detailModalVisible: !!flag,
                 });
             },
             /**
@@ -623,18 +647,18 @@ export default class Index extends PureComponent {
             onClickEditButton(flag, record) {
                 console.log('修改？', record);
                 if (record) {
-                    const {$fetch} = that.props;
+                    const { $fetch } = that.props;
                     that.setState({
-                        editModalValues: {}
+                        editModalValues: {},
                     });
-                    $fetch({id: record.id}, (data) => {
+                    $fetch({ id: record.id }, data => {
                         that.setState({
-                            editModalValues: data
+                            editModalValues: data,
                         });
                     });
                 }
                 that.setState({
-                    editModalVisible: !!flag
+                    editModalVisible: !!flag,
                 });
             },
             /**

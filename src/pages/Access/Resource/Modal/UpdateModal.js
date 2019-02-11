@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Form, Select, Button, Modal, Steps, TreeSelect, Switch, Icon, Input, Tooltip } from 'antd';
+import { Button, Form, Icon, Input, Modal, Select, Steps, Switch, Tooltip, TreeSelect } from 'antd';
 import { connect } from 'dva';
 import getIcons from '@/services/data';
 import { Types } from '../constant/constant';
@@ -7,15 +7,10 @@ import { Types } from '../constant/constant';
 /**
  * 更新弹窗
  */
-@connect(({ resource, loading }) => ({
-    // data 数据的加载状态
-    // result: resource.result,
-    // submitting: loading.effects['resource/save'],
-}))
+@connect(({ resource, loading }) => ({}))
 @Form.create()
 export default class UpdateModal extends PureComponent {
     state = {
-        id: this.props.id,
         // 当前步骤
         step: 1,
         // 待提交的值
@@ -50,9 +45,7 @@ export default class UpdateModal extends PureComponent {
      * @组件挂载后
      */
     componentDidMount() {
-        const { dispatch } = this.props;
-        const { id } = this.state;
-        console.log(this.props, this.state);
+        const { dispatch, id } = this.props;
         dispatch({
             type: 'resource/selectOne',
             payload: {
@@ -315,8 +308,8 @@ export default class UpdateModal extends PureComponent {
         return {
             // 点击 下一页 触发
             onClickNext(step) {
-                const { form, onDone } = that.props;
-                const { id, formVals: oldValue } = that.state;
+                const { form, onDone, id } = that.props;
+                const { formVals: oldValue } = that.state;
                 form.validateFields((err, fieldsValue) => {
                     if (err) return;
                     const formVals = { ...oldValue, ...fieldsValue };

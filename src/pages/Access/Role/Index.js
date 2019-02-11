@@ -2,7 +2,6 @@ import React, { Fragment, PureComponent } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
 import {
-    Badge,
     Button,
     Card,
     Col,
@@ -21,81 +20,20 @@ import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Index.less';
 import * as LangKit from '../../../utils/LangKit';
+import { Status } from './constant/constant';
 import CreateModal from './Modal/CreateModal';
 import UpdateModal from './Modal/UpdateModal';
-import DetailModal from './Modal/DetailModal';
+import router from 'umi/router';
+import * as RenderKit from '../../../utils/RenderKit';
 
-const Expand = {
-    // 发起请求
-    mapDispatchToProps(dispatch) {
-        return {
-            example() {},
-            page(params) {
-                dispatch({
-                    type: 'roles/page',
-                    payload: params,
-                });
-            },
-            // 查询
-            query(params) {
-                dispatch({
-                    type: 'role/query',
-                    payload: params,
-                });
-            },
-            remove(key, callback) {
-                dispatch({
-                    type: 'rule/remove',
-                    payload: {
-                        key: key,
-                    },
-                    callback: callback,
-                });
-            },
-            add(desc) {
-                dispatch({
-                    type: 'rule/add',
-                    payload: {
-                        desc: desc,
-                    },
-                });
-            },
-            update(name, desc, key) {
-                dispatch({
-                    type: 'rule/update',
-                    payload: {
-                        name,
-                        desc,
-                        key,
-                    },
-                });
-            },
-        };
-    },
-    // 状态解析
-    status() {
-        return [
-            {
-                status: 'error',
-                text: '禁用',
-            },
-            {
-                status: 'success',
-                text: '启用',
-            },
-        ];
-    },
-};
 const Constant = {
     CREATE_MODAL_VISIBLE: 'createModalVisible',
     UPDATE_MODAL_VISIBLE: 'updateModalVisible',
-    DETAIL_MODAL_VISIBLE: 'detailModalVisible',
 };
 
-const TITLE = '角色管理';
 /* eslint react/no-multi-comp:0 */
 @connect(({ role, loading }) => ({
-    result: role,
+    result: role.page,
     // data 数据的加载状态
     loading: loading.models.role,
 }))
@@ -123,6 +61,17 @@ export default class Index extends PureComponent {
             });
     }
 
+    /**
+     * @组件挂载后
+     */
+    componentDidMount() {
+        const { dispatch } = this.props;
+        dispatch({
+            type: 'role/paging',
+            payload: {},
+        });
+    }
+
     // 字段
     columns = [
         {
@@ -140,19 +89,8 @@ export default class Index extends PureComponent {
         {
             title: '状态',
             dataIndex: 'enabled',
-            //     filters: [
-            //         {
-            //             text: Expand.status()[0].text,
-            //             value: 0,
-            //         },
-            //         {
-            //             text: Expand.status()[1].text,
-            //             value: 1,
-            //         },
-            //     ],
             render(val) {
-                // let {status, text} = Expand.status()[val];
-                return <Badge status="success" text="启用" />;
+                return RenderKit.renderSwitch(val);
             },
         },
         {
@@ -189,27 +127,13 @@ export default class Index extends PureComponent {
         },
     ];
 
-    /**
-     * @组件挂载后
-     */
-    componentDidMount() {
-        const { dispatch } = this.props;
-        dispatch({
-            type: 'roles/page',
-            payload: {},
-        });
-    }
-
     render() {
-        const that = this;
-        const { result, loading } = this.props;
         const {
-            selectedRows,
-            operationRow,
-            createModalVisible,
-            updateModalVisible,
-            detailModalVisible,
-        } = this.state;
+            route: { name },
+            result,
+            loading,
+        } = this.props;
+        const { selectedRows } = this.state;
         const menu = (
             <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
                 <Menu.Item key="remove">删除</Menu.Item>
@@ -218,7 +142,7 @@ export default class Index extends PureComponent {
         );
 
         return (
-            <PageHeaderWrapper title={TITLE}>
+            <PageHeaderWrapper title={name}>
                 <Card bordered={false}>
                     <div className={styles.tableList}>
                         {/*搜索层*/}
@@ -256,30 +180,8 @@ export default class Index extends PureComponent {
                         />
                     </div>
                 </Card>
-                {/*新增弹窗*/}
-                <CreateModal
-                    visible={createModalVisible}
-                    onCancel={() => this.onClose(Constant.CREATE_MODAL_VISIBLE)}
-                    onDone={() => this.onClose(Constant.CREATE_MODAL_VISIBLE)}
-                />
-                {/*更新弹窗*/}
-                {operationRow ? (
-                    <UpdateModal
-                        visible={updateModalVisible}
-                        onCancel={() => this.onClose(Constant.UPDATE_MODAL_VISIBLE)}
-                        onDone={() => this.onClose(Constant.UPDATE_MODAL_VISIBLE)}
-                        id={operationRow}
-                    />
-                ) : null}
-                {/*详情弹窗*/}
-                {operationRow ? (
-                    <DetailModal
-                        visible={detailModalVisible}
-                        onCancel={() => this.onClose(Constant.DETAIL_MODAL_VISIBLE)}
-                        onDone={() => this.onClose(Constant.DETAIL_MODAL_VISIBLE)}
-                        id={operationRow}
-                    />
-                ) : null}
+                {this.renderCreateModal()}
+                {this.renderUpdateModal()}
             </PageHeaderWrapper>
         );
     }
@@ -352,9 +254,9 @@ export default class Index extends PureComponent {
                         <Form.Item label="使用状态">
                             {getFieldDecorator('status')(
                                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    {Expand.status().map(({ status, text }) => {
+                                    {Status.map(({ value, text }, index) => {
                                         return (
-                                            <Select.Option key={status} value={status}>
+                                            <Select.Option key={index} value={value}>
                                                 {text}
                                             </Select.Option>
                                         );
@@ -443,6 +345,36 @@ export default class Index extends PureComponent {
                     </Form>
                 );
             },
+            /**
+             * 渲染创建 Modal
+             */
+            renderCreateModal() {
+                const { createModalVisible } = that.state;
+                return (
+                    <CreateModal
+                        visible={createModalVisible}
+                        onCancel={() => this.onClose(Constant.CREATE_MODAL_VISIBLE)}
+                        onDone={() => this.onClose(Constant.CREATE_MODAL_VISIBLE)}
+                    />
+                );
+            },
+            /**
+             * 渲染更新 Modal
+             */
+            renderUpdateModal() {
+                const { operationRow, updateModalVisible } = that.state;
+                return (
+                    operationRow &&
+                    updateModalVisible && (
+                        <UpdateModal
+                            visible={updateModalVisible}
+                            onCancel={() => this.onClose(Constant.UPDATE_MODAL_VISIBLE)}
+                            onDone={() => this.onClose(Constant.UPDATE_MODAL_VISIBLE)}
+                            id={operationRow}
+                        />
+                    )
+                );
+            },
         };
     }
 
@@ -470,7 +402,12 @@ export default class Index extends PureComponent {
                             // 查看详情
                             case 'detail':
                             default: {
-                                that.onShow(Constant.DETAIL_MODAL_VISIBLE);
+                                router.push({
+                                    pathname: '/access/role/detail',
+                                    query: {
+                                        id: data.id,
+                                    },
+                                });
                             }
                         }
                     }

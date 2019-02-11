@@ -6,7 +6,7 @@ import { toString } from '@/utils/utils';
  * 查询节点信息
  * @param query
  */
-export async function selectBy(query) {
+export async function selectAll(query) {
     const search = stringify(query);
     let uri = '/resource';
     if (search.length) {

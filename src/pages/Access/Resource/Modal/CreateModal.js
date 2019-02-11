@@ -9,7 +9,7 @@ import { Types } from '../constant/constant';
  */
 @connect(({ resource, loading }) => ({
     // data 数据的加载状态
-    result: resource.result,
+    allResource: resource.all,
     submitting: loading.effects['resource/save'],
 }))
 @Form.create()
@@ -102,7 +102,7 @@ export default class CreateModal extends PureComponent {
             // 渲染步骤内容
             renderSteps() {
                 const { step } = that.state;
-                const { form, onCancel, result, defaultParent, submitting } = that.props;
+                const { form, onCancel, allResource, defaultParent, submitting } = that.props;
                 return [
                     {
                         title(key = '') {
@@ -113,10 +113,12 @@ export default class CreateModal extends PureComponent {
                                 <Form.Item key="parent" {...that.formLayout} label="父节点">
                                     {form.getFieldDecorator('parent', {
                                         initialValue:
-                                            defaultParent != null ? defaultParent : result[0].id,
+                                            defaultParent != null
+                                                ? defaultParent
+                                                : allResource[0].id,
                                     })(
                                         <TreeSelect style={{ width: '100%' }}>
-                                            {that.renderTreeNode(result)}
+                                            {that.renderTreeNode(allResource)}
                                         </TreeSelect>
                                     )}
                                 </Form.Item>,

@@ -293,13 +293,23 @@ export default [
                 routes: [
                     {
                         name: '角色管理',
-                        component: './Access/Role/Index',
                         path: '/access/role',
+                        routes: [
+                            {
+                                path: '/access/role',
+                                component: './Access/Role/Index',
+                            },
+                            {
+                                name: '角色详情',
+                                path: '/access/role/detail',
+                                component: './Access/Role/Detail',
+                            },
+                        ],
                     },
                     {
                         name: '资源管理',
-                        component: './Access/Resource/Index',
                         path: '/access/resource',
+                        component: './Access/Resource/Index',
                     },
                 ],
             },
@@ -310,8 +320,8 @@ export default [
                 routes: [
                     {
                         name: '数据字典',
-                        component: './System/Dictionary/Index',
                         path: '/system/dictionary',
+                        component: './System/Dictionary/Index',
                     },
                     //     {
                     //     name: "变量配置",

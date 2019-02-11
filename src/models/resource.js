@@ -1,19 +1,20 @@
-import { selectBy, insert, deletes, selectOne, updateOne } from '@/services/resource';
+import { selectAll, insert, deletes, selectOne, updateOne } from '@/services/resource';
+import { ResultCode } from '../utils/Constant';
 
 export default {
     namespace: 'resource',
     state: {
-        // 资源(树结构)
-        result: [],
+        // 资源
+        all: [],
     },
 
     effects: {
-        // 获取所有资源(树结构)
-        *query({ payload, callback }, { call, put }) {
-            const { code, message, data } = yield call(selectBy, payload);
-            if (code === 200) {
+        // 获取所有资源
+        *selectAll({ payload, callback }, { call, put }) {
+            const { code, message, data } = yield call(selectAll, payload);
+            if (code === ResultCode.SUCCESS) {
                 yield put({
-                    type: 'updateResources',
+                    type: 'fillAll',
                     payload: data,
                 });
             } else {
@@ -23,7 +24,7 @@ export default {
         // 查询单条
         *selectOne({ payload, callback }, { call, put }) {
             const { code, message, data } = yield call(selectOne, payload);
-            if (code === 200) {
+            if (code === ResultCode.SUCCESS) {
                 if (callback) {
                     callback(data);
                 }
@@ -34,7 +35,7 @@ export default {
         // 新增资源
         *save({ payload, callback }, { call, put }) {
             const { code, message, data } = yield call(insert, payload);
-            if (code === 200) {
+            if (code === ResultCode.SUCCESS) {
                 // 发送刷新请求
                 yield put({
                     type: 'query',
@@ -49,7 +50,7 @@ export default {
         // 批量删除
         *deletes({ payload, callback }, { call, put }) {
             const { code, message, data } = yield call(deletes, payload);
-            if (code === 200) {
+            if (code === ResultCode.SUCCESS) {
                 // 发送刷新请求
                 yield put({
                     type: 'query',
@@ -64,7 +65,7 @@ export default {
         // 更新
         *updateOne({ payload, callback }, { call, put }) {
             const { code, message, data } = yield call(updateOne, payload);
-            if (code === 200) {
+            if (code === ResultCode.SUCCESS) {
                 // 发送刷新请求
                 yield put({
                     type: 'query',
@@ -79,11 +80,11 @@ export default {
     },
 
     reducers: {
-        // 更新数据
-        updateResources(state, { payload }) {
+        // 填充数据
+        fillAll(state, { payload }) {
             return {
                 ...state,
-                result: [payload],
+                all: payload,
             };
         },
     },

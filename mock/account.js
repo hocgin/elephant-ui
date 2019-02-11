@@ -1,4 +1,5 @@
 import { success } from './util/result';
+import { resource } from './resource';
 
 /**
  * 账号相关 API
@@ -37,30 +38,18 @@ export default {
      * 获取菜单列表
      */
     'GET /account/menus': (req, res) => {
-        let createMenu = (name, type, method, path, enabled, children) => {
-            return {
-                id: `uuid_${new Date().getTime()}`,
-                name,
-                description: '描述',
-                type,
-                method,
-                path,
-                icon: 'warning',
-                enabled,
-                children,
-            };
-        };
-
         return res.json(
-            success([
-                createMenu('访问控制', 0, 'GET', '/access', true, [
-                    createMenu('角色管理', 0, 'GET', '/access/role', true, []),
-                    createMenu('资源管理', 0, 'GET', '/access/resource', true, []),
-                ]),
-                createMenu('系统配置', 0, 'GET', '/system', true, [
-                    createMenu('数据字典', 0, 'GET', '/system/dictionary', true, []),
-                ]),
-            ])
+            success(
+                resource('根节点', 0, 'GET', '/', true, [
+                    resource('访问控制', 0, 'GET', '/access', true, [
+                        resource('角色管理', 0, 'GET', '/access/role', true, []),
+                        resource('资源管理', 0, 'GET', '/access/resource', true, []),
+                    ]),
+                    resource('系统配置', 0, 'GET', '/system', true, [
+                        resource('数据字典', 0, 'GET', '/system/dictionary', true, []),
+                    ]),
+                ]).children
+            )
         );
     },
 };

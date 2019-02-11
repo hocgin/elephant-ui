@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Button, Form, Input, message, Modal, Steps, TreeSelect } from 'antd';
 import { connect } from 'dva';
-import { toAntTreeData } from '../../../../utils/LangKit';
+import * as LangKit from '../../../../utils/LangKit';
 
 /**
  * 更新弹窗
@@ -9,11 +9,10 @@ import { toAntTreeData } from '../../../../utils/LangKit';
  * - onCancel 取消时触发
  * - onDone 完成时触发
  */
-@connect(({ resource, loading }) => {
-    console.log(resource);
+@connect(({ resource, role, loading }) => {
     return {
-        // data 数据的加载状态
-        result: resource.result,
+        allResource: resource.all,
+        detail: role.detail,
     };
 })
 @Form.create()
@@ -29,12 +28,32 @@ export default class UpdateModal extends PureComponent {
         wrapperCol: { span: 13 },
     };
 
+    constructor(props) {
+        super(props);
+    }
+
+    /**
+     * @组件挂载后
+     */
+    componentDidMount() {
+        const { dispatch } = this.props;
+        dispatch({
+            type: 'role/detail',
+            payload: {
+                id: this.props.id,
+            },
+        });
+        dispatch({
+            type: 'resource/selectAll',
+        });
+    }
+
     /**
      * 渲染步骤内容
      */
     renderSteps = () => {
-        const { step, formVals } = this.state;
-        const { form } = this.props;
+        const { step } = this.state;
+        const { form, detail } = this.props;
         const that = this;
 
         // 上一页
@@ -56,9 +75,10 @@ export default class UpdateModal extends PureComponent {
                             });
                         } else {
                             dispatch({
-                                type: 'role/insertOne',
+                                type: 'role/updateOne',
                                 payload: formVals,
                                 callback: () => {
+                                    console.log('提交数据', formVals);
                                     message.success('提交成功');
                                     form.resetFields();
                                     that.props.onDone();
@@ -102,7 +122,7 @@ export default class UpdateModal extends PureComponent {
                     return [
                         <Form.Item key={0} {...that.formLayout} label="角色名称" hasFeedback>
                             {form.getFieldDecorator('name', {
-                                initialValue: formVals.name,
+                                initialValue: detail.name,
                                 rules: [{ required: true, message: '请输入角色名称' }],
                             })(<Input style={{ width: '100%' }} />)}
                         </Form.Item>,
@@ -114,13 +134,13 @@ export default class UpdateModal extends PureComponent {
                             extra={'请使用"ROLE_"开头的大写字符'}
                         >
                             {form.getFieldDecorator('mark', {
-                                initialValue: formVals.mark,
+                                initialValue: detail.mark,
                                 rules: [{ required: true, message: '请输入角色唯一标识' }],
                             })(<Input style={{ width: '100%' }} />)}
                         </Form.Item>,
                         <Form.Item key={2} {...that.formLayout} label="角色描述" hasFeedback>
                             {form.getFieldDecorator('description', {
-                                initialValue: formVals.description,
+                                initialValue: detail.description,
                             })(
                                 <Input.TextArea
                                     autosize={{ minRows: 3, maxRows: 6 }}
@@ -136,15 +156,21 @@ export default class UpdateModal extends PureComponent {
             },
             {
                 content() {
-                    const { result } = that.props;
+                    const { allResource } = that.props;
+                    const resourceId = (detail.resources || []).map(resource => {
+                        return resource.id;
+                    });
+                    const treeData = LangKit.toAntTreeData([LangKit.buildTree2(allResource)]);
+                    console.log('resourceId', resourceId);
+                    console.log('treeData', treeData);
                     return [
                         <Form.Item key={0} {...that.formLayout} label="分配资源">
                             {form.getFieldDecorator('resources', {
-                                initialValue: formVals.resources,
+                                initialValue: resourceId,
                             })(
                                 <TreeSelect
                                     treeCheckable
-                                    treeData={toAntTreeData(result)}
+                                    treeData={treeData}
                                     searchPlaceholder="请选择赋予角色资源权限"
                                     style={{ width: '100%' }}
                                 />
@@ -159,76 +185,27 @@ export default class UpdateModal extends PureComponent {
         ];
     };
 
-    constructor(props) {
-        super(props);
-        /**
-         * 挂载函数
-         */
-        [this.methods(), this.rendering(), this.listener()]
-            .map(item => {
-                return Object.keys(item).map(key => {
-                    return item[key];
-                });
-            })
-            .reduce((func1, func2) => {
-                return [...func1, ...func2];
-            })
-            .forEach(func => {
-                this[func.name] = func;
-            });
-    }
-
-    /**
-     * @组件挂载后
-     */
-    componentDidMount() {
-        const { dispatch } = this.props;
-        dispatch({
-            type: 'role/selectOne',
-            payload: {
-                id: this.props.id,
-            },
-            callback: data => this.setState({ formVals: data }),
-        });
-    }
-
-    /**
-     * =====================================
-     *                  渲染
-     * =====================================
-     */
     render() {
-        const { visible, onCancel } = this.props;
+        const { visible, onCancel, detail } = this.props;
         const { step } = this.state;
         const Step = this.renderSteps()[step];
-        console.log(step, Step);
         return (
-            <Modal
-                width={640}
-                bodyStyle={{ padding: '32px 40px 48px' }}
-                title="创建角色"
-                visible={visible}
-                onCancel={onCancel}
-                footer={Step.footer()}
-            >
-                <Steps size="small" current={step} style={{ marginBottom: 28 }}>
-                    <Steps.Step title="基本信息" />
-                    <Steps.Step title="分配资源" />
-                </Steps>
-                {Step.content()}
-            </Modal>
+            detail && (
+                <Modal
+                    width={640}
+                    bodyStyle={{ padding: '32px 40px 48px' }}
+                    title="创建角色"
+                    visible={visible}
+                    onCancel={onCancel}
+                    footer={Step.footer()}
+                >
+                    <Steps size="small" current={step} style={{ marginBottom: 28 }}>
+                        <Steps.Step title="基本信息" />
+                        <Steps.Step title="分配资源" />
+                    </Steps>
+                    {Step.content()}
+                </Modal>
+            )
         );
-    }
-
-    rendering() {
-        return {};
-    }
-
-    methods() {
-        return {};
-    }
-
-    listener() {
-        return {};
     }
 }

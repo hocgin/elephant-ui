@@ -2,14 +2,14 @@ import React, { PureComponent } from 'react';
 import { Form, Select, Button, Modal, Steps } from 'antd';
 
 /**
- * 新增弹窗
+ * 更新弹窗
  * - visible 是否可见
  * - value 更新时携带的原值
  * - onCancel 取消时触发
  * - onDone 完成时触发
  */
 @Form.create()
-export default class CreateModal extends PureComponent {
+export default class UpdateModal extends PureComponent {
     state = {
         // 当前步骤
         step: 0,
@@ -24,7 +24,7 @@ export default class CreateModal extends PureComponent {
      * 步骤渲染
      */
     steps = () => {
-        const { step, formValue } = this.state;
+        const { step } = this.state;
         const { form, onModalVisible } = this.props;
         const that = this;
 
@@ -182,7 +182,7 @@ export default class CreateModal extends PureComponent {
                         },
                         () => {
                             if (step < that.steps().length - 1) {
-                                this.forward();
+                                that.forward();
                             } else {
                                 onDone(formVals);
                             }

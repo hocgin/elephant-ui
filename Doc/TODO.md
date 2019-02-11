@@ -44,5 +44,14 @@ insertOne
 deletes,
 // 查询单个
 selectOne
+// 查询所有
+selectAll
 
 ```
+
+### 关于每个页面的大体构成
+- 分页查询
+- 增加
+- 删除
+- 修改
+- 详情

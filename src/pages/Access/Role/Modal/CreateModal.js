@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Button, Form, Input, message, Modal, Steps, TreeSelect } from 'antd';
 import { connect } from 'dva';
-import { toAntTreeData } from '../../../../utils/LangKit';
+import * as LangKit from '../../../../utils/LangKit';
 
 /**
  * 新增弹窗
@@ -10,10 +10,8 @@ import { toAntTreeData } from '../../../../utils/LangKit';
  * - onDone 完成时触发
  */
 @connect(({ resource, loading }) => {
-    console.log(resource);
     return {
-        // data 数据的加载状态
-        result: resource.result,
+        allResource: resource.all,
     };
 })
 @Form.create()
@@ -28,6 +26,20 @@ export default class CreateModal extends PureComponent {
         labelCol: { span: 7 },
         wrapperCol: { span: 13 },
     };
+
+    constructor(props) {
+        super(props);
+    }
+
+    /**
+     * @组件挂载后
+     */
+    componentDidMount() {
+        const { dispatch } = this.props;
+        dispatch({
+            type: 'resource/selectAll',
+        });
+    }
 
     /**
      * 渲染步骤内容
@@ -136,7 +148,8 @@ export default class CreateModal extends PureComponent {
             },
             {
                 content() {
-                    const { result } = that.props;
+                    const { allResource } = that.props;
+                    console.log(allResource);
                     return [
                         <Form.Item key={0} {...that.formLayout} label="分配资源">
                             {form.getFieldDecorator('resources', {
@@ -144,7 +157,9 @@ export default class CreateModal extends PureComponent {
                             })(
                                 <TreeSelect
                                     treeCheckable
-                                    treeData={toAntTreeData(result)}
+                                    treeData={LangKit.toAntTreeData([
+                                        LangKit.buildTree2(allResource),
+                                    ])}
                                     searchPlaceholder="请选择赋予角色资源权限"
                                     style={{ width: '100%' }}
                                 />
@@ -159,45 +174,10 @@ export default class CreateModal extends PureComponent {
         ];
     };
 
-    constructor(props) {
-        super(props);
-        /**
-         * 挂载函数
-         */
-        [this.methods(), this.rendering(), this.listener()]
-            .map(item => {
-                return Object.keys(item).map(key => {
-                    return item[key];
-                });
-            })
-            .reduce((func1, func2) => {
-                return [...func1, ...func2];
-            })
-            .forEach(func => {
-                this[func.name] = func;
-            });
-    }
-
-    /**
-     * @组件挂载后
-     */
-    componentDidMount() {
-        const { dispatch } = this.props;
-        dispatch({
-            type: 'role/page',
-        });
-    }
-
-    /**
-     * =====================================
-     *                  渲染
-     * =====================================
-     */
     render() {
         const { visible, onCancel } = this.props;
         const { step } = this.state;
         const Step = this.renderSteps()[step];
-        console.log(step, Step);
         return (
             <Modal
                 width={640}
@@ -214,17 +194,5 @@ export default class CreateModal extends PureComponent {
                 {Step.content()}
             </Modal>
         );
-    }
-
-    rendering() {
-        return {};
-    }
-
-    methods() {
-        return {};
-    }
-
-    listener() {
-        return {};
     }
 }

@@ -1,24 +1,27 @@
-import { insertOne, selectOne, page } from '@/services/role';
+import { insertOne, page, selectOne, updateOne } from '@/services/role';
 import { message } from 'antd';
-import { ResultCode } from '../../../../utils/Constant';
+import { ResultCode } from '../utils/Constant';
 
 export default {
     namespace: 'role',
     state: {
-        records: [],
-        total: 0,
-        size: 0,
-        current: 1,
-        pages: 1,
-        searchCount: true,
+        page: {
+            records: [],
+            total: 0,
+            size: 0,
+            current: 1,
+            pages: 1,
+            searchCount: true,
+        },
+        detail: null,
     },
     effects: {
         // 分页查询
-        *page({ payload }, { call, put }) {
+        *paging({ payload }, { call, put }) {
             let result = yield call(page, payload);
             if (result.code === ResultCode.SUCCESS) {
                 yield put({
-                    type: 'updateRole',
+                    type: 'fillPage',
                     payload: result.data,
                 });
             } else {
@@ -40,11 +43,26 @@ export default {
             }
         },
         // 查询单个
-        *selectOne({ payload, callback }, { call, put }) {
+        *detail({ payload, callback }, { call, put }) {
             let result = yield call(selectOne, payload);
             if (result.code === ResultCode.SUCCESS) {
+                yield put({
+                    type: 'fillDetail',
+                    payload: result.data,
+                });
+            } else {
+                message.error(result.message);
+            }
+        },
+        // 更新单个
+        *updateOne({ payload, callback }, { call, put }) {
+            let result = yield call(updateOne, payload);
+            if (result.code === ResultCode.SUCCESS) {
+                yield put({
+                    type: 'page',
+                });
                 if (callback) {
-                    callback(result.data);
+                    callback();
                 }
             } else {
                 message.error(result.message);
@@ -52,10 +70,18 @@ export default {
         },
     },
     reducers: {
-        updateRole(state, { payload }) {
+        // 更新分页
+        fillPage(state, { payload }) {
             return {
                 ...state,
-                ...payload,
+                page: payload,
+            };
+        },
+        // 更新单个
+        fillDetail(state, { payload }) {
+            return {
+                ...state,
+                detail: payload,
             };
         },
     },

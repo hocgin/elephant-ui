@@ -1,14 +1,9 @@
-import React, { Fragment, PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import moment from 'moment';
 import {
-    Badge,
     Button,
     Card,
     Col,
-    DatePicker,
-    Divider,
-    Dropdown,
     Form,
     Icon,
     Input,
@@ -24,13 +19,18 @@ import CreateModal from './Modal/CreateModal';
 
 import styles from './Index.less';
 import UpdateModal from './Modal/UpdateModal';
-import { Types, Status } from './constant/constant';
+import { Status, Types } from './constant/constant';
+import * as LangKit from '../../../utils/LangKit';
+import * as RenderKit from '../../../utils/RenderKit';
+
+const Constant = {
+    CREATE_MODAL_VISIBLE: 'createModalVisible',
+    UPDATE_MODAL_VISIBLE: 'updateModalVisible',
+};
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ resource, loading }) => ({
-    result: resource.result,
-    // data 数据的加载状态
-    loading: loading.models.result,
+    allResource: resource.all,
 }))
 @Form.create()
 export default class Index extends PureComponent {
@@ -77,68 +77,62 @@ export default class Index extends PureComponent {
     componentDidMount() {
         const { dispatch } = this.props;
         dispatch({
-            type: 'resource/query',
+            type: 'resource/selectAll',
         });
     }
 
     render() {
-        const { result, dispatch } = this.props;
+        const {
+            route: { name },
+            allResource,
+        } = this.props;
         const { selectedRows, expandedKeys, autoExpandParent } = this.state;
-        // const menu = (
-        //     <Menu onClick={this.onClickMenus} selectedKeys={[]}>
-        //         <Menu.Item key="remove">删除</Menu.Item>
-        //         <Menu.Item key="approval">批量审批</Menu.Item>
-        //     </Menu>
-        // );
 
         return (
-            <PageHeaderWrapper title="资源管理">
-                <Card bordered={false}>
-                    <div className={styles.tableList}>
-                        {/*搜索层*/}
-                        <div className={styles.tableListForm}>{this.renderForm()}</div>
-                        {/*工具栏(新建/批量操作)层*/}
-                        <div className={styles.tableListOperator}>
-                            <Button
-                                icon="plus"
-                                type="primary"
-                                onClick={() => {
-                                    this.onShow('createModalVisible');
-                                }}
-                                htmlType="button"
-                            >
-                                新建
-                            </Button>
-                            {selectedRows.length > 0 && (
-                                <span>
+            allResource.length && (
+                <PageHeaderWrapper title={name}>
+                    <Card bordered={false}>
+                        <div className={styles.tableList}>
+                            {/*搜索层*/}
+                            <div className={styles.tableListForm}>{this.renderSearchBar()}</div>
+                            {/*工具栏(新建/批量操作)层*/}
+                            <div className={styles.tableListOperator}>
+                                <Button
+                                    icon="plus"
+                                    type="primary"
+                                    onClick={() => {
+                                        this.onShow(Constant.CREATE_MODAL_VISIBLE);
+                                    }}
+                                    htmlType="button"
+                                >
+                                    新建
+                                </Button>
+                                {selectedRows.length > 0 && (
                                     <Button onClick={this.onClickBatchDelete} htmlType="button">
                                         批量删除
                                     </Button>
-                                    {/*<Dropdown overlay={menu}>*/}
-                                    {/*<Button htmlType="button">*/}
-                                    {/*更多操作 <Icon type="down"/>*/}
-                                    {/*</Button>*/}
-                                    {/*</Dropdown>*/}
-                                </span>
-                            )}
+                                )}
+                            </div>
+                            <Tree
+                                showIcon
+                                multiple
+                                onExpand={this.onExpand}
+                                expandedKeys={expandedKeys}
+                                autoExpandParent={autoExpandParent}
+                                onSelect={this.onSelectTreeNodeRow}
+                                onRightClick={this.onRightClickNode}
+                            >
+                                {RenderKit.renderResourceTreeNode(null, [
+                                    LangKit.buildTree2(allResource),
+                                ])}
+                            </Tree>
                         </div>
-                        <Tree
-                            showIcon
-                            multiple
-                            onExpand={this.onExpand}
-                            expandedKeys={expandedKeys}
-                            autoExpandParent={autoExpandParent}
-                            onSelect={this.onSelectTreeNodeRow}
-                            onRightClick={this.onRightClickNode}
-                        >
-                            {this.renderTreeNode(null, result)}
-                        </Tree>
-                    </div>
-                </Card>
-                {this.renderCreateModal()}
-                {this.renderUpdateModal()}
-                {this.renderRightPanel()}
-            </PageHeaderWrapper>
+                    </Card>
+                    {this.renderCreateModal()}
+                    {this.renderUpdateModal()}
+                    {this.renderRightPanel()}
+                </PageHeaderWrapper>
+            )
         );
     }
 
@@ -160,44 +154,9 @@ export default class Index extends PureComponent {
         const that = this;
         return {
             /**
-             * 渲染节点
-             * 节点数据格式:
-             * children: (2) [{…}, {…}]
-             * depth: 0
-             * description: "描述信息"
-             * enabled: true
-             * icon: "warning"
-             * id: "root"
-             * lft: 1
-             * method: "GET"
-             * name: "根"
-             * path: "/"
-             * rgt: 12
-             * type: 0
-             * @param parent
-             * @param nodes
-             */
-            renderTreeNode(parent, nodes) {
-                return (nodes || []).map(node => {
-                    return (
-                        <Tree.TreeNode
-                            disabled={!node.enabled}
-                            title={<span>{node.name}</span>}
-                            key={node.id}
-                            parentKey={parent}
-                            icon={<Icon type={node.icon} />}
-                        >
-                            {node.children && node.children.length
-                                ? that.renderTreeNode(node.id, node.children)
-                                : null}
-                        </Tree.TreeNode>
-                    );
-                });
-            },
-            /**
              * 根据情况渲染搜索框
              */
-            renderForm() {
+            renderSearchBar() {
                 const {
                     form: { getFieldDecorator },
                 } = that.props;
@@ -301,7 +260,6 @@ export default class Index extends PureComponent {
                 if (!rightEvent) {
                     return null;
                 }
-                console.log('右键菜单', rightNode);
                 let { pageX, pageY } = rightEvent;
                 const tmpStyle = {
                     position: 'absolute',
@@ -347,40 +305,42 @@ export default class Index extends PureComponent {
              * 渲染创建弹窗
              */
             renderCreateModal() {
-                const { result, dispatch } = this.props;
+                const { allResource, dispatch } = this.props;
                 const { createModalVisible, createDefaultParent } = this.state;
-                return result.length > 0 ? (
-                    <CreateModal
-                        visible={createModalVisible}
-                        defaultParent={createDefaultParent}
-                        onCancel={() => {
-                            this.onHidden('createModalVisible');
-                        }}
-                        onDone={formVals => {
-                            dispatch({
-                                type: 'resource/save',
-                                payload: formVals,
-                                callback: () => {
-                                    this.onHidden('createModalVisible');
-                                    message.success('新增成功');
-                                },
-                            });
-                        }}
-                    />
-                ) : null;
+                return (
+                    allResource.length && (
+                        <CreateModal
+                            visible={createModalVisible}
+                            defaultParent={createDefaultParent}
+                            onCancel={() => {
+                                this.onHidden(Constant.CREATE_MODAL_VISIBLE);
+                            }}
+                            onDone={formVals => {
+                                dispatch({
+                                    type: 'resource/save',
+                                    payload: formVals,
+                                    callback: () => {
+                                        this.onHidden(Constant.CREATE_MODAL_VISIBLE);
+                                        message.success('新增成功');
+                                    },
+                                });
+                            }}
+                        />
+                    )
+                );
             },
             /**
              * 渲染更新弹窗
              */
             renderUpdateModal() {
-                const { result, dispatch } = that.props;
+                const { allResource, dispatch } = that.props;
                 const { updateModalVisible, updateId } = that.state;
                 return updateId && updateModalVisible ? (
                     <UpdateModal
                         visible={updateModalVisible}
-                        nodes={result}
+                        nodes={allResource}
                         onCancel={() => {
-                            this.onHidden('updateModalVisible');
+                            this.onHidden(Constant.UPDATE_MODAL_VISIBLE);
                         }}
                         id={updateId}
                         onDone={(id, formVals) => {
@@ -391,7 +351,7 @@ export default class Index extends PureComponent {
                                     body: formVals,
                                 },
                                 callback: () => {
-                                    this.onHidden('updateModalVisible');
+                                    this.onHidden(Constant.UPDATE_MODAL_VISIBLE);
                                     message.success('更新成功');
                                 },
                             });
@@ -498,7 +458,7 @@ export default class Index extends PureComponent {
                                 updateId: rightNode.props.eventKey,
                             },
                             () => {
-                                that.onShow('updateModalVisible');
+                                that.onShow(Constant.UPDATE_MODAL_VISIBLE);
                             }
                         );
                         break;
@@ -512,7 +472,7 @@ export default class Index extends PureComponent {
                                 createDefaultStep: 1,
                             },
                             () => {
-                                that.onShow('createModalVisible');
+                                that.onShow(Constant.CREATE_MODAL_VISIBLE);
                             }
                         );
                         break;
@@ -526,7 +486,7 @@ export default class Index extends PureComponent {
                                 createDefaultStep: 1,
                             },
                             () => {
-                                that.onShow('createModalVisible');
+                                that.onShow(Constant.CREATE_MODAL_VISIBLE);
                             }
                         );
                         break;
@@ -623,14 +583,14 @@ export default class Index extends PureComponent {
              */
             onClickSearchButton(e) {
                 e.preventDefault();
-                const { form, result } = that.props;
+                const { form, allResource } = that.props;
 
                 form.validateFields((err, fieldsValue) => {
                     if (err) return;
                     const { name, enabled, type } = fieldsValue;
 
                     let expandedKeys = [];
-                    that.iteration(result[0], result[0].children, (parent, item) => {
+                    that.iteration(allResource[0], allResource[0].children, (parent, item) => {
                         if (
                             (name === undefined || item.name.indexOf(name) > -1) &&
                             (enabled === undefined || `${item.enabled}` === enabled) &&
