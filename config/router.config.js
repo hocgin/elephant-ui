@@ -4,10 +4,10 @@ export default [
         path: '/user',
         component: '../layouts/UserLayout',
         routes: [
-            {path: '/user', redirect: '/user/login'},
-            {path: '/user/login', component: './User/Login'},
-            {path: '/user/register', component: './User/Register'},
-            {path: '/user/register-result', component: './User/RegisterResult'},
+            { path: '/user', redirect: '/user/login' },
+            { path: '/user/login', component: './User/Login' },
+            { path: '/user/register', component: './User/Register' },
+            { path: '/user/register-result', component: './User/RegisterResult' },
         ],
     },
     // app
@@ -143,7 +143,7 @@ export default [
                         name: 'success',
                         component: './Result/Success',
                     },
-                    {path: '/result/fail', name: 'fail', component: './Result/Error'},
+                    { path: '/result/fail', name: 'fail', component: './Result/Error' },
                 ],
             },
             {
@@ -263,25 +263,29 @@ export default [
              * =========================================================
              */
             // dashboard
-            {path: '/', redirect: '/dashboard/analysis'},
+            {
+                name: '主页',
+                path: '/',
+                redirect: '/dashboard/analysis',
+            },
             {
                 path: '/dashboard',
                 name: '仪表盘',
                 icon: 'dashboard',
                 routes: [
                     {
+                        name: '分析页',
                         path: '/dashboard/analysis',
-                        name: '主页',
                         component: './Dashboard/Analysis',
                     },
                     {
+                        name: '监控页',
                         path: '/dashboard/monitor',
-                        name: '系统监控',
                         component: './Dashboard/Monitor',
                     },
                     {
+                        name: '工作台',
                         path: '/dashboard/workplace',
-                        name: 'workplace',
                         component: './Dashboard/Workplace',
                     },
                 ],
@@ -324,10 +328,10 @@ export default [
                         path: '/system/dictionary',
                         component: './System/Dictionary/Index',
                     },
-                    //     {
-                    //     name: "变量配置",
+                    // {
+                    //     name: '变量配置',
+                    //     path: '/system/property',
                     //     component: './System/Property/Index',
-                    //     path: "/system/property"
                     // }
                 ],
             },
