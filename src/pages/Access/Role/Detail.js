@@ -71,7 +71,12 @@ export default class Detail extends Component {
         const {
             detail: { resources },
         } = this.props;
-        const tree = LangKit.buildTree2(resources);
+        console.log('resources', resources);
+        if (LangKit.isEmpty(resources)) {
+            return '暂无';
+        }
+        const tree = LangKit.buildTree3(resources);
+        console.log(tree);
         return (
             <Tree defaultExpandAll={true} showLine>
                 {RenderKit.renderResourceTreeNode(null, [tree])}

@@ -13,6 +13,7 @@ import {
     Input,
     Menu,
     message,
+    Modal,
     Row,
     Select,
 } from 'antd';
@@ -106,6 +107,7 @@ export default class Index extends PureComponent {
                 const menu = (
                     <Menu onClick={this.onClickItemMenu.bind(this, record)}>
                         <Menu.Item key="edit">修改</Menu.Item>
+                        <Menu.Item key="delete">删除</Menu.Item>
                         <Menu.Item key="on">启用</Menu.Item>
                         <Menu.Item key="off">禁用</Menu.Item>
                     </Menu>
@@ -159,12 +161,19 @@ export default class Index extends PureComponent {
                             </Button>
                             {selectedRows.length > 0 && (
                                 <span>
-                                    <Button htmlType="button">批量操作</Button>
-                                    <Dropdown overlay={menu}>
-                                        <Button htmlType="button">
-                                            更多操作 <Icon type="down" />
-                                        </Button>
-                                    </Dropdown>
+                                    <Button
+                                        htmlType="button"
+                                        onClick={() => {
+                                            this.$deletes(selectedRows.map(n => n.id));
+                                        }}
+                                    >
+                                        批量删除
+                                    </Button>
+                                    {/*<Dropdown overlay={menu}>*/}
+                                    {/*<Button htmlType="button">*/}
+                                    {/*更多操作 <Icon type="down"/>*/}
+                                    {/*</Button>*/}
+                                    {/*</Dropdown>*/}
                                 </span>
                             )}
                         </div>
@@ -202,29 +211,23 @@ export default class Index extends PureComponent {
                     [key]: false,
                 });
             },
-            /**
-             * 处理新增请求
-             * @param fields
-             */
-            handleAdd(fields) {
-                that.props.add(fields.desc);
-
-                message.success('添加成功');
-                that.onClickCreateButton();
-            },
-            /**
-             * 处理更改请求
-             * @param fields
-             */
-            handleUpdate(fields) {
-                that.props.update({
-                    name: fields.name,
-                    desc: fields.desc,
-                    key: fields.key,
+            $deletes(ids) {
+                const { dispatch } = that.props;
+                Modal.confirm({
+                    title: '警告!',
+                    content: '确认删除角色?',
+                    onOk() {
+                        dispatch({
+                            type: 'role/deletes',
+                            payload: {
+                                id: ids,
+                            },
+                            callback: () => {
+                                message.success('删除成功');
+                            },
+                        });
+                    },
                 });
-
-                message.success('配置成功');
-                that.onClickDetailButton();
             },
         };
     }
@@ -399,6 +402,11 @@ export default class Index extends PureComponent {
                                 that.onShow(Constant.UPDATE_MODAL_VISIBLE);
                                 break;
                             }
+                            // 删除
+                            case 'delete': {
+                                that.$deletes([data.id]);
+                                break;
+                            }
                             // 查看详情
                             case 'detail':
                             default: {
@@ -426,6 +434,7 @@ export default class Index extends PureComponent {
              */
             onChangeStandardTableCondition(pagination, filtersArg, sorter) {
                 const { formValues } = that.state;
+                const { dispatch } = that.props;
 
                 const filters = Object.keys(filtersArg).reduce((obj, key) => {
                     const newObj = { ...obj };
@@ -434,17 +443,21 @@ export default class Index extends PureComponent {
                 }, {});
 
                 const params = {
-                    currentPage: pagination.current,
-                    pageSize: pagination.pageSize,
+                    page: pagination.current,
+                    limit: pagination.pageSize,
                     ...formValues,
                     ...filters,
                 };
                 if (sorter.field) {
-                    params.sorter = `${sorter.field}_${sorter.order}`;
+                    params.sort = {
+                        [sorter.field]: sorter.order === 'descend' ? 'DESC' : 'ASC',
+                    };
+                    // params.sorter = `${sorter.field}_${sorter.order}`;
                 }
-
-                console.log('Table 搜索条件', params);
-                // this.props.query();
+                dispatch({
+                    type: 'role/paging',
+                    payload: params,
+                });
             },
             // 点击搜索按钮
             onClickSearch(e) {

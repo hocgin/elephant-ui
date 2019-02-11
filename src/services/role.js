@@ -37,9 +37,11 @@ export async function insertOne(body) {
  * @param id
  */
 export async function deletes({ id }) {
-    const IDs = toString([...id]);
-    return request(`/roles?id=${IDs}`, {
+    return request(`/roles`, {
         method: 'DELETE',
+        body: {
+            id,
+        },
     });
 }
 

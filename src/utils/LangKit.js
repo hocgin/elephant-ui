@@ -68,6 +68,32 @@ export function buildTree2(nodes) {
 }
 
 /**
+ * 构建树, 仅使用 lft rgt
+ * @param nodes
+ */
+export function buildTree3(nodes) {
+    const list = nodes
+        .sort((node1, node2) => {
+            return node1.lft - node2.lft;
+        })
+        .reverse();
+    list.forEach((n, index) => {
+        for (let i in list) {
+            let n2 = list[i];
+            if (n.lft > n2.lft && n.rgt < n2.rgt) {
+                if (!n2.children) {
+                    n2.children = [];
+                }
+                n2.children.push(n);
+                delete list[index];
+                break;
+            }
+        }
+    });
+    return list[list.length - 1];
+}
+
+/**
  * 对象转化为 Ant List 数据源格式
  * @param object
  */
@@ -88,4 +114,11 @@ export function toAntListDataSource(object) {
  */
 export function toUTC(timestamp) {
     return moment(timestamp).format('YYYY-MM-DD HH:mm:ss');
+}
+
+/**
+ * null or [] return true
+ */
+export function isEmpty(array) {
+    return !array || array.length === 0;
 }

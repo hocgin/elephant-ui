@@ -1,4 +1,4 @@
-import { insertOne, _paging, selectOne, updateOne } from '@/services/role';
+import { _paging, deletes, insertOne, selectOne, updateOne } from '@/services/role';
 import { message } from 'antd';
 import { ResultCode } from '../utils/Constant';
 
@@ -33,7 +33,7 @@ export default {
             let result = yield call(insertOne, payload);
             if (result.code === ResultCode.SUCCESS) {
                 yield put({
-                    type: 'page',
+                    type: 'paging',
                 });
                 if (callback) {
                     callback();
@@ -59,11 +59,22 @@ export default {
             let result = yield call(updateOne, payload);
             if (result.code === ResultCode.SUCCESS) {
                 yield put({
-                    type: 'page',
+                    type: 'paging',
                 });
                 if (callback) {
                     callback();
                 }
+            } else {
+                message.error(result.message);
+            }
+        },
+        // 批量删除
+        *deletes({ payload, callback }, { call, put }) {
+            let result = yield call(deletes, payload);
+            if (result.code === ResultCode.SUCCESS) {
+                yield put({
+                    type: 'paging',
+                });
             } else {
                 message.error(result.message);
             }
