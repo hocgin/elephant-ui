@@ -18,6 +18,7 @@ let role = (name, mark) => {
 };
 
 let allRole = () => {
+    i = 0;
     return [role('管理员', 'ROLE_ADMIN'), role('超级管理员', 'ROLE_SUPPER_ADMIN')];
 };
 
