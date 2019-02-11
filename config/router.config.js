@@ -296,6 +296,7 @@ export default [
                         path: '/access/role',
                         routes: [
                             {
+                                name: '角色管理',
                                 path: '/access/role',
                                 component: './Access/Role/Index',
                             },
