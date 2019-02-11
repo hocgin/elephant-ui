@@ -44,7 +44,7 @@ let resource = (name, type, method, path, enabled, children) => {
 
 // 构建
 export let allResource = () => {
-    let i = 0;
+    i = 0;
     const tree = resource('根节点', 0, 'GET', '', true, [
         resource('仪表盘', 0, 'GET', '/dashboard', true, [
             resource('分析页', 0, 'GET', '/dashboard/analysis', true, []),
