@@ -1,25 +1,12 @@
-import React, { PureComponent } from 'react';
-import { connect } from 'dva';
-import {
-    Button,
-    Card,
-    Col,
-    Form,
-    Icon,
-    Input,
-    Menu,
-    message,
-    Modal,
-    Row,
-    Select,
-    Tree,
-} from 'antd';
+import React, {PureComponent} from 'react';
+import {connect} from 'dva';
+import {Button, Card, Col, Form, Icon, Input, Menu, message, Modal, Row, Select, Tree,} from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import CreateModal from './Modal/CreateModal';
 
 import styles from './Index.less';
 import UpdateModal from './Modal/UpdateModal';
-import { Status, Types } from './constant/constant';
+import {Status, Types} from './constant/constant';
 import * as LangKit from '../../../utils/LangKit';
 import * as RenderKit from '../../../utils/RenderKit';
 
@@ -29,7 +16,7 @@ const Constant = {
 };
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ resource, loading }) => ({
+@connect(({resource, loading}) => ({
     allResource: resource.all,
 }))
 @Form.create()
@@ -75,7 +62,7 @@ export default class Index extends PureComponent {
      * @组件挂载后
      */
     componentDidMount() {
-        const { dispatch } = this.props;
+        const {dispatch} = this.props;
         dispatch({
             type: 'resource/selectAll',
         });
@@ -83,10 +70,10 @@ export default class Index extends PureComponent {
 
     render() {
         const {
-            route: { name },
+            route: {name},
             allResource,
         } = this.props;
-        const { selectedRows, expandedKeys, autoExpandParent } = this.state;
+        const {selectedRows, expandedKeys, autoExpandParent} = this.state;
         return (
             allResource.length && (
                 <PageHeaderWrapper title={name}>
@@ -158,21 +145,21 @@ export default class Index extends PureComponent {
              */
             renderSearchBar() {
                 const {
-                    form: { getFieldDecorator },
+                    form: {getFieldDecorator},
                 } = that.props;
-                const { expandForm } = that.state;
+                const {expandForm} = that.state;
 
                 const items = [
                     <Col key={0} md={8} sm={24}>
                         <Form.Item label="资源名称">
-                            {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+                            {getFieldDecorator('name')(<Input placeholder="请输入"/>)}
                         </Form.Item>
                     </Col>,
                     <Col key={1} md={8} sm={24}>
                         <Form.Item label="启用状态">
                             {getFieldDecorator('enabled')(
-                                <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    {Status.map(({ value, text }) => {
+                                <Select placeholder="请选择" style={{width: '100%'}}>
+                                    {Status.map(({value, text}) => {
                                         return (
                                             <Select.Option key={value} value={value}>
                                                 {text}
@@ -186,8 +173,8 @@ export default class Index extends PureComponent {
                     <Col key={2} md={8} sm={24}>
                         <Form.Item label="资源类型">
                             {getFieldDecorator('type')(
-                                <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    {Types.map(({ value, text }) => {
+                                <Select placeholder="请选择" style={{width: '100%'}}>
+                                    {Types.map(({value, text}) => {
                                         return (
                                             <Select.Option key={value} value={value}>
                                                 {text}
@@ -202,7 +189,7 @@ export default class Index extends PureComponent {
 
                 return (
                     <Form onSubmit={that.onClickSearchButton} layout="inline">
-                        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+                        <Row gutter={{md: 8, lg: 24, xl: 48}}>
                             {!!expandForm ? items : [items[0], items[1]]}
                             {/*收起状态*/}
                             {!expandForm && (
@@ -212,16 +199,16 @@ export default class Index extends PureComponent {
                                             查询
                                         </Button>
                                         <Button
-                                            style={{ marginLeft: 8 }}
+                                            style={{marginLeft: 8}}
                                             onClick={that.onClickResetSearch}
                                         >
                                             重置
                                         </Button>
                                         <a
-                                            style={{ marginLeft: 8 }}
+                                            style={{marginLeft: 8}}
                                             onClick={that.onClickToggleSearchMode}
                                         >
-                                            展开 <Icon type="down" />
+                                            展开 <Icon type="down"/>
                                         </a>
                                     </span>
                                 </Col>
@@ -229,22 +216,22 @@ export default class Index extends PureComponent {
                         </Row>
                         {/*展开状态*/}
                         {expandForm && (
-                            <div style={{ overflow: 'hidden' }}>
-                                <div style={{ float: 'right', marginBottom: 24 }}>
+                            <div style={{overflow: 'hidden'}}>
+                                <div style={{float: 'right', marginBottom: 24}}>
                                     <Button type="primary" htmlType="submit">
                                         查询
                                     </Button>
                                     <Button
-                                        style={{ marginLeft: 8 }}
+                                        style={{marginLeft: 8}}
                                         onClick={that.onClickResetSearch}
                                     >
                                         重置
                                     </Button>
                                     <a
-                                        style={{ marginLeft: 8 }}
+                                        style={{marginLeft: 8}}
                                         onClick={that.onClickToggleSearchMode}
                                     >
-                                        收起 <Icon type="up" />
+                                        收起 <Icon type="up"/>
                                     </a>
                                 </div>
                             </div>
@@ -256,11 +243,11 @@ export default class Index extends PureComponent {
              * 渲染树节点右键菜单
              */
             renderRightPanel() {
-                const { rightEvent, rightNode } = that.state;
+                const {rightEvent, rightNode} = that.state;
                 if (!rightEvent) {
                     return null;
                 }
-                let { pageX, pageY } = rightEvent;
+                let {pageX, pageY} = rightEvent;
                 const tmpStyle = {
                     position: 'absolute',
                     left: `${pageX - 10}px`,
@@ -270,32 +257,32 @@ export default class Index extends PureComponent {
                     <Menu
                         style={tmpStyle}
                         onMouseLeave={() => {
-                            that.setState({ rightEvent: null, rightNode: null });
+                            that.setState({rightEvent: null, rightNode: null});
                         }}
                         onClick={this.onClickMenus}
                     >
                         <Menu.Item key={rightNode.props.disabled ? 'enable' : 'disable'}>
-                            <Icon type="edit" />
+                            <Icon type="edit"/>
                             {rightNode.props.disabled ? '启用' : '禁用'}
                         </Menu.Item>
                         <Menu.Item key="edit">
-                            <Icon type="edit" />
+                            <Icon type="edit"/>
                             {'修改'}
                         </Menu.Item>
                         <Menu.Item key="appendNode">
-                            <Icon type="plus-circle" />
+                            <Icon type="plus-circle"/>
                             {'加同级'}
                         </Menu.Item>
                         <Menu.Item key="addChild">
-                            <Icon type="plus-circle-o" />
+                            <Icon type="plus-circle-o"/>
                             {'加下级'}
                         </Menu.Item>
                         <Menu.Item key="deleteGroup">
-                            <Icon type="minus-circle-o" />
+                            <Icon type="minus-circle-o"/>
                             {'删除目录'}
                         </Menu.Item>
                         <Menu.Item key="deleteOne">
-                            <Icon type="minus-circle-o" />
+                            <Icon type="minus-circle-o"/>
                             {'仅移除该节点'}
                         </Menu.Item>
                     </Menu>
@@ -305,8 +292,8 @@ export default class Index extends PureComponent {
              * 渲染创建弹窗
              */
             renderCreateModal() {
-                const { allResource, dispatch } = this.props;
-                const { createModalVisible, createDefaultParent } = this.state;
+                const {allResource, dispatch} = this.props;
+                const {createModalVisible, createDefaultParent} = this.state;
                 return (
                     allResource.length && (
                         <CreateModal
@@ -333,8 +320,8 @@ export default class Index extends PureComponent {
              * 渲染更新弹窗
              */
             renderUpdateModal() {
-                const { allResource, dispatch } = that.props;
-                const { updateModalVisible, updateId } = that.state;
+                const {allResource, dispatch} = that.props;
+                const {updateModalVisible, updateId} = that.state;
                 return updateId && updateModalVisible ? (
                     <UpdateModal
                         visible={updateModalVisible}
@@ -389,8 +376,8 @@ export default class Index extends PureComponent {
              * 批量删除
              */
             onClickBatchDelete() {
-                const { selectedRows } = that.state;
-                const { dispatch } = that.props;
+                const {selectedRows} = that.state;
+                const {dispatch} = that.props;
                 if (!selectedRows.length) {
                     return;
                 }
@@ -409,18 +396,19 @@ export default class Index extends PureComponent {
                             },
                         });
                     },
-                    onCancel() {},
+                    onCancel() {
+                    },
                 });
             },
             /**
              * 菜单点击
              * @param e
              */
-            onClickMenus({ item, key, keyPath }) {
-                const { dispatch } = that.props;
+            onClickMenus({item, key, keyPath}) {
+                const {dispatch} = that.props;
                 switch (key) {
                     case 'enable': {
-                        const { rightNode } = that.state;
+                        const {rightNode} = that.state;
                         dispatch({
                             type: 'resource/updateOne',
                             payload: {
@@ -436,7 +424,7 @@ export default class Index extends PureComponent {
                         break;
                     }
                     case 'disable': {
-                        const { rightNode } = that.state;
+                        const {rightNode} = that.state;
                         dispatch({
                             type: 'resource/updateOne',
                             payload: {
@@ -452,47 +440,38 @@ export default class Index extends PureComponent {
                         break;
                     }
                     case 'edit': {
-                        const { rightNode } = that.state;
-                        that.setState(
-                            {
-                                updateId: rightNode.props.eventKey,
-                            },
-                            () => {
-                                that.onShow(Constant.UPDATE_MODAL_VISIBLE);
-                            }
-                        );
+                        const {rightNode} = that.state;
+                        that.setState({
+                            updateId: rightNode.props.eventKey,
+                        }, () => {
+                            that.onShow(Constant.UPDATE_MODAL_VISIBLE);
+                        });
                         break;
                     }
                     case 'appendNode': {
                         // 新建同级节点
-                        const { rightNode } = that.state;
-                        that.setState(
-                            {
-                                createDefaultParent: rightNode.props.parentKey,
-                                createDefaultStep: 1,
-                            },
-                            () => {
-                                that.onShow(Constant.CREATE_MODAL_VISIBLE);
-                            }
-                        );
+                        const {rightNode} = that.state;
+                        that.setState({
+                            createDefaultParent: rightNode.props.parentKey,
+                            createDefaultStep: 1,
+                        }, () => {
+                            that.onShow(Constant.CREATE_MODAL_VISIBLE);
+                        });
                         break;
                     }
                     case 'addChild': {
                         // 新建子节点
-                        const { rightNode } = that.state;
-                        that.setState(
-                            {
-                                createDefaultParent: rightNode.props.eventKey,
-                                createDefaultStep: 1,
-                            },
-                            () => {
-                                that.onShow(Constant.CREATE_MODAL_VISIBLE);
-                            }
-                        );
+                        const {rightNode} = that.state;
+                        that.setState({
+                            createDefaultParent: rightNode.props.eventKey,
+                            createDefaultStep: 1,
+                        }, () => {
+                            that.onShow(Constant.CREATE_MODAL_VISIBLE);
+                        });
                         break;
                     }
                     case 'deleteGroup': {
-                        const { rightNode } = that.state;
+                        const {rightNode} = that.state;
                         Modal.confirm({
                             title: '警告!',
                             content: '该操作将会删除该节点及其子节点, 请谨慎操作。',
@@ -508,16 +487,16 @@ export default class Index extends PureComponent {
                                     },
                                 });
                             },
-                            onCancel() {},
+                            onCancel() {
+                            },
                         });
                         break;
                     }
                     case 'deleteOne': {
-                        const { rightNode } = that.state;
+                        const {rightNode} = that.state;
                         Modal.confirm({
                             title: '警告!',
-                            content:
-                                '该操作将会删除该节点并将其子节点提升到该节点级别, 请谨慎操作。',
+                            content: '该操作将会删除该节点并将其子节点提升到该节点级别, 请谨慎操作。',
                             onOk() {
                                 dispatch({
                                     type: 'resource/deletes',
@@ -530,7 +509,8 @@ export default class Index extends PureComponent {
                                     },
                                 });
                             },
-                            onCancel() {},
+                            onCancel() {
+                            },
                         });
                         break;
                     }
@@ -551,8 +531,8 @@ export default class Index extends PureComponent {
              * @param event
              * @param node
              */
-            onRightClickNode({ event, node }) {
-                const { pageX, pageY } = event;
+            onRightClickNode({event, node}) {
+                const {pageX, pageY} = event;
                 that.setState({
                     rightNode: node,
                     rightEvent: {
@@ -565,7 +545,7 @@ export default class Index extends PureComponent {
              * 处理展开/收起
              */
             onClickToggleSearchMode() {
-                const { expandForm } = that.state;
+                const {expandForm} = that.state;
                 that.setState({
                     expandForm: !expandForm,
                 });
@@ -574,7 +554,7 @@ export default class Index extends PureComponent {
              * 处理搜索条件重置
              */
             onClickResetSearch() {
-                const { form } = that.props;
+                const {form} = that.props;
                 form.resetFields();
             },
             /**
@@ -583,11 +563,11 @@ export default class Index extends PureComponent {
              */
             onClickSearchButton(e) {
                 e.preventDefault();
-                const { form, allResource } = that.props;
+                const {form, allResource} = that.props;
 
                 form.validateFields((err, fieldsValue) => {
                     if (err) return;
-                    const { name, enabled, type } = fieldsValue;
+                    const {name, enabled, type} = fieldsValue;
                     let expandedKeys = [];
                     that.iteration(allResource[0], allResource[0].children, (parent, item) => {
                         if (
