@@ -7,19 +7,19 @@ export default {
     /**
      * 增加
      */
-    'POST /example': (req, res) => {
+    'POST /template': (req, res) => {
         return res.json(success());
     },
     /**
      * 删除
      */
-    'DELETE /example': (req, res) => {
+    'DELETE /template': (req, res) => {
         return res.json(success());
     },
     /**
      * 分页获取
      */
-    'GET /example': (req, res) => {
+    'GET /template': (req, res) => {
         return res.json(
             success(
                 pageWrapper({
@@ -31,7 +31,7 @@ export default {
     /**
      * 获取单个
      */
-    'GET /example/:uuid': (req, res) => {
+    'GET /template/:uuid': (req, res) => {
         return res.json(success());
     },
 };
