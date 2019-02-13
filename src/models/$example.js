@@ -1,11 +1,11 @@
-import { paging } from '@/services/.example';
+import { paging } from '@/services/$example';
 import { message as Message } from 'antd';
 import { ResultCode } from '../utils/Constant';
 
 export default {
     namespace: 'example',
     state: {
-        list: [],
+        page: {},
     },
 
     effects: {
@@ -13,8 +13,8 @@ export default {
             const { code, message, data } = yield call(paging, payload);
             if (code === ResultCode.SUCCESS) {
                 yield put({
-                    type: 'fillList',
-                    payload: Array.isArray(data) ? data : [],
+                    type: 'fillPage',
+                    payload: data,
                 });
             } else {
                 Message.error(message);
@@ -23,10 +23,10 @@ export default {
     },
 
     reducers: {
-        fillList(state, { payload }) {
+        fillPage(state, { payload }) {
             return {
                 ...state,
-                list: payload,
+                page: payload,
             };
         },
     },

@@ -2,7 +2,7 @@ import { pageWrapper, success } from './util/result';
 import { createdAt, deletedAt, updatedAt } from './util/mock';
 
 let i = 0,
-    create = (...args) =>
+    create = object =>
         Object.assign(
             {
                 id: `id_example_${i++}`,
@@ -12,7 +12,7 @@ let i = 0,
                 ...updatedAt(),
                 ...deletedAt(),
             },
-            args
+            object
         ),
     all = () => [
         create({

@@ -352,6 +352,18 @@ export default [
                     },
                 ],
             },
+            // 例子
+            {
+                name: '模版',
+                path: '/example/$Template',
+                routes: [
+                    {
+                        name: '表单页面',
+                        path: '/example/$Template/表单页面',
+                        component: './$Template/表单页面',
+                    },
+                ],
+            },
             {
                 component: '404',
             },
