@@ -1,14 +1,24 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-/**
- * 分页查询
- */
-export async function paging(query) {
-    return request(`/example/_paging`, {
+const classify = 'example';
+
+// 分页查询
+export async function paging(payload) {
+    return request(`/${classify}/_paging`, {
         method: 'POST',
         body: {
-            ...query,
+            ...payload,
+        },
+    });
+}
+
+// 删除
+export async function deletes(payload) {
+    return request(`/${classify}`, {
+        method: 'DELETE',
+        body: {
+            ...payload,
         },
     });
 }
