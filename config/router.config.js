@@ -360,7 +360,7 @@ export default [
                     {
                         name: '表单页面',
                         path: '/example/$Template/表单页面',
-                        component: './$Template/表单页面',
+                        component: './$Template/表单页面/Index',
                     },
                 ],
             },

@@ -9,114 +9,135 @@ import * as DateFormatter from '../../../utils/formatter/DateFormatter';
 import SearchBar from '../../../components/ext/SearchBar';
 
 @connect(
-    ({ example: { page }, loading }) => ({
-        data: LangKit.toAntProPage(page),
-        loading: loading.models.list,
-    }),
-    dispatch => ({
-        $paging: body => dispatch({ type: 'example/$paging', ...body }),
-    })
+  ({ example: { page }, loading }) => ({
+    data: LangKit.toAntProPage(page),
+    loading: loading.models.list,
+  }),
+  dispatch => ({
+    $paging: body => dispatch({ type: 'example/$paging', ...body }),
+  }),
 )
 @Form.create()
 export default class Index extends React.Component {
-    state = {
-        selectedRows: [],
-        searchValues: null,
+  state = {
+    selectedRows: [],
+    searchValues: null,
+  };
+
+  columns = [
+    {
+      title: '编号',
+      dataIndex: 'id',
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createdAt',
+      sorter: true,
+      render: val => <span>{DateFormatter.toUTC(val)}</span>,
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'updatedAt',
+      sorter: true,
+      render: val => <span>{DateFormatter.toUTC(val)}</span>,
+    },
+  ];
+
+  componentDidMount() {
+    const { $paging } = this.props;
+    $paging();
+  }
+
+  render() {
+    const {
+      route: { name },
+      data,
+      loading,
+    } = this.props;
+    const { selectedRows } = this.state;
+    return (
+      <PageHeaderWrapper title={name}>
+        <Card bordered={false}>
+          <SearchBar
+            onSubmit={(...args) => {
+              console.log('Search', args);
+            }}
+          >
+            {form => (
+              [<Form.Item label="创建日期">
+                {form.getFieldDecorator('createdAt')(
+                  <DatePicker
+                    style={{ width: '100%' }}
+                    placeholder="请输入更新日期"
+                  />,
+                )}
+              </Form.Item>, <Form.Item label="创建日期">
+                {form.getFieldDecorator('createdAt')(
+                  <DatePicker
+                    style={{ width: '100%' }}
+                    placeholder="请输入更新日期"
+                  />,
+                )}
+              </Form.Item>, <Form.Item label="创建日期">
+                {form.getFieldDecorator('createdAt')(
+                  <DatePicker
+                    style={{ width: '100%' }}
+                    placeholder="请输入更新日期"
+                  />,
+                )}
+              </Form.Item>, <Form.Item label="创建日期">
+                {form.getFieldDecorator('createdAt')(
+                  <DatePicker
+                    style={{ width: '100%' }}
+                    placeholder="请输入更新日期"
+                  />,
+                )}
+              </Form.Item>]
+            )}
+          </SearchBar>
+          <div className={styles.tableList}>
+            {/*数据表格层*/}
+            <StandardTable
+              rowKey="id"
+              selectedRows={selectedRows}
+              loading={loading}
+              data={data}
+              columns={this.columns}
+              onSelectRow={this.onSelectRows}
+              onChange={this.onChangeStandardTableCondition}
+            />
+          </div>
+        </Card>
+      </PageHeaderWrapper>
+    );
+  }
+
+  onSelectRows = rows => {
+    this.setState({
+      selectedRows: rows,
+    });
+  };
+
+  onChangeStandardTableCondition = (pagination, filtersArg, sorter) => {
+    const filters = Object.keys(filtersArg).reduce((obj, key) => {
+      const newObj = { ...obj };
+      newObj[key] = toString(filtersArg[key]);
+      return newObj;
+    }, {});
+    const { searchValues } = this.state;
+    const { $paging } = this.props;
+
+    const params = {
+      page: pagination.current,
+      limit: pagination.pageSize,
+      ...searchValues,
+      ...filters,
     };
-
-    columns = [
-        {
-            title: '编号',
-            dataIndex: 'id',
-        },
-        {
-            title: '创建时间',
-            dataIndex: 'createdAt',
-            sorter: true,
-            render: val => <span>{DateFormatter.toUTC(val)}</span>,
-        },
-        {
-            title: '更新时间',
-            dataIndex: 'updatedAt',
-            sorter: true,
-            render: val => <span>{DateFormatter.toUTC(val)}</span>,
-        },
-    ];
-
-    componentDidMount() {
-        const { $paging } = this.props;
-        $paging();
+    if (sorter.field) {
+      params.sort = {
+        [sorter.field]: sorter.order === 'descend' ? 'DESC' : 'ASC',
+      };
     }
-
-    render() {
-        const {
-            route: { name },
-            data,
-            loading,
-        } = this.props;
-        const { selectedRows } = this.state;
-        return (
-            <PageHeaderWrapper title={name}>
-                <Card bordered={false}>
-                    <SearchBar
-                        onSubmit={(...args) => {
-                            console.log('Search', args);
-                        }}
-                    >
-                        {form => (
-                            <Form.Item label="创建日期">
-                                {form.getFieldDecorator('createdAt')(
-                                    <DatePicker
-                                        style={{ width: '100%' }}
-                                        placeholder="请输入更新日期"
-                                    />
-                                )}
-                            </Form.Item>
-                        )}
-                    </SearchBar>
-                    <div className={styles.tableList}>
-                        {/*数据表格层*/}
-                        <StandardTable
-                            rowKey="id"
-                            selectedRows={selectedRows}
-                            loading={loading}
-                            data={data}
-                            columns={this.columns}
-                            onSelectRow={this.onSelectRows}
-                            onChange={this.onChangeStandardTableCondition}
-                        />
-                    </div>
-                </Card>
-            </PageHeaderWrapper>
-        );
-    }
-
-    onSelectRows = rows => {
-        this.setState({
-            selectedRows: rows,
-        });
-    };
-
-    onChangeStandardTableCondition = (pagination, filtersArg, sorter) => {
-        const filters = Object.keys(filtersArg).reduce((obj, key) => {
-            const newObj = { ...obj };
-            newObj[key] = toString(filtersArg[key]);
-            return newObj;
-        }, {});
-        const { searchValues } = this.state;
-        const { $paging } = this.props;
-
-        const params = {
-            page: pagination.current,
-            limit: pagination.pageSize,
-            ...searchValues,
-            ...filters,
-        };
-        if (sorter.field) {
-            params.sort = {
-                [sorter.field]: sorter.order === 'descend' ? 'DESC' : 'ASC',
-            };
-        }
-        $paging({ payload: params });
-    };
+    $paging({ payload: params });
+  };
 }
