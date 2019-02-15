@@ -31,7 +31,7 @@ import Toolbar from '../../../components/ext/Toolbar';
 export default class Index extends React.Component {
     state = {
         selectedRows: [],
-        searchValues: null,
+        searchValues: {},
     };
 
     columns = [
@@ -150,9 +150,8 @@ export default class Index extends React.Component {
      */
     onClickBatchMenu = e => {
         const { selectedRows } = this.state;
-        const { $deletes } = this.props;
-
         if (!selectedRows) return;
+        const { $deletes } = this.props;
         switch (e.key) {
             case 'delete': {
                 $deletes({
@@ -166,7 +165,7 @@ export default class Index extends React.Component {
                 break;
             }
             default:
-                break;
+                return;
         }
     };
 
@@ -234,15 +233,21 @@ export default class Index extends React.Component {
                 [sorter.field]: sorter.order === 'descend' ? 'DESC' : 'ASC',
             };
         }
+        this.setState({ searchValues: params });
         $paging({ payload: params });
     };
 
     /**
      * 点击搜索按钮
-     * @param params
+     * @param values
      */
-    onClickSearch = params => {
+    onClickSearch = values => {
         const { $paging } = this.props;
+        const { searchValues } = this.state;
+        const params = Object.assign(searchValues, values);
+        this.setState({
+            searchValues: params,
+        });
         $paging({ payload: params });
     };
 }
