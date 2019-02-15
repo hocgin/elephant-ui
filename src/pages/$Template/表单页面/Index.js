@@ -1,21 +1,20 @@
 import React from 'react';
-import {connect} from 'dva';
-import {Card, Form} from 'antd';
+import { connect } from 'dva';
+import { Card, DatePicker, Form } from 'antd';
 import styles from '../../Access/Role/Index.less';
 import * as LangKit from '../../../utils/LangKit';
 import StandardTable from '../../../components/StandardTable';
 import PageHeaderWrapper from '../../../components/PageHeaderWrapper';
-import moment from 'moment';
-import * as DateFormatter from "../../../utils/formatter/DateFormatter";
-import SearchBar from "../../../components/ext/SearchBar";
+import * as DateFormatter from '../../../utils/formatter/DateFormatter';
+import SearchBar from '../../../components/ext/SearchBar';
 
 @connect(
-    ({example: {page}, loading}) => ({
+    ({ example: { page }, loading }) => ({
         data: LangKit.toAntProPage(page),
         loading: loading.models.list,
     }),
     dispatch => ({
-        $paging: body => dispatch({type: 'example/$paging', ...body}),
+        $paging: body => dispatch({ type: 'example/$paging', ...body }),
     })
 )
 @Form.create()
@@ -45,23 +44,36 @@ export default class Index extends React.Component {
     ];
 
     componentDidMount() {
-        const {$paging} = this.props;
+        const { $paging } = this.props;
         $paging();
     }
 
     render() {
         const {
-            route: {name},
+            route: { name },
             data,
             loading,
         } = this.props;
-        const {selectedRows} = this.state;
+        const { selectedRows } = this.state;
         return (
             <PageHeaderWrapper title={name}>
                 <Card bordered={false}>
-                    <SearchBar onSubmit={(...args)=>{
-                        console.log('Search', args);
-                    }}/>
+                    <SearchBar
+                        onSubmit={(...args) => {
+                            console.log('Search', args);
+                        }}
+                    >
+                        {form => (
+                            <Form.Item label="创建日期">
+                                {form.getFieldDecorator('createdAt')(
+                                    <DatePicker
+                                        style={{ width: '100%' }}
+                                        placeholder="请输入更新日期"
+                                    />
+                                )}
+                            </Form.Item>
+                        )}
+                    </SearchBar>
                     <div className={styles.tableList}>
                         {/*数据表格层*/}
                         <StandardTable
@@ -79,7 +91,7 @@ export default class Index extends React.Component {
         );
     }
 
-    onSelectRows = (rows) => {
+    onSelectRows = rows => {
         this.setState({
             selectedRows: rows,
         });
@@ -87,12 +99,12 @@ export default class Index extends React.Component {
 
     onChangeStandardTableCondition = (pagination, filtersArg, sorter) => {
         const filters = Object.keys(filtersArg).reduce((obj, key) => {
-            const newObj = {...obj};
+            const newObj = { ...obj };
             newObj[key] = toString(filtersArg[key]);
             return newObj;
         }, {});
-        const {searchValues} = this.state;
-        const {$paging} = this.props;
+        const { searchValues } = this.state;
+        const { $paging } = this.props;
 
         const params = {
             page: pagination.current,
@@ -105,6 +117,6 @@ export default class Index extends React.Component {
                 [sorter.field]: sorter.order === 'descend' ? 'DESC' : 'ASC',
             };
         }
-        $paging({payload: params});
+        $paging({ payload: params });
     };
 }
