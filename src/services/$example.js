@@ -1,4 +1,3 @@
-import { stringify } from 'qs';
 import request from '@/utils/request';
 
 const classify = 'example';
@@ -13,6 +12,13 @@ export async function paging(payload) {
     });
 }
 
+// 查询详情
+export async function fetch({id}) {
+    return request(`/${classify}/${id}`, {
+        method: 'GET',
+    });
+}
+
 // 删除
 export async function deletes(payload) {
     return request(`/${classify}`, {
@@ -23,11 +29,22 @@ export async function deletes(payload) {
     });
 }
 
-export async function pagingx(query) {
-    const search = stringify(query);
-    let uri = '/operating';
-    if (search.length) {
-        uri += `?${search}`;
-    }
-    return request(`${uri}${stringify(query)}`);
+// 更新
+export async function update(payload) {
+    return request(`/${classify}`, {
+        method: 'PUT',
+        body: {
+            ...payload,
+        },
+    });
+}
+
+// 新增
+export async function insert(payload) {
+    return request(`/${classify}`, {
+        method: 'POST',
+        body: {
+            ...payload,
+        },
+    });
 }

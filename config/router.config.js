@@ -359,8 +359,23 @@ export default [
                 routes: [
                     {
                         name: '表单页面',
-                        path: '/example/$Template/表单页面',
+                        path: '/example/$template/表单页面',
                         component: './$Template/表单页面/Index',
+                    },
+                    {
+                        name: '表单页面-详情',
+                        path: '/example/$template/表单页面/detail',
+                        component: './$Template/表单页面/Detail/Index',
+                    },
+                    {
+                        name: '表单页面 - 新增',
+                        path: '/example/$template/表单页面/add',
+                        component: './$Template/表单页面/Add/Index',
+                    },
+                    {
+                        name: '表单页面 - 修改',
+                        path: '/example/$template/表单页面/edit',
+                        component: './$Template/表单页面/Edit/Index',
                     },
                 ],
             },
