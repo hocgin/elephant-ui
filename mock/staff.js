@@ -5,8 +5,15 @@ let i = 0,
     create = object =>
         Object.assign(
             {
-                id: `id_example_${i++}`,
-                name: 'example_name',
+                id: `id_staff_${i++}`,
+                account: 'account_uuid',
+                nickname: 'staff_nickname',
+                username: 'staff_username',
+                avatar: 'http://iph.href.lu/55x55',
+                gender: 0,
+                nonExpired: true,
+                nonLocked: true,
+                enabled: true,
                 type: 4,
                 ...createdAt(),
                 ...updatedAt(),
@@ -16,13 +23,13 @@ let i = 0,
         ),
     all = () => [
         create({
-            name: 'example_name_1',
+            nickname: 'staff_name_1',
         }),
         create({
-            name: 'example_name_2',
+            nickname: 'staff_name_2',
         }),
         create({
-            name: 'example_name_3',
+            nickname: 'staff_name_3',
         }),
     ];
 
