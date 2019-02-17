@@ -9,9 +9,9 @@ import * as LangKit from '../../../utils/LangKit';
 import * as DateFormatter from '../../../utils/formatter/DateFormatter';
 
 @connect(
-    ({ example: { page }, loading }) => ({
+    ({ staff: { page }, loading }) => ({
         data: LangKit.toAntProPage(page),
-        loading: loading.effects['example/$paging'],
+        loading: loading.effects['staff/$paging'],
     }),
     dispatch => ({
         $paging: (args = {}) => dispatch({ type: 'staff/$paging', ...args }),
@@ -40,6 +40,30 @@ export default class Index extends React.Component {
         {
             title: '编号',
             dataIndex: 'id',
+        },
+        {
+            title: '昵称',
+            dataIndex: 'nickname',
+        },
+        {
+            title: '用户名',
+            dataIndex: 'username',
+        },
+        {
+            title: '性别',
+            dataIndex: 'gender',
+        },
+        {
+            title: '过期状态',
+            dataIndex: 'nonExpired',
+        },
+        {
+            title: '锁定状态',
+            dataIndex: 'nonLocked',
+        },
+        {
+            title: '启用状态',
+            dataIndex: 'enabled',
         },
         {
             title: '创建时间',
@@ -182,7 +206,6 @@ export default class Index extends React.Component {
      * @param e
      */
     onClickMoreMenu = ({ id }, e) => {
-        console.log('点击更多操作菜单', id, e.key);
         const { $deletes, $gotoDetailPage, $gotoEditPage } = this.props;
         switch (e.key) {
             case 'edit': {

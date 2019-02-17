@@ -175,63 +175,6 @@ export default [
                     },
                 ],
             },
-            {
-                name: 'account',
-                icon: 'user',
-                path: '/account',
-                routes: [
-                    {
-                        path: '/account/center',
-                        name: 'center',
-                        component: './Account/Center/Center',
-                        routes: [
-                            {
-                                path: '/account/center',
-                                redirect: '/account/center/articles',
-                            },
-                            {
-                                path: '/account/center/articles',
-                                component: './Account/Center/Articles',
-                            },
-                            {
-                                path: '/account/center/applications',
-                                component: './Account/Center/Applications',
-                            },
-                            {
-                                path: '/account/center/projects',
-                                component: './Account/Center/Projects',
-                            },
-                        ],
-                    },
-                    {
-                        path: '/account/settings',
-                        name: 'settings',
-                        component: './Account/Settings/Info',
-                        routes: [
-                            {
-                                path: '/account/settings',
-                                redirect: '/account/settings/base',
-                            },
-                            {
-                                path: '/account/settings/base',
-                                component: './Account/Settings/BaseView',
-                            },
-                            {
-                                path: '/account/settings/security',
-                                component: './Account/Settings/SecurityView',
-                            },
-                            {
-                                path: '/account/settings/binding',
-                                component: './Account/Settings/BindingView',
-                            },
-                            {
-                                path: '/account/settings/notification',
-                                component: './Account/Settings/NotificationView',
-                            },
-                        ],
-                    },
-                ],
-            },
             // test
             {
                 icon: 'warning',
@@ -336,20 +279,91 @@ export default [
                 ],
             },
             {
-                icon: 'warning',
                 name: '账号管理',
+                icon: 'user',
                 path: '/account',
                 routes: [
                     {
-                        name: '员工管理',
-                        path: '/account/staff',
-                        component: './System/Dictionary/Index',
+                        path: '/account/center',
+                        name: 'center',
+                        component: './Account/Center/Center',
+                        routes: [
+                            {
+                                path: '/account/center',
+                                redirect: '/account/center/articles',
+                            },
+                            {
+                                path: '/account/center/articles',
+                                component: './Account/Center/Articles',
+                            },
+                            {
+                                path: '/account/center/applications',
+                                component: './Account/Center/Applications',
+                            },
+                            {
+                                path: '/account/center/projects',
+                                component: './Account/Center/Projects',
+                            },
+                        ],
+                    },
+                    {
+                        path: '/account/settings',
+                        name: 'settings',
+                        component: './Account/Settings/Info',
+                        routes: [
+                            {
+                                path: '/account/settings',
+                                redirect: '/account/settings/base',
+                            },
+                            {
+                                path: '/account/settings/base',
+                                component: './Account/Settings/BaseView',
+                            },
+                            {
+                                path: '/account/settings/security',
+                                component: './Account/Settings/SecurityView',
+                            },
+                            {
+                                path: '/account/settings/binding',
+                                component: './Account/Settings/BindingView',
+                            },
+                            {
+                                path: '/account/settings/notification',
+                                component: './Account/Settings/NotificationView',
+                            },
+                        ],
                     },
                     {
                         name: '用户管理',
-                        path: '/account/user',
-                        component: './System/Dictionary/Index',
+                        path: '/account/staff',
+                        routes: [
+                            {
+                                name: '员工管理',
+                                path: '/account/staff',
+                                component: './Account/Staff/Index',
+                            },
+                            {
+                                name: '员工详情',
+                                path: '/account/staff/detail',
+                                component: './Account/Staff/Detail/Index',
+                            },
+                            {
+                                name: '新建员工账号',
+                                path: '/account/staff/add',
+                                component: './Account/Staff/Add/Index',
+                            },
+                            {
+                                name: '更新员工信息',
+                                path: '/account/staff/edit',
+                                component: './Account/Staff/Edit/Index',
+                            },
+                        ],
                     },
+                    // {
+                    //     name: '用户管理',
+                    //     path: '/account/user',
+                    //     component: './System/Dictionary/Index',
+                    // }
                 ],
             },
             // 例子

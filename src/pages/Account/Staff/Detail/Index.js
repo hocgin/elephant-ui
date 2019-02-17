@@ -9,7 +9,7 @@ const { Description } = DescriptionList;
 
 @connect(
     ({
-        example: { detail },
+        staff: { detail },
         loading,
         routing: {
             location: { query },
@@ -21,7 +21,7 @@ const { Description } = DescriptionList;
         };
     },
     dispatch => ({
-        $fetch: (args = {}) => dispatch({ type: 'example/$fetch', ...args }),
+        $fetch: (args = {}) => dispatch({ type: 'staff/$fetch', ...args }),
     })
 )
 export default class Index extends React.Component {
@@ -44,7 +44,15 @@ export default class Index extends React.Component {
                 <PageHeaderWrapper title={name}>
                     <Card bordered={false}>
                         <DescriptionList size="large" title="基础信息" style={{ marginBottom: 32 }}>
-                            <Description term="名称">{data.name}</Description>
+                            <Description term="昵称">{data.nickname}</Description>
+                            <Description term="用户名">{data.username}</Description>
+                            <Description term="性别">{data.gender}</Description>
+                            <Description term="过期状态">{data.nonExpired}</Description>
+                            <Description term="锁定状态">{data.nonLocked}</Description>
+                            <Description term="启用状态">{data.enabled}</Description>
+                            <Description term="更新时间">
+                                {LangKit.toUTC(data.updatedAt)}
+                            </Description>
                             <Description term="创建时间">
                                 {LangKit.toUTC(data.createdAt)}
                             </Description>

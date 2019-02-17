@@ -17,7 +17,6 @@ const goto = ({ payload, pathname, isPush }) => {
 export default {
     namespace: 'router',
     state: {},
-
     effects: {
         *gotoExampleEdit(
             {
@@ -66,10 +65,41 @@ export default {
                 isPush,
             });
         },
+        // 员工管理
+        *gotoStaffEdit(
+            {
+                payload: { id },
+                isPush = true,
+            },
+            { call, put }
+        ) {
+            goto({
+                pathname: '/account/staff/edit',
+                payload: { id },
+                isPush,
+            });
+        },
+        *gotoStaffDetail(
+            {
+                payload: { id },
+                isPush = true,
+            },
+            { call, put }
+        ) {
+            goto({
+                pathname: '/account/staff/detail',
+                payload: { id },
+                isPush,
+            });
+        },
+        *gotoStaffAdd({ payload = {}, isPush = true }, { call, put }) {
+            goto({
+                pathname: '/account/staff/add',
+                payload,
+                isPush,
+            });
+        },
     },
-
-    reducers: {
-        example2(state, { payload }) {},
-    },
+    reducers: {},
     subscriptions: {},
 };
