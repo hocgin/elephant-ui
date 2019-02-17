@@ -13,7 +13,7 @@ export async function paging(payload) {
 }
 
 // 查询详情
-export async function fetch({id}) {
+export async function fetch({ id }) {
     return request(`/${classify}/${id}`, {
         method: 'GET',
     });
@@ -31,7 +31,7 @@ export async function deletes(payload) {
 
 // 更新
 export async function update(payload) {
-    return request(`/${classify}`, {
+    return request(`/${classify}/${payload.id}`, {
         method: 'PUT',
         body: {
             ...payload,

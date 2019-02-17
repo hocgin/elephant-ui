@@ -72,4 +72,10 @@ export default {
     'GET /example/:uuid': (req, res) => {
         return res.json(success(all()[0]));
     },
+    /**
+     * 更新单个
+     */
+    'PUT /example/:uuid': (req, res) => {
+        return res.json(success());
+    },
 };

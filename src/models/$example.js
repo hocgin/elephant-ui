@@ -1,4 +1,4 @@
-import { deletes, paging, fetch, insert } from '@/services/$example';
+import { deletes, paging, fetch, insert, update } from '@/services/$example';
 import { message as Message } from 'antd';
 import { ResultCode } from '../utils/Constant';
 
@@ -8,6 +8,7 @@ export default {
         page: {},
         detail: {},
         addValue: {},
+        editValue: {},
     },
 
     effects: {
@@ -51,6 +52,16 @@ export default {
         },
         *$insert({ payload, callback }, { call, put }) {
             const { code, message, data } = yield call(insert, payload);
+            if (code === ResultCode.SUCCESS) {
+                if (callback) {
+                    callback();
+                }
+            } else {
+                Message.error(message);
+            }
+        },
+        *$update({ payload, callback }, { call, put }) {
+            const { code, message, data } = yield call(update, payload);
             if (code === ResultCode.SUCCESS) {
                 if (callback) {
                     callback();

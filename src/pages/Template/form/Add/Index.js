@@ -6,7 +6,6 @@ import styles from './Index.less';
 
 const { Step } = Steps;
 @connect(args => {
-    console.log(args);
     return {};
 })
 export default class Index extends PureComponent {
