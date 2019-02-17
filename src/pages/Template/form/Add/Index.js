@@ -2,7 +2,7 @@ import React, { Fragment, PureComponent } from 'react';
 import { connect } from 'dva';
 import { Card, Steps } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from 'Index.less';
+import styles from './Index.less';
 
 const { Step } = Steps;
 @connect(args => {
