@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { connect } from 'dva';
-import { Button, Card, DatePicker, Divider, Dropdown, Form, Icon, Menu, Modal } from 'antd';
+import { Badge, Button, Card, DatePicker, Divider, Dropdown, Form, Icon, Menu, Modal } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import StandardTable from '@/components/StandardTable';
 import SearchBar from '@/components/ext/SearchBar';
@@ -54,16 +54,31 @@ export default class Index extends React.Component {
             dataIndex: 'gender',
         },
         {
-            title: '过期状态',
-            dataIndex: 'nonExpired',
-        },
-        {
-            title: '锁定状态',
-            dataIndex: 'nonLocked',
-        },
-        {
-            title: '启用状态',
-            dataIndex: 'enabled',
+            title: '状态',
+            dataIndex: 'status',
+            render: (text, record) => {
+                let state = {
+                    status: 'success',
+                    text: '正常',
+                };
+                if (!record.nonLocked) {
+                    state = {
+                        status: 'waring',
+                        text: '锁定',
+                    };
+                } else if (!record.nonExpired) {
+                    state = {
+                        status: 'waring',
+                        text: '过期',
+                    };
+                } else if (!record.enabled) {
+                    state = {
+                        status: 'error',
+                        text: '禁用',
+                    };
+                }
+                return <Badge status={state.status} text={state.text} />;
+            },
         },
         {
             title: '创建时间',
