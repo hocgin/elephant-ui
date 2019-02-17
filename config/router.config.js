@@ -355,27 +355,50 @@ export default [
             // 例子
             {
                 name: '模版',
-                path: '/example/$Template',
+                path: '/example/$template',
                 routes: [
                     {
-                        name: '表单页面',
-                        path: '/example/$template/表单页面',
-                        component: './$Template/表单页面/Index',
+                        name: 'form',
+                        path: '/example/$template/form',
+                        component: './Template/form/Index',
                     },
                     {
-                        name: '表单页面-详情',
-                        path: '/example/$template/表单页面/detail',
-                        component: './$Template/表单页面/Detail/Index',
+                        name: 'form-详情',
+                        path: '/example/$template/form/detail',
+                        component: './Template/form/Detail/Index',
                     },
                     {
-                        name: '表单页面 - 新增',
-                        path: '/example/$template/表单页面/add',
-                        component: './$Template/表单页面/Add/Index',
+                        name: 'form-新增',
+                        path: '/example/$template/form/add',
+                        hideChildrenInMenu: true,
+                        component: './Template/form/Add/Index',
+                        routes: [
+                            {
+                                name: 'form-新增',
+                                path: '/example/$template/form/add',
+                                redirect: '/example/$template/form/add/basic',
+                            },
+                            {
+                                name: '基础信息',
+                                path: '/example/$template/form/add/basic',
+                                component: './Template/form/Add/Steps/Basic',
+                            },
+                            {
+                                name: '其他信息',
+                                path: '/example/$template/form/add/other',
+                                component: './Template/form/Add/Steps/Other',
+                            },
+                            {
+                                name: '完成',
+                                path: '/example/$template/form/add/done',
+                                component: './Template/form/Add/Steps/Done',
+                            },
+                        ],
                     },
                     {
-                        name: '表单页面 - 修改',
-                        path: '/example/$template/表单页面/edit',
-                        component: './$Template/表单页面/Edit/Index',
+                        name: 'form-修改',
+                        path: '/example/$template/form/edit',
+                        component: './Template/form/Edit/Index',
                     },
                 ],
             },
