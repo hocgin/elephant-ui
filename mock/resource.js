@@ -1,5 +1,5 @@
-import { success } from './util/result';
-import { createdAt, deletedAt, updatedAt } from './util/mock';
+import {success} from './util/result';
+import {createdAt, deletedAt, updatedAt} from './util/mock';
 
 // 填充 lft rgt depth
 let fillLftRgtAndDepth = (nodes, lft, depth) => {
@@ -54,6 +54,10 @@ export let allResource = () => {
         resource('访问控制', 0, 'GET', '/access', true, [
             resource('角色管理', 0, 'GET', '/access/role', true, []),
             resource('资源管理', 0, 'GET', '/access/resource', true, []),
+        ]),
+        resource('账号管理', 0, 'GET', '/account', true, [
+            resource('用户管理', 0, 'GET', '/account/user', true, []),
+            resource('员工管理', 0, 'GET', '/account/staff', true, []),
         ]),
         resource('系统配置', 0, 'GET', '/system', true, [
             resource('数据字典', 0, 'GET', '/system/dictionary', true, []),
