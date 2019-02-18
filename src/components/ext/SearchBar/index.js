@@ -19,8 +19,8 @@ export default class SearchBar extends React.PureComponent {
                 <Form onSubmit={this.onSubmit} layout="inline">
                     {isExpand
                         ? LangKit.chunk(ele, 3)
-                            .map((el) => (
-                                <Row gutter={{md: 8, lg: 24, xl: 48}}>{
+                            .map((el, index) => (
+                                <Row key={index} gutter={{md: 8, lg: 24, xl: 48}}>{
                                     el.map((item, index) => <Col key={index} md={8} sm={24}>{item}</Col>)
                                 }</Row>))
                             .concat(<div style={{overflow: 'hidden'}}>
@@ -43,7 +43,7 @@ export default class SearchBar extends React.PureComponent {
                         : <Row gutter={{md: 8, lg: 24, xl: 48}}>
                             {LangKit.slice(ele, 2)
                                 .map((item, index) => <Col key={index} md={8} sm={24}>{item}</Col>)
-                                .concat(<Col md={8} sm={24}>
+                                .concat(<Col key={ele.length + 1} md={8} sm={24}>
                                 <span className={styles.submitButtons}>
                                     <Button type="primary" htmlType="submit">
                                         查询

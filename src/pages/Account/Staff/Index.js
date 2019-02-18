@@ -1,6 +1,6 @@
-import React, { Fragment } from 'react';
-import { connect } from 'dva';
-import {Badge, Button, Card, DatePicker, Divider, Dropdown, Form, Icon, Input, Menu, Modal, Select} from 'antd';
+import React, {Fragment} from 'react';
+import {connect} from 'dva';
+import {Badge, Button, Card, Divider, Dropdown, Form, Icon, Input, Menu, Modal, Select} from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import StandardTable from '@/components/StandardTable';
 import SearchBar from '@/components/ext/SearchBar';
@@ -9,24 +9,24 @@ import * as LangKit from '../../../utils/LangKit';
 import * as DateFormatter from '../../../utils/formatter/DateFormatter';
 
 @connect(
-    ({ staff: { page }, loading }) => ({
+    ({staff: {page}, loading}) => ({
         data: LangKit.toAntProPage(page),
         loading: loading.effects['staff/$paging'],
     }),
     dispatch => ({
-        $paging: (args = {}) => dispatch({ type: 'staff/$paging', ...args }),
+        $paging: (args = {}) => dispatch({type: 'staff/$paging', ...args}),
         $deletes: (args = {}) => {
             Modal.confirm({
                 title: '删除确认',
                 content: '是否确定删除？',
                 okText: '确认',
                 cancelText: '取消',
-                onOk: () => dispatch({ type: 'staff/$deletes', ...args }),
+                onOk: () => dispatch({type: 'staff/$deletes', ...args}),
             });
         },
-        $gotoEditPage: (args = {}) => dispatch({ type: 'router/gotoStaffEdit', ...args }),
-        $gotoAddPage: (args = {}) => dispatch({ type: 'router/gotoStaffAdd', ...args }),
-        $gotoDetailPage: (args = {}) => dispatch({ type: 'router/gotoStaffDetail', ...args }),
+        $gotoEditPage: (args = {}) => dispatch({type: 'router/gotoStaffEdit', ...args}),
+        $gotoAddPage: (args = {}) => dispatch({type: 'router/gotoStaffAdd', ...args}),
+        $gotoDetailPage: (args = {}) => dispatch({type: 'router/gotoStaffDetail', ...args}),
     })
 )
 @Form.create()
@@ -52,6 +52,7 @@ export default class Index extends React.Component {
         {
             title: '性别',
             dataIndex: 'gender',
+            render: (text) => (['女', '男'][text * 1])
         },
         {
             title: '状态',
@@ -77,7 +78,7 @@ export default class Index extends React.Component {
                         text: '禁用',
                     };
                 }
-                return <Badge status={state.status} text={state.text} />;
+                return <Badge status={state.status} text={state.text}/>;
             },
         },
         {
@@ -87,16 +88,10 @@ export default class Index extends React.Component {
             render: val => <span>{DateFormatter.toUTC(val)}</span>,
         },
         {
-            title: '更新时间',
-            dataIndex: 'updatedAt',
-            sorter: true,
-            render: val => <span>{DateFormatter.toUTC(val)}</span>,
-        },
-        {
             title: '操作',
             key: 'operation',
             render: (text, record) => {
-                const MoreMenus = ({ onClick }) => (
+                const MoreMenus = ({onClick}) => (
                     <Menu onClick={onClick}>
                         <Menu.Item key="edit">修改</Menu.Item>
                         <Menu.Item key="delete">删除</Menu.Item>
@@ -105,17 +100,17 @@ export default class Index extends React.Component {
 
                 return (
                     <Fragment>
-                        <a onClick={this.onClickMoreMenu.bind(this, record, { key: 'detail' })}>
+                        <a onClick={this.onClickMoreMenu.bind(this, record, {key: 'detail'})}>
                             查看详情
                         </a>
-                        <Divider type="vertical" />
+                        <Divider type="vertical"/>
                         <Dropdown
                             overlay={
-                                <MoreMenus onClick={this.onClickMoreMenu.bind(this, record)} />
+                                <MoreMenus onClick={this.onClickMoreMenu.bind(this, record)}/>
                             }
                         >
                             <a className="ant-dropdown-link">
-                                更多操作 <Icon type="down" />
+                                更多操作 <Icon type="down"/>
                             </a>
                         </Dropdown>
                     </Fragment>
@@ -125,22 +120,22 @@ export default class Index extends React.Component {
     ];
 
     componentDidMount() {
-        const { $paging } = this.props;
+        const {$paging} = this.props;
         $paging();
     }
 
     render() {
         const {
-            route: { name },
+            route: {name},
             data,
             loading,
         } = this.props;
-        const { selectedRows } = this.state;
+        const {selectedRows} = this.state;
 
         /**
          * 批量操作菜单
          */
-        const BatchMenus = ({ onClick }) => (
+        const BatchMenus = ({onClick}) => (
             <Menu onClick={onClick}>
                 <Menu.Item key="delete">批量删除</Menu.Item>
             </Menu>
@@ -151,39 +146,31 @@ export default class Index extends React.Component {
                     <SearchBar onSubmit={this.onClickSearch}>
                         {form => [
                             <Form.Item label="昵称">
-                                {form.getFieldDecorator('username')(
-                                    <Input style={{ width: '100%' }}
+                                {form.getFieldDecorator('nickname')(
+                                    <Input style={{width: '100%'}}
                                            placeholder="请输入昵称"
                                     />
                                 )}
                             </Form.Item>,
                             <Form.Item label="用户名">
                                 {form.getFieldDecorator('username')(
-                                    <Input style={{ width: '100%' }}
+                                    <Input style={{width: '100%'}}
                                            placeholder="请输入用户名"
                                     />
                                 )}
                             </Form.Item>,
-                            <Form.Item label="启用状态">
-                                {form.getFieldDecorator('username')(
-                                    <Select style={{ width: '100%' }}>
-                                        <Option value="1">启用</Option>
-                                        <Option value="2">禁用</Option>
+                            <Form.Item label="性别">
+                                {form.getFieldDecorator('gender')(
+                                    <Select style={{width: '100%'}}>
+                                        <Option value="1">男</Option>
+                                        <Option value="0">女</Option>
                                     </Select>
-                                )}
-                            </Form.Item>,
-                            <Form.Item label="创建日期">
-                                {form.getFieldDecorator('createdAt')(
-                                    <DatePicker
-                                        style={{ width: '100%' }}
-                                        placeholder="请输入更新日期"
-                                    />
                                 )}
                             </Form.Item>,
                         ]}
                     </SearchBar>
                     <Toolbar
-                        menu={<BatchMenus onClick={this.onClickBatchMenu} />}
+                        menu={<BatchMenus onClick={this.onClickBatchMenu}/>}
                         selectedRows={selectedRows}
                     >
                         <Button
@@ -217,9 +204,9 @@ export default class Index extends React.Component {
      * @param e
      */
     onClickBatchMenu = e => {
-        const { selectedRows } = this.state;
+        const {selectedRows} = this.state;
         if (!selectedRows) return;
-        const { $deletes } = this.props;
+        const {$deletes} = this.props;
         switch (e.key) {
             case 'delete': {
                 $deletes({
@@ -242,8 +229,8 @@ export default class Index extends React.Component {
      * @param obj
      * @param e
      */
-    onClickMoreMenu = ({ id }, e) => {
-        const { $deletes, $gotoDetailPage, $gotoEditPage } = this.props;
+    onClickMoreMenu = ({id}, e) => {
+        const {$deletes, $gotoDetailPage, $gotoEditPage} = this.props;
         switch (e.key) {
             case 'edit': {
                 $gotoEditPage({
@@ -275,7 +262,7 @@ export default class Index extends React.Component {
     };
 
     onClickAdd = () => {
-        const { $gotoAddPage } = this.props;
+        const {$gotoAddPage} = this.props;
         $gotoAddPage();
     };
 
@@ -297,17 +284,19 @@ export default class Index extends React.Component {
      */
     onChangeStandardTableCondition = (pagination, filtersArg, sorter) => {
         const filters = Object.keys(filtersArg).reduce((obj, key) => {
-            const newObj = { ...obj };
+            const newObj = {...obj};
             newObj[key] = toString(filtersArg[key]);
             return newObj;
         }, {});
-        const { searchValues } = this.state;
-        const { $paging } = this.props;
+        const {searchValues} = this.state;
+        const {$paging} = this.props;
 
         const params = {
             page: pagination.current,
             limit: pagination.pageSize,
-            ...searchValues,
+            condition: {
+                ...searchValues
+            },
             ...filters,
         };
         if (sorter.field) {
@@ -315,8 +304,8 @@ export default class Index extends React.Component {
                 [sorter.field]: sorter.order === 'descend' ? 'DESC' : 'ASC',
             };
         }
-        this.setState({ searchValues: params });
-        $paging({ payload: params });
+        this.setState({searchValues: params});
+        $paging({payload: params});
     };
 
     /**
@@ -324,12 +313,18 @@ export default class Index extends React.Component {
      * @param values
      */
     onClickSearch = values => {
-        const { $paging } = this.props;
-        const { searchValues } = this.state;
-        const params = Object.assign(searchValues, values);
-        this.setState({
-            searchValues: params,
+        this.setState((state) => ({
+            searchValues: {
+                ...state.searchValues,
+                condition: {
+                    ...state.condition,
+                    ...values
+                }
+            }
+        }), () => {
+            const {$paging} = this.props;
+            const {searchValues} = this.state;
+            $paging({payload: searchValues});
         });
-        $paging({ payload: params });
     };
 }

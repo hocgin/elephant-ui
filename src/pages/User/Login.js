@@ -1,14 +1,14 @@
-import React, { Component } from 'react';
-import { connect } from 'dva';
-import { formatMessage, FormattedMessage } from 'umi/locale';
+import React, {Component} from 'react';
+import {connect} from 'dva';
+import {formatMessage, FormattedMessage} from 'umi/locale';
 import Link from 'umi/link';
-import { Checkbox, Alert, Icon } from 'antd';
+import {Alert, Checkbox, Icon} from 'antd';
 import styles from './Login.less';
-import Login from '../../components/Login';
+import Login from '@/components/Login';
 
-const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
+const {Tab, UserName, Password, Mobile, Captcha, Submit} = Login;
 
-@connect(({ login, loading }) => ({
+@connect(({login, loading}) => ({
     login,
     submitting: loading.effects['account/login'],
 }))
@@ -43,8 +43,8 @@ export default class LoginPage extends Component {
     }
 
     render() {
-        const { login, submitting } = this.props;
-        const { type, autoLogin } = this.state;
+        const {login, submitting} = this.props;
+        const {type, autoLogin} = this.state;
         return (
             <div className={styles.main}>
                 <Login
@@ -57,14 +57,14 @@ export default class LoginPage extends Component {
                 >
                     <Tab
                         key="account"
-                        tab={formatMessage({ id: 'app.login.tab-login-credentials' })}
+                        tab={formatMessage({id: 'app.login.tab-login-credentials'})}
                     >
                         {login.status === 'error' &&
-                            type === 'account' &&
-                            !submitting &&
-                            this.renderMessage(
-                                formatMessage({ id: 'app.login.message-invalid-credentials' })
-                            )}
+                        type === 'account' &&
+                        !submitting &&
+                        this.renderMessage(
+                            formatMessage({id: 'app.login.message-invalid-credentials'})
+                        )}
                         <UserName
                             name="username"
                             placeholder="用户名"
@@ -87,14 +87,14 @@ export default class LoginPage extends Component {
                             ]}
                         />
                     </Tab>
-                    <Tab key="mobile" tab={formatMessage({ id: 'app.login.tab-login-mobile' })}>
+                    <Tab key="mobile" tab={formatMessage({id: 'app.login.tab-login-mobile'})}>
                         {login.status === 'error' &&
-                            type === 'mobile' &&
-                            !submitting &&
-                            this.renderMessage(
-                                formatMessage({ id: 'app.login.message-invalid-verification-code' })
-                            )}
-                        <Mobile name="mobile" placeholder="手机号" />
+                        type === 'mobile' &&
+                        !submitting &&
+                        this.renderMessage(
+                            formatMessage({id: 'app.login.message-invalid-verification-code'})
+                        )}
+                        <Mobile name="mobile" placeholder="手机号"/>
                         <Captcha
                             name="captcha"
                             placeholder="验证码"
@@ -105,23 +105,23 @@ export default class LoginPage extends Component {
                     {/*自动登陆 & 忘记密码*/}
                     <div>
                         <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
-                            <FormattedMessage id="app.login.remember-me" />
+                            <FormattedMessage id="app.login.remember-me"/>
                         </Checkbox>
-                        <a style={{ float: 'right' }} href="">
-                            <FormattedMessage id="app.login.forgot-password" />
+                        <a style={{float: 'right'}} href="">
+                            <FormattedMessage id="app.login.forgot-password"/>
                         </a>
                     </div>
-                    <Submit loading={submitting} style={{ width: '100%' }}>
-                        <FormattedMessage id="app.login.login" />
+                    <Submit loading={submitting} style={{width: '100%'}}>
+                        <FormattedMessage id="app.login.login"/>
                     </Submit>
                     {/*其他方式*/}
                     <div className={styles.other}>
-                        <FormattedMessage id="app.login.sign-in-with" />
-                        <Icon type="alipay-circle" className={styles.icon} theme="outlined" />
-                        <Icon type="taobao-circle" className={styles.icon} theme="outlined" />
-                        <Icon type="weibo-circle" className={styles.icon} theme="outlined" />
+                        <FormattedMessage id="app.login.sign-in-with"/>
+                        <Icon type="alipay-circle" className={styles.icon} theme="outlined"/>
+                        <Icon type="taobao-circle" className={styles.icon} theme="outlined"/>
+                        <Icon type="weibo-circle" className={styles.icon} theme="outlined"/>
                         <Link className={styles.register} to="/User/Register">
-                            <FormattedMessage id="app.login.signup" />
+                            <FormattedMessage id="app.login.signup"/>
                         </Link>
                     </div>
                 </Login>
@@ -145,7 +145,7 @@ export default class LoginPage extends Component {
         return {
             renderMessage(content) {
                 return (
-                    <Alert style={{ marginBottom: 24 }} message={content} type="error" showIcon />
+                    <Alert style={{marginBottom: 24}} message={content} type="error" showIcon/>
                 );
             },
         };
@@ -164,7 +164,7 @@ export default class LoginPage extends Component {
             },
             onTabChange(type) {
                 console.log(type);
-                return that.setState({ type });
+                return that.setState({type});
             },
 
             onGetCaptcha() {
@@ -173,7 +173,7 @@ export default class LoginPage extends Component {
                         if (err) {
                             reject(err);
                         } else {
-                            const { dispatch } = that.props;
+                            const {dispatch} = that.props;
                             dispatch({
                                 type: 'login/getCaptcha',
                                 payload: values.mobile,
@@ -184,25 +184,26 @@ export default class LoginPage extends Component {
                     });
                 });
             },
-
-            /**
-             * 提交登陆
-             * @param err
-             * @param values
-             */
-            onSubmitLogin(err, values) {
-                if (!err) {
-                    const { type } = that.state;
-                    const { dispatch } = that.props;
-                    dispatch({
-                        type: 'login/login',
-                        payload: {
-                            ...values,
-                            type,
-                        },
-                    });
-                }
-            },
         };
     };
+
+    /**
+     * 提交登陆
+     * @param err
+     * @param values
+     */
+    onSubmitLogin = (err, values) => {
+        console.log('登陆');
+        if (!err) {
+            const {type} = this.state;
+            const {dispatch} = this.props;
+            dispatch({
+                type: 'login/login',
+                payload: {
+                    ...values,
+                    type,
+                },
+            });
+        }
+    }
 }

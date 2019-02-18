@@ -1,46 +1,47 @@
 import React from 'react';
-import { connect } from 'dva';
+import {connect} from 'dva';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Button, Card, Form, Input, Switch } from 'antd';
+import {Button, Card, Form, Input, Select, Switch} from 'antd';
 import router from 'umi/router';
 
 const formItemLayout = {
     labelCol: {
-        xs: { span: 24 },
-        sm: { span: 7 },
+        xs: {span: 24},
+        sm: {span: 7},
     },
     wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 12 },
-        md: { span: 10 },
+        xs: {span: 24},
+        sm: {span: 12},
+        md: {span: 10},
     },
 };
 
 const submitFormLayout = {
     wrapperCol: {
-        xs: { span: 24, offset: 0 },
-        sm: { span: 10, offset: 7 },
+        xs: {span: 24, offset: 0},
+        sm: {span: 10, offset: 7},
     },
 };
 
 @connect(
     ({
-        example,
-        loading,
-        routing: {
-            location: { query },
-        },
-    }) => ({
+         example,
+         loading,
+         routing: {
+             location: {query},
+         },
+     }) => ({
         loading: loading.effects['staff/$insert'],
     }),
     dispatch => ({
-        $submit: (args = {}) => dispatch({ type: 'staff/$insert', ...args }),
+        $submit: (args = {}) => dispatch({type: 'staff/$insert', ...args}),
     })
 )
 @Form.create()
 export default class Index extends React.Component {
     state = {
         data: {
+            gender: 1,
             nonExpired: false,
             nonLocked: false,
             enabled: true,
@@ -49,15 +50,15 @@ export default class Index extends React.Component {
 
     render() {
         const {
-            route: { name },
-            form: { getFieldDecorator },
+            route: {name},
+            form: {getFieldDecorator},
             loading,
         } = this.props;
-        const { data } = this.state;
+        const {data} = this.state;
         return (
             <PageHeaderWrapper title={name}>
                 <Card bordered={false}>
-                    <Form onSubmit={this.onSubmit} style={{ marginTop: 8 }}>
+                    <Form onSubmit={this.onSubmit} style={{marginTop: 8}}>
                         <Form.Item {...formItemLayout} label="用户名">
                             {getFieldDecorator('username', {
                                 initialValue: data.username,
@@ -67,7 +68,7 @@ export default class Index extends React.Component {
                                         message: '必填',
                                     },
                                 ],
-                            })(<Input type="text" placeholder="请填写用户名" />)}
+                            })(<Input type="text" placeholder="请填写用户名"/>)}
                         </Form.Item>
                         <Form.Item {...formItemLayout} label="昵称">
                             {getFieldDecorator('nickname', {
@@ -78,38 +79,46 @@ export default class Index extends React.Component {
                                         message: '必填',
                                     },
                                 ],
-                            })(<Input type="text" placeholder="请填写昵称" />)}
+                            })(<Input type="text" placeholder="请填写昵称"/>)}
                         </Form.Item>
                         <Form.Item {...formItemLayout} label="密码">
                             {getFieldDecorator('password', {
-                                initialValue: data.username,
+                                initialValue: data.password,
                                 rules: [
                                     {
                                         required: true,
                                         message: '必填',
                                     },
                                 ],
-                            })(<Input type="password" placeholder="请填写密码" />)}
+                            })(<Input type="password" placeholder="请填写密码"/>)}
                         </Form.Item>
-                        <Form.Item {...formItemLayout} label="过期状态">
+                        <Form.Item {...formItemLayout} label="性别">
+                            {getFieldDecorator('gender', {
+                                initialValue: data.gender,
+                            })(<Select>
+                                <Select.Option value={0}>女</Select.Option>
+                                <Select.Option value={1}>男</Select.Option>
+                            </Select>)}
+                        </Form.Item>
+                        <Form.Item {...formItemLayout} label="过期">
                             {getFieldDecorator('nonExpired', {
                                 initialValue: data.nonExpired,
                                 valuePropName: 'checked',
-                            })(<Switch />)}
+                            })(<Switch/>)}
                         </Form.Item>
-                        <Form.Item {...formItemLayout} label="锁定状态">
+                        <Form.Item {...formItemLayout} label="锁定">
                             {getFieldDecorator('nonLocked', {
                                 initialValue: data.nonLocked,
                                 valuePropName: 'checked',
-                            })(<Switch />)}
+                            })(<Switch/>)}
                         </Form.Item>
-                        <Form.Item {...formItemLayout} label="启用状态">
+                        <Form.Item {...formItemLayout} label="启用">
                             {getFieldDecorator('enabled', {
                                 initialValue: data.enabled,
                                 valuePropName: 'checked',
-                            })(<Switch />)}
+                            })(<Switch/>)}
                         </Form.Item>
-                        <Form.Item {...submitFormLayout} style={{ marginTop: 32 }}>
+                        <Form.Item {...submitFormLayout} style={{marginTop: 32}}>
                             <Button
                                 type="primary"
                                 onClick={this.onSubmit}
@@ -119,7 +128,7 @@ export default class Index extends React.Component {
                                 提交
                             </Button>
                             <Button
-                                style={{ marginLeft: 8 }}
+                                style={{marginLeft: 8}}
                                 htmlType={'button'}
                                 onClick={router.goBack}
                             >
@@ -139,7 +148,7 @@ export default class Index extends React.Component {
     onSubmit = e => {
         e.preventDefault();
         const {
-            form: { validateFieldsAndScroll },
+            form: {validateFieldsAndScroll},
             $submit,
             id,
         } = this.props;
