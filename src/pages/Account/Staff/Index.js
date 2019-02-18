@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { connect } from 'dva';
-import { Badge, Button, Card, DatePicker, Divider, Dropdown, Form, Icon, Menu, Modal } from 'antd';
+import {Badge, Button, Card, DatePicker, Divider, Dropdown, Form, Icon, Input, Menu, Modal, Select} from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import StandardTable from '@/components/StandardTable';
 import SearchBar from '@/components/ext/SearchBar';
@@ -150,6 +150,28 @@ export default class Index extends React.Component {
                 <Card bordered={false}>
                     <SearchBar onSubmit={this.onClickSearch}>
                         {form => [
+                            <Form.Item label="昵称">
+                                {form.getFieldDecorator('username')(
+                                    <Input style={{ width: '100%' }}
+                                           placeholder="请输入昵称"
+                                    />
+                                )}
+                            </Form.Item>,
+                            <Form.Item label="用户名">
+                                {form.getFieldDecorator('username')(
+                                    <Input style={{ width: '100%' }}
+                                           placeholder="请输入用户名"
+                                    />
+                                )}
+                            </Form.Item>,
+                            <Form.Item label="启用状态">
+                                {form.getFieldDecorator('username')(
+                                    <Select style={{ width: '100%' }}>
+                                        <Option value="1">启用</Option>
+                                        <Option value="2">禁用</Option>
+                                    </Select>
+                                )}
+                            </Form.Item>,
                             <Form.Item label="创建日期">
                                 {form.getFieldDecorator('createdAt')(
                                     <DatePicker

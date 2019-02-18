@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Col, Form, Icon, Row } from 'antd';
+import {Button, Col, Form, Icon, Row} from 'antd';
 import * as LangKit from '../../../utils/LangKit';
 import styles from './index.less';
 
@@ -10,58 +10,55 @@ export default class SearchBar extends React.PureComponent {
     };
 
     render() {
-        const { children } = this.props;
-        const { form } = this.props;
-        let { isExpand } = this.state;
+        const {children} = this.props;
+        const {form} = this.props;
+        let {isExpand} = this.state;
         let ele = children(form);
         return (
             <div className={styles.tableListForm}>
                 <Form onSubmit={this.onSubmit} layout="inline">
-                    <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-                        {(isExpand ? ele : LangKit.slice(ele, 2)).map((item, index) => (
-                            <Col key={index} md={8} sm={24}>
-                                {item}
-                            </Col>
-                        ))}
-                        {!isExpand && (
-                            <Col md={8} sm={24}>
-                                <span className={styles.submitButtons}>
+                    {isExpand
+                        ? LangKit.chunk(ele, 3)
+                            .map((el) => (
+                                <Row gutter={{md: 8, lg: 24, xl: 48}}>{
+                                    el.map((item, index) => <Col key={index} md={8} sm={24}>{item}</Col>)
+                                }</Row>))
+                            .concat(<div style={{overflow: 'hidden'}}>
+                                <div style={{float: 'right', marginBottom: 24}}>
                                     <Button type="primary" htmlType="submit">
                                         查询
                                     </Button>
                                     <Button
                                         htmlType="button"
-                                        style={{ marginLeft: 8 }}
+                                        style={{marginLeft: 8}}
                                         onClick={this.onReset}
                                     >
                                         重置
                                     </Button>
-                                    <a style={{ marginLeft: 8 }} onClick={this.onClickToggleExpand}>
-                                        展开 <Icon type="down" />
+                                    <a style={{marginLeft: 8}} onClick={this.onClickToggleExpand}>
+                                        收起 <Icon type="up"/>
+                                    </a>
+                                </div>
+                            </div>)
+                        : <Row gutter={{md: 8, lg: 24, xl: 48}}>
+                            {LangKit.slice(ele, 2)
+                                .map((item, index) => <Col key={index} md={8} sm={24}>{item}</Col>)
+                                .concat(<Col md={8} sm={24}>
+                                <span className={styles.submitButtons}>
+                                    <Button type="primary" htmlType="submit">
+                                        查询
+                                    </Button>
+                                    <Button htmlType="button"
+                                            style={{marginLeft: 8}}
+                                            onClick={this.onReset}>
+                                        重置
+                                    </Button>
+                                    <a style={{marginLeft: 8}} onClick={this.onClickToggleExpand}>
+                                        展开 <Icon type="down"/>
                                     </a>
                                 </span>
-                            </Col>
-                        )}
-                    </Row>
-                    {isExpand && (
-                        <div style={{ overflow: 'hidden' }}>
-                            <div style={{ float: 'right', marginBottom: 24 }}>
-                                <Button type="primary" htmlType="submit">
-                                    查询
-                                </Button>
-                                <Button
-                                    htmlType="button"
-                                    style={{ marginLeft: 8 }}
-                                    onClick={this.onReset}
-                                >
-                                    重置
-                                </Button>
-                                <a style={{ marginLeft: 8 }} onClick={this.onClickToggleExpand}>
-                                    收起 <Icon type="up" />
-                                </a>
-                            </div>
-                        </div>
-                    )}
+                                </Col>)}
+                        </Row>}
                 </Form>
             </div>
         );
@@ -74,7 +71,7 @@ export default class SearchBar extends React.PureComponent {
      */
     onSubmit = e => {
         e.preventDefault();
-        const { form, onSubmit } = this.props;
+        const {form, onSubmit} = this.props;
         form.validateFields((err, fieldsValue) => {
             if (err) return;
             onSubmit(fieldsValue);
@@ -84,7 +81,7 @@ export default class SearchBar extends React.PureComponent {
      * 重置输入框
      */
     onReset = () => {
-        const { form } = this.props;
+        const {form} = this.props;
         form.resetFields();
     };
 
@@ -92,7 +89,7 @@ export default class SearchBar extends React.PureComponent {
      * 切换展开状态
      */
     onClickToggleExpand = () => {
-        this.setState(({ isExpand }) => ({
+        this.setState(({isExpand}) => ({
             isExpand: !isExpand,
         }));
     };
