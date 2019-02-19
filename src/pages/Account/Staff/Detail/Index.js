@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Card, Divider, Avatar } from 'antd';
+import { Avatar, Card, Divider } from 'antd';
 import * as LangKit from '../../../../utils/LangKit';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -47,17 +47,23 @@ export default class Index extends React.Component {
                             <Description>
                                 <Avatar shape="square" size={55} src={data.avatar} />
                             </Description>
-                            <Description term="昵称">{data.nickname}</Description>
                             <Description term="用户名">{data.username}</Description>
-                            <Description term="性别">{data.gender}</Description>
-                            <Description term="过期状态">{data.nonExpired}</Description>
-                            <Description term="锁定状态">{data.nonLocked}</Description>
-                            <Description term="启用状态">{data.enabled}</Description>
-                            <Description term="更新时间">
-                                {LangKit.toUTC(data.updatedAt)}
+                            <Description term="昵称">{data.nickname}</Description>
+                            <Description term="性别">{['女', '男'][data.gender]}</Description>
+                            <Description term="过期状态">
+                                {data.nonExpired ? '未过期' : '已过期'}
+                            </Description>
+                            <Description term="锁定状态">
+                                {data.nonLocked ? '未锁定' : '锁定中'}
+                            </Description>
+                            <Description term="启用状态">
+                                {data.enabled ? '启用' : '禁用'}
                             </Description>
                             <Description term="创建时间">
                                 {LangKit.toUTC(data.createdAt)}
+                            </Description>
+                            <Description term="更新时间">
+                                {LangKit.toUTC(data.updatedAt)}
                             </Description>
                         </DescriptionList>
                         <Divider style={{ marginBottom: 32 }} />

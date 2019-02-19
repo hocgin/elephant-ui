@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'dva';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Button, Card, Form, Input, Switch } from 'antd';
+import { Button, Card, Form, Input, message, Select, Switch } from 'antd';
 import router from 'umi/router';
 
 const formItemLayout = {
@@ -25,13 +25,13 @@ const submitFormLayout = {
 
 @connect(
     ({
-        example,
+        staff,
         loading,
         routing: {
             location: { query },
         },
     }) => ({
-        data: example.detail,
+        data: staff.detail,
         id: query.id,
         loading: loading.effects['staff/$update'],
     }),
@@ -86,30 +86,29 @@ export default class Index extends React.Component {
                                 ],
                             })(<Input type="text" placeholder="请填写昵称" />)}
                         </Form.Item>
-                        <Form.Item {...formItemLayout} label="密码">
-                            {getFieldDecorator('password', {
-                                initialValue: data.username,
-                                rules: [
-                                    {
-                                        required: true,
-                                        message: '必填',
-                                    },
-                                ],
-                            })(<Input type="password" placeholder="请填写密码" />)}
+                        <Form.Item {...formItemLayout} label="性别">
+                            {getFieldDecorator('gender', {
+                                initialValue: data.gender,
+                            })(
+                                <Select>
+                                    <Select.Option value={0}>女</Select.Option>
+                                    <Select.Option value={1}>男</Select.Option>
+                                </Select>
+                            )}
                         </Form.Item>
-                        <Form.Item {...formItemLayout} label="过期状态">
+                        <Form.Item {...formItemLayout} label="过期">
                             {getFieldDecorator('nonExpired', {
-                                initialValue: data.nonExpired,
+                                initialValue: !data.nonExpired,
                                 valuePropName: 'checked',
                             })(<Switch />)}
                         </Form.Item>
-                        <Form.Item {...formItemLayout} label="锁定状态">
+                        <Form.Item {...formItemLayout} label="锁定">
                             {getFieldDecorator('nonLocked', {
-                                initialValue: data.nonLocked,
+                                initialValue: !data.nonLocked,
                                 valuePropName: 'checked',
                             })(<Switch />)}
                         </Form.Item>
-                        <Form.Item {...formItemLayout} label="启用状态">
+                        <Form.Item {...formItemLayout} label="启用">
                             {getFieldDecorator('enabled', {
                                 initialValue: data.enabled,
                                 valuePropName: 'checked',
@@ -155,6 +154,9 @@ export default class Index extends React.Component {
                     payload: {
                         id,
                         ...values,
+                    },
+                    callback: () => {
+                        message.success('更新成功');
                     },
                 });
             }
