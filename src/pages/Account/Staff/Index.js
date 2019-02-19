@@ -212,9 +212,9 @@ export default class Index extends React.Component {
      * @param e
      */
     onClickBatchMenu = e => {
-        const { selectedRows } = this.state;
+        const { selectedRows, searchValues } = this.state;
         if (!selectedRows) return;
-        const { $deletes } = this.props;
+        const { $deletes, $paging } = this.props;
         switch (e.key) {
             case 'delete': {
                 $deletes({
@@ -223,6 +223,7 @@ export default class Index extends React.Component {
                         this.setState({
                             selectedRows: [],
                         });
+                        $paging({ payload: searchValues });
                     },
                 });
                 break;
@@ -238,7 +239,8 @@ export default class Index extends React.Component {
      * @param e
      */
     onClickMoreMenu = ({ id }, e) => {
-        const { $deletes, $gotoDetailPage, $gotoEditPage } = this.props;
+        const { searchValues } = this.state;
+        const { $deletes, $gotoDetailPage, $gotoEditPage, $paging } = this.props;
         switch (e.key) {
             case 'edit': {
                 $gotoEditPage({
@@ -260,6 +262,9 @@ export default class Index extends React.Component {
                 $deletes({
                     payload: {
                         id: [id],
+                    },
+                    callback: () => {
+                        $paging({ payload: searchValues });
                     },
                 });
                 break;

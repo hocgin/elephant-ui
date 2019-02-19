@@ -111,7 +111,7 @@ export default class CreateModal extends PureComponent {
                         content() {
                             return [
                                 <Form.Item key="parent" {...that.formLayout} label="父节点">
-                                    {form.getFieldDecorator('parent', {
+                                    {form.getFieldDecorator('refNode', {
                                         initialValue:
                                             defaultParent != null
                                                 ? defaultParent
