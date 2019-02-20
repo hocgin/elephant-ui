@@ -125,6 +125,7 @@ export default function request(url, option) {
     }
 
     const expirys = options.expirys && 60;
+    options.expirys = true;
     // options.expirys !== false, return the cache,
     if (options.expirys !== false) {
         const cached = sessionStorage.getItem(hashcode);
@@ -139,6 +140,7 @@ export default function request(url, option) {
             sessionStorage.removeItem(`${hashcode}:timestamp`);
         }
     }
+    console.log(`${config.API_HOST}${url}`, newOptions);
     return fetch(`${config.API_HOST}${url}`, newOptions)
         .then(checkStatus)
         .then(response => cachedSave(response, hashcode))

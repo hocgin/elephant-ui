@@ -41,8 +41,8 @@ export default class Index extends React.Component {
     state = {
         data: {
             gender: 1,
-            nonExpired: false,
-            nonLocked: false,
+            nonExpired: true,
+            nonLocked: true,
             enabled: true,
         },
     };
@@ -101,15 +101,15 @@ export default class Index extends React.Component {
                                 </Select>
                             )}
                         </Form.Item>
-                        <Form.Item {...formItemLayout} label="过期">
+                        <Form.Item {...formItemLayout} label="未过期">
                             {getFieldDecorator('nonExpired', {
-                                initialValue: !data.nonExpired,
+                                initialValue: data.nonExpired,
                                 valuePropName: 'checked',
                             })(<Switch />)}
                         </Form.Item>
-                        <Form.Item {...formItemLayout} label="锁定">
+                        <Form.Item {...formItemLayout} label="未锁定">
                             {getFieldDecorator('nonLocked', {
-                                initialValue: !data.nonLocked,
+                                initialValue: data.nonLocked,
                                 valuePropName: 'checked',
                             })(<Switch />)}
                         </Form.Item>
