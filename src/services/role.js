@@ -1,9 +1,9 @@
 import request from '@/utils/request';
 
 /**
- * 分页查询
+ * 查询所有
  */
-export async function page(query) {
+export async function findAll(query) {
     return request('/roles');
 }
 

@@ -1,4 +1,4 @@
-import { _paging, deletes, insertOne, selectOne, updateOne } from '@/services/role';
+import { _paging, deletes, insertOne, selectOne, updateOne, findAll } from '@/services/role';
 import { message } from 'antd';
 import { ResultCode } from '../utils/Constant';
 
@@ -13,7 +13,8 @@ export default {
             pages: 1,
             searchCount: true,
         },
-        detail: null,
+        all: [],
+        detail: {},
     },
     effects: {
         // 分页查询
@@ -22,6 +23,18 @@ export default {
             if (result.code === ResultCode.SUCCESS) {
                 yield put({
                     type: 'fillPage',
+                    payload: result.data,
+                });
+            } else {
+                message.error(result.message);
+            }
+        },
+        // 获取所有
+        *$findAll({ payload }, { call, put }) {
+            let result = yield call(findAll, payload);
+            if (result.code === ResultCode.SUCCESS) {
+                yield put({
+                    type: 'fillAll',
                     payload: result.data,
                 });
             } else {
@@ -93,6 +106,12 @@ export default {
             return {
                 ...state,
                 detail: payload,
+            };
+        },
+        fillAll(state, { payload }) {
+            return {
+                ...state,
+                all: payload,
             };
         },
     },

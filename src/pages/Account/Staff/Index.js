@@ -19,14 +19,22 @@ import SearchBar from '@/components/ext/SearchBar';
 import Toolbar from '@/components/ext/Toolbar';
 import * as LangKit from '../../../utils/LangKit';
 import * as DateFormatter from '../../../utils/formatter/DateFormatter';
+import SetRolesModal from './Modal/SetRolesModal';
+
+const Constant = {
+    // 分配角色弹窗
+    SET_ROLE_MODAL_VISIBLE: 'SET_ROLE_MODAL_VISIBLE',
+};
 
 @connect(
-    ({ staff: { page }, loading }) => ({
+    ({ staff: { page }, role: { all }, loading }) => ({
         data: LangKit.toAntProPage(page),
+        roles: all,
         loading: loading.effects['staff/$paging'],
     }),
     dispatch => ({
         $paging: (args = {}) => dispatch({ type: 'staff/$paging', ...args }),
+        $findAllRole: (args = {}) => dispatch({ type: 'role/$findAll', ...args }),
         $deletes: (args = {}) => {
             Modal.confirm({
                 title: '删除确认',
@@ -46,6 +54,7 @@ export default class Index extends React.Component {
     state = {
         selectedRows: [],
         searchValues: {},
+        operateRow: {},
     };
 
     columns = [
@@ -105,21 +114,31 @@ export default class Index extends React.Component {
             render: (text, record) => {
                 const MoreMenus = ({ onClick }) => (
                     <Menu onClick={onClick}>
+                        <Menu.Item key="setRoles">分配角色</Menu.Item>
                         <Menu.Item key="edit">修改</Menu.Item>
                         <Menu.Item key="delete">删除</Menu.Item>
                     </Menu>
                 );
 
+                const onClickOperateRow = (record, e) => {
+                    this.setState(
+                        {
+                            operateRow: record,
+                        },
+                        () => {
+                            this.onClickMoreMenu(record, e);
+                        }
+                    );
+                };
+
                 return (
                     <Fragment>
-                        <a onClick={this.onClickMoreMenu.bind(this, record, { key: 'detail' })}>
+                        <a onClick={onClickOperateRow.bind(this, record, { key: 'detail' })}>
                             查看详情
                         </a>
                         <Divider type="vertical" />
                         <Dropdown
-                            overlay={
-                                <MoreMenus onClick={this.onClickMoreMenu.bind(this, record)} />
-                            }
+                            overlay={<MoreMenus onClick={onClickOperateRow.bind(this, record)} />}
                         >
                             <a className="ant-dropdown-link">
                                 更多操作 <Icon type="down" />
@@ -132,8 +151,9 @@ export default class Index extends React.Component {
     ];
 
     componentDidMount() {
-        const { $paging } = this.props;
+        const { $paging, $findAllRole } = this.props;
         $paging();
+        $findAllRole();
     }
 
     render() {
@@ -141,9 +161,13 @@ export default class Index extends React.Component {
             route: { name },
             data,
             loading,
+            roles,
         } = this.props;
-        const { selectedRows } = this.state;
-
+        const {
+            selectedRows,
+            operateRow,
+            [Constant.SET_ROLE_MODAL_VISIBLE]: setRoleModalVisible,
+        } = this.state;
         /**
          * 批量操作菜单
          */
@@ -203,9 +227,30 @@ export default class Index extends React.Component {
                         />
                     </div>
                 </Card>
+                {operateRow.id && (
+                    <SetRolesModal
+                        id={operateRow.id}
+                        roles={roles}
+                        selected={[]}
+                        visible={setRoleModalVisible}
+                        onCancel={this.onClose.bind(this, Constant.SET_ROLE_MODAL_VISIBLE)}
+                    />
+                )}
             </PageHeaderWrapper>
         );
     }
+
+    onShow = key => {
+        this.setState({
+            [key]: true,
+        });
+    };
+
+    onClose = key => {
+        this.setState({
+            [key]: false,
+        });
+    };
 
     /**
      * 点击批量操作菜单
@@ -218,13 +263,16 @@ export default class Index extends React.Component {
         switch (e.key) {
             case 'delete': {
                 $deletes({
-                    id: selectedRows.map(row => row.key),
-                    callback: () => {
-                        this.setState({
-                            selectedRows: [],
-                        });
-                        $paging({ payload: searchValues });
+                    payload: {
+                        id: selectedRows.map(row => row.id),
                     },
+                    callback: this.setState.bind(
+                        this,
+                        {
+                            selectedRows: [],
+                        },
+                        $paging.bind(this, { payload: searchValues })
+                    ),
                 });
                 break;
             }
@@ -263,10 +311,12 @@ export default class Index extends React.Component {
                     payload: {
                         id: [id],
                     },
-                    callback: () => {
-                        $paging({ payload: searchValues });
-                    },
+                    callback: $paging.bind(this, { payload: searchValues }),
                 });
+                break;
+            }
+            case 'setRoles': {
+                this.onShow(Constant.SET_ROLE_MODAL_VISIBLE);
                 break;
             }
             default:

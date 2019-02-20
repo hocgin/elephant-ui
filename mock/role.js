@@ -45,16 +45,10 @@ export default {
         return res.json(success());
     },
     /**
-     * 分页获取
+     * 获取所有
      */
     'GET /roles': (req, res) => {
-        return res.json(
-            success(
-                pageWrapper({
-                    records: allRole(),
-                })
-            )
-        );
+        return res.json(success(allRole()));
     },
     /**
      * 分页获取
