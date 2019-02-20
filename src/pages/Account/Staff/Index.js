@@ -231,7 +231,7 @@ export default class Index extends React.Component {
                     <SetRolesModal
                         id={operateRow.id}
                         roles={roles}
-                        selected={[]}
+                        selected={operateRow.roles}
                         visible={setRoleModalVisible}
                         onCancel={this.onClose.bind(this, Constant.SET_ROLE_MODAL_VISIBLE)}
                     />

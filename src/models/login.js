@@ -5,7 +5,7 @@ import { fakeAccountLogin, getFakeCaptcha } from '@/services/api';
 import { getPageQuery } from '@/utils/utils';
 import { LocalStorage } from '../utils/Constant';
 import router from 'umi/router';
-import { message } from 'antd';
+import { message as Message } from 'antd';
 
 export default {
     namespace: 'login',
@@ -17,10 +17,9 @@ export default {
     effects: {
         // 登陆
         *login({ payload }, { call, put }) {
-            const result = yield call(login, payload);
-            console.log('[登陆]', result);
-            if (result.code === 200) {
-                const { token } = result.data;
+            const {code, data, message} = yield call(login, payload);
+            if (code === 200) {
+                const { token } = data;
                 // 存储token
                 localStorage.setItem(LocalStorage.TOKEN, token);
                 const urlParams = new URL(window.location.href);
@@ -42,30 +41,31 @@ export default {
                 }
                 yield put(router.replace(redirect || '/'));
             } else {
-                message.error(result.message);
+                Message.error(message);
             }
         },
 
         *getCaptcha({ payload }, { call }) {
-            console.log('TODO: 获取验证码');
+            throw 'TODO: 获取验证码';
             // yield call(getFakeCaptcha, payload);
         },
 
         *logout(_, { put }) {
+            throw 'TODO: 退出登陆';
             // yield put({
             //     type: 'changeLoginStatus',
             //     payload: {
             //         status: false,
             //     },
             // });
-            yield put(
-                router.push({
-                    pathname: '/user/login',
-                    search: stringify({
-                        redirect: window.location.href,
-                    }),
-                })
-            );
+            // yield put(
+            //     router.push({
+            //         pathname: '/user/login',
+            //         search: stringify({
+            //             redirect: window.location.href,
+            //         }),
+            //     })
+            // );
         },
     },
 

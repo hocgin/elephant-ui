@@ -10,6 +10,7 @@ let i = 0,
                 nickname: 'staff_nickname',
                 username: 'staff_username',
                 avatar: 'http://iph.href.lu/55x55',
+                roles: ['uuid_role_0'],
                 gender: 0,
                 nonExpired: true,
                 nonLocked: true,
@@ -40,19 +41,19 @@ export default {
     /**
      * 增加
      */
-    'POST /staff': (req, res) => {
+    'POST /api/v1/staff': (req, res) => {
         return res.json(success());
     },
     /**
      * 删除
      */
-    'DELETE /staff': (req, res) => {
+    'DELETE /api/v1/staff': (req, res) => {
         return res.json(success());
     },
     /**
      * 分页获取
      */
-    'GET /staff': (req, res) => {
+    'GET /api/v1/staff': (req, res) => {
         return res.json(
             success(
                 pageWrapper({
@@ -64,7 +65,7 @@ export default {
     /**
      * 分页获取
      */
-    'POST /staff/_paging': (req, res) => {
+    'POST /api/v1/staff/_paging': (req, res) => {
         return res.json(
             success(
                 pageWrapper({
@@ -76,13 +77,13 @@ export default {
     /**
      * 获取单个
      */
-    'GET /staff/:uuid': (req, res) => {
+    'GET /api/v1/staff/:uuid': (req, res) => {
         return res.json(success(all()[0]));
     },
     /**
      * 更新单个
      */
-    'PUT /staff/:uuid': (req, res) => {
+    'PUT /api/v1/staff/:uuid': (req, res) => {
         return res.json(success());
     },
 };

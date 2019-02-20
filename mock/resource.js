@@ -75,31 +75,31 @@ export default {
     /**
      * 增加节点
      */
-    'POST /resource': (req, res) => {
+    'POST /api/v1/resource': (req, res) => {
         return res.json(success());
     },
     /**
      * 更新节点
      */
-    'PUT /resource/:uuid': (req, res) => {
+    'PUT /api/v1/resource/:uuid': (req, res) => {
         return res.json(success());
     },
     /**
      * 删除节点
      */
-    'DELETE /resource': (req, res) => {
+    'DELETE /api/v1/resource': (req, res) => {
         return res.json(success());
     },
     /**
      * 查询节点
      */
-    'GET /resource/:uuid': (req, res) => {
+    'GET /api/v1/resource/:uuid': (req, res) => {
         return res.json(success(allResource()[0]));
     },
     /**
      * 查询节点
      */
-    'GET /resource': (req, res) => {
+    'GET /api/v1/resource': (req, res) => {
         return res.json(success(allResource()));
     },
 };

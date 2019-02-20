@@ -1,10 +1,10 @@
 import request from '@/utils/request';
 
-const classify = 'staff';
+const prefix = '/api/v1/staff';
 
 // 分页查询
 export async function paging(payload) {
-    return request(`/${classify}/_paging`, {
+    return request(`${prefix}/_paging`, {
         method: 'POST',
         body: {
             ...payload,
@@ -13,15 +13,15 @@ export async function paging(payload) {
 }
 
 // 查询详情
-export async function fetch({ id }) {
-    return request(`/${classify}/${id}`, {
+export async function fetch({id}) {
+    return request(`${prefix}/${id}`, {
         method: 'GET',
     });
 }
 
 // 删除
 export async function deletes(payload) {
-    return request(`/${classify}`, {
+    return request(`${prefix}`, {
         method: 'DELETE',
         body: {
             ...payload,
@@ -31,7 +31,7 @@ export async function deletes(payload) {
 
 // 更新
 export async function update(payload) {
-    return request(`/${classify}/${payload.id}`, {
+    return request(`${prefix}/${payload.id}`, {
         method: 'PUT',
         body: {
             ...payload,
@@ -41,7 +41,7 @@ export async function update(payload) {
 
 // 新增
 export async function insert(payload) {
-    return request(`/${classify}`, {
+    return request(`${prefix}`, {
         method: 'POST',
         body: {
             ...payload,

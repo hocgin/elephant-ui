@@ -29,31 +29,31 @@ export default {
     /**
      * 增加
      */
-    'POST /roles': (req, res) => {
+    'POST /api/v1/roles': (req, res) => {
         return res.json(success());
     },
     /**
      * 删除
      */
-    'DELETE /roles': (req, res) => {
+    'DELETE /api/v1/roles': (req, res) => {
         return res.json(success());
     },
     /**
      * 更新
      */
-    'PUT /roles/:uuid': (req, res) => {
+    'PUT /api/v1/roles/:uuid': (req, res) => {
         return res.json(success());
     },
     /**
      * 获取所有
      */
-    'GET /roles': (req, res) => {
+    'GET /api/v1/roles': (req, res) => {
         return res.json(success(allRole()));
     },
     /**
      * 分页获取
      */
-    'POST /roles/_paging': (req, res) => {
+    'POST /api/v1/roles/_paging': (req, res) => {
         return res.json(
             success(
                 pageWrapper({
@@ -65,7 +65,7 @@ export default {
     /**
      * 获取单个
      */
-    'GET /roles/:uuid': (req, res) => {
+    'GET /api/v1/roles/:uuid': (req, res) => {
         return res.json(success(allRole()[0]));
     },
 };

@@ -1,18 +1,15 @@
-import { stringify } from 'qs';
+import {stringify} from 'qs';
 import request from '@/utils/request';
-import { toString } from '@/utils/utils';
+import {toString} from '@/utils/utils';
+
+const prefix = '/api/v1/resource';
 
 /**
  * 查询节点信息
  * @param query
  */
 export async function selectAll(query) {
-    const search = stringify(query);
-    let uri = '/resource';
-    if (search.length) {
-        uri += `?${search}`;
-    }
-    return request(`${uri}${stringify(query)}`);
+    return request(`${prefix}?${stringify(query)}`);
 }
 
 /**
@@ -20,7 +17,7 @@ export async function selectAll(query) {
  * @param body
  */
 export async function insert(body) {
-    return request(`/resource`, {
+    return request(`${prefix}`, {
         method: 'POST',
         body: {
             ...body,
@@ -44,21 +41,21 @@ export async function insert(body) {
  * @param body
  * @returns {Promise<void>}
  */
-export async function deletes({ id, mode }) {
+export async function deletes({id, mode}) {
     const IDs = toString([...id]);
-    return request(`/resource?id=${IDs}&mode=${mode || 0}`, {
+    return request(`${prefix}?id=${IDs}&mode=${mode || 0}`, {
         method: 'DELETE',
     });
 }
 
-export async function selectOne({ id }) {
-    return request(`/resource/${id}`, {
+export async function selectOne({id}) {
+    return request(`${prefix}/${id}`, {
         method: 'GET',
     });
 }
 
-export async function updateOne({ id, body }) {
-    return request(`/resource/${id}`, {
+export async function updateOne({id, body}) {
+    return request(`${prefix}/${id}`, {
         method: 'PUT',
         body: {
             ...body,

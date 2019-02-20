@@ -2,58 +2,37 @@ import React, {Component} from 'react';
 import {connect} from 'dva';
 import {formatMessage, FormattedMessage} from 'umi/locale';
 import Link from 'umi/link';
-import {Alert, Checkbox, Icon} from 'antd';
+import {Alert, Button, Checkbox, Icon} from 'antd';
 import styles from './Login.less';
 import Login from '@/components/Login';
 
 const {Tab, UserName, Password, Mobile, Captcha, Submit} = Login;
 
 @connect(({login, loading}) => ({
-    login,
-    submitting: loading.effects['account/login'],
-}))
+        login,
+        submitting: loading.effects['account/login'],
+    }),
+    dispatch => ({
+        $login: (args = {}) => dispatch({type: 'login/login', ...args}),
+        $getCaptcha: (args = {}) => dispatch({type: 'login/getCaptcha', ...args}),
+    }))
 export default class LoginPage extends Component {
     state = {
         type: 'account',
         autoLogin: true,
     };
 
-    constructor(props) {
-        super(props);
-        /**
-         * 挂载函数
-         * - methods() =>
-         * - rendering() => renderXX
-         * - listener() => onXX
-         */
-        [this.methods(), this.rendering(), this.listener()]
-            .map(item => {
-                return Object.keys(item).map(key => {
-                    return item[key];
-                });
-            })
-            .reduce((func1, func2) => {
-                return [...func1, ...func2];
-            })
-            .forEach(func => {
-                this[func.name] = func;
-            });
-        console.log('绑定函数', this, document.referrer, opener && opener.location.href);
-        console.log('更新时间', new Date(), this.state.type);
-    }
-
     render() {
         const {login, submitting} = this.props;
         const {type, autoLogin} = this.state;
         return (
             <div className={styles.main}>
-                <Login
-                    defaultActiveKey={type}
-                    onTabChange={this.onTabChange}
-                    onSubmit={this.onSubmitLogin}
-                    ref={form => {
-                        this.loginForm = form;
-                    }}
+                <Login defaultActiveKey={type}
+                       onTabChange={this.onTabChange}
+                       onSubmit={this.onSubmitLogin}
+                       ref={form => {
+                           this.loginForm = form;
+                       }}
                 >
                     <Tab
                         key="account"
@@ -68,23 +47,11 @@ export default class LoginPage extends Component {
                         <UserName
                             name="username"
                             placeholder="用户名"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: '请输入用户名!',
-                                },
-                            ]}
                         />
                         <Password
                             name="password"
                             placeholder="密码"
                             onPressEnter={() => this.loginForm.validateFields(this.onSubmitLogin)}
-                            rules={[
-                                {
-                                    required: true,
-                                    message: '请输入密码!',
-                                },
-                            ]}
                         />
                     </Tab>
                     <Tab key="mobile" tab={formatMessage({id: 'app.login.tab-login-mobile'})}>
@@ -111,8 +78,9 @@ export default class LoginPage extends Component {
                             <FormattedMessage id="app.login.forgot-password"/>
                         </a>
                     </div>
-                    <Submit loading={submitting} style={{width: '100%'}}>
-                        <FormattedMessage id="app.login.login"/>
+                    <Button htmlType={"submit"}>登陆</Button>
+                    <Submit loading={submitting}>
+                        登陆
                     </Submit>
                     {/*其他方式*/}
                     <div className={styles.other}>
@@ -130,61 +98,43 @@ export default class LoginPage extends Component {
     }
 
     /**
-     * 自定义函数
+     * 渲染消息
      */
-    methods = () => {
-        const that = this;
-        return {};
+    renderMessage = (content) => {
+        return (
+            <Alert style={{marginBottom: 24}} message={content} type="error" showIcon/>
+        );
     };
 
-    /**
-     * 渲染函数
-     */
-    rendering = () => {
-        const that = this;
-        return {
-            renderMessage(content) {
-                return (
-                    <Alert style={{marginBottom: 24}} message={content} type="error" showIcon/>
-                );
-            },
-        };
+    // 自动登陆
+    changeAutoLogin = (e) => {
+        this.setState({
+            autoLogin: e.target.checked,
+        });
     };
 
-    /**
-     * 事件监听函数
-     */
-    listener = () => {
-        const that = this;
-        return {
-            changeAutoLogin(e) {
-                return that.setState({
-                    autoLogin: e.target.checked,
-                });
-            },
-            onTabChange(type) {
-                console.log(type);
-                return that.setState({type});
-            },
+    // 登陆方式切换
+    onTabChange = (type) => {
+        console.log(type);
+        this.setState({type});
+    };
 
-            onGetCaptcha() {
-                new Promise((resolve, reject) => {
-                    that.loginForm.validateFields(['mobile'], {}, (err, values) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            const {dispatch} = that.props;
-                            dispatch({
-                                type: 'login/getCaptcha',
-                                payload: values.mobile,
-                            })
-                                .then(resolve)
-                                .catch(reject);
-                        }
-                    });
-                });
-            },
-        };
+    // 验证码
+    onGetCaptcha = () => {
+        new Promise((resolve, reject) => {
+            this.loginForm.validateFields(['mobile'], {}, (err, values) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const {$getCaptcha} = this.props;
+                    $getCaptcha({
+                        payload: values.mobile,
+                    })
+                        .then(resolve)
+                        .catch(reject);
+                }
+            });
+        });
     };
 
     /**
@@ -193,17 +143,17 @@ export default class LoginPage extends Component {
      * @param values
      */
     onSubmitLogin = (err, values) => {
-        console.log('登陆');
-        if (!err) {
-            const {type} = this.state;
-            const {dispatch} = this.props;
-            dispatch({
-                type: 'login/login',
-                payload: {
-                    ...values,
-                    type,
-                },
-            });
+        console.log('登陆', err);
+        if (err) {
+            return;
         }
+        const {type} = this.state;
+        const {$login} = this.props;
+        $login({
+            payload: {
+                ...values,
+                type,
+            },
+        });
     }
 }
