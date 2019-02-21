@@ -157,9 +157,9 @@ export default function request(url, option) {
             if (status === 401) {
                 // @HACK
                 /* eslint-disable no-underscore-dangle */
-                // window.g_app._store.dispatch({
-                //   type: 'login/logout',
-                // });
+                window.g_app._store.dispatch({
+                    type: 'login/logout',
+                });
                 console.log('401 统一处理');
                 return;
             }

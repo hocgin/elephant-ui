@@ -6,6 +6,6 @@ export default {
         return `http://localhost:8080`;
     },
     isDev() {
-        return true;
+        return false;
     },
 };
