@@ -30,18 +30,18 @@ const Constant = {
     ({ staff: { page }, role: { all }, loading }) => ({
         data: LangKit.toAntProPage(page),
         roles: all,
-        loading: loading.effects['staff/$paging'],
+        loading: loading.effects['staff/paging'],
     }),
     dispatch => ({
-        $paging: (args = {}) => dispatch({ type: 'staff/$paging', ...args }),
-        $findAllRole: (args = {}) => dispatch({ type: 'role/$findAll', ...args }),
+        $paging: (args = {}) => dispatch({ type: 'staff/paging', ...args }),
+        $findAllRole: (args = {}) => dispatch({ type: 'role/findAll', ...args }),
         $deletes: (args = {}) => {
             Modal.confirm({
                 title: '删除确认',
                 content: '是否确定删除？',
                 okText: '确认',
                 cancelText: '取消',
-                onOk: () => dispatch({ type: 'staff/$deletes', ...args }),
+                onOk: () => dispatch({ type: 'staff/deletes', ...args }),
             });
         },
         $gotoEditPage: (args = {}) => dispatch({ type: 'router/gotoStaffEdit', ...args }),
@@ -149,12 +149,6 @@ export default class Index extends React.Component {
             },
         },
     ];
-
-    componentDidMount() {
-        const { $paging, $findAllRole } = this.props;
-        $paging();
-        $findAllRole();
-    }
 
     render() {
         const {

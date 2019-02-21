@@ -21,7 +21,7 @@ const { Description } = DescriptionList;
         };
     },
     dispatch => ({
-        $fetch: (args = {}) => dispatch({ type: 'staff/$fetch', ...args }),
+        $fetch: (args = {}) => dispatch({ type: 'staff/fetch', ...args }),
     })
 )
 export default class Index extends React.Component {

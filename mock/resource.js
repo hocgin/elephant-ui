@@ -1,5 +1,5 @@
-import {success} from './util/result';
-import {createdAt, deletedAt, updatedAt} from './util/mock';
+import { success } from './util/result';
+import { createdAt, deletedAt, updatedAt } from './util/mock';
 
 // 填充 lft rgt depth
 let fillLftRgtAndDepth = (nodes, lft, depth) => {
@@ -75,31 +75,31 @@ export default {
     /**
      * 增加节点
      */
-    'POST /api/v1/resource': (req, res) => {
+    'POST /api/v1/resources': (req, res) => {
         return res.json(success());
     },
     /**
      * 更新节点
      */
-    'PUT /api/v1/resource/:uuid': (req, res) => {
+    'PUT /api/v1/resources/:uuid': (req, res) => {
         return res.json(success());
     },
     /**
      * 删除节点
      */
-    'DELETE /api/v1/resource': (req, res) => {
+    'DELETE /api/v1/resources': (req, res) => {
         return res.json(success());
     },
     /**
      * 查询节点
      */
-    'GET /api/v1/resource/:uuid': (req, res) => {
+    'GET /api/v1/resources/:uuid': (req, res) => {
         return res.json(success(allResource()[0]));
     },
     /**
      * 查询节点
      */
-    'GET /api/v1/resource': (req, res) => {
+    'GET /api/v1/resources': (req, res) => {
         return res.json(success(allResource()));
     },
 };

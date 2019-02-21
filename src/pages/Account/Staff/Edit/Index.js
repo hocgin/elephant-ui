@@ -33,25 +33,16 @@ const submitFormLayout = {
     }) => ({
         data: staff.detail,
         id: query.id,
-        loading: loading.effects['staff/$update'],
+        loading: loading.effects['staff/update'],
     }),
     dispatch => ({
-        $fetch: (args = {}) => dispatch({ type: 'staff/$fetch', ...args }),
-        $submit: (args = {}) => dispatch({ type: 'staff/$update', ...args }),
+        $fetch: (args = {}) => dispatch({ type: 'staff/fetch', ...args }),
+        $submit: (args = {}) => dispatch({ type: 'staff/update', ...args }),
     })
 )
 @Form.create()
 export default class Index extends React.Component {
     state = {};
-
-    componentDidMount() {
-        const { $fetch, id } = this.props;
-        $fetch({
-            payload: {
-                id,
-            },
-        });
-    }
 
     render() {
         const {

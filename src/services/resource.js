@@ -1,8 +1,8 @@
-import {stringify} from 'qs';
+import { stringify } from 'qs';
 import request from '@/utils/request';
-import {toString} from '@/utils/utils';
+import { toString } from '@/utils/utils';
 
-const prefix = '/api/v1/resource';
+const prefix = '/api/v1/resources';
 
 /**
  * 查询节点信息
@@ -41,20 +41,20 @@ export async function insert(body) {
  * @param body
  * @returns {Promise<void>}
  */
-export async function deletes({id, mode}) {
+export async function deletes({ id, mode }) {
     const IDs = toString([...id]);
     return request(`${prefix}?id=${IDs}&mode=${mode || 0}`, {
         method: 'DELETE',
     });
 }
 
-export async function selectOne({id}) {
+export async function selectOne({ id }) {
     return request(`${prefix}/${id}`, {
         method: 'GET',
     });
 }
 
-export async function updateOne({id, body}) {
+export async function updateOne({ id, body }) {
     return request(`${prefix}/${id}`, {
         method: 'PUT',
         body: {

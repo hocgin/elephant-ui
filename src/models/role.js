@@ -30,7 +30,7 @@ export default {
             }
         },
         // 获取所有
-        *$findAll({ payload }, { call, put }) {
+        *findAll({ payload }, { call, put }) {
             let result = yield call(findAll, payload);
             if (result.code === ResultCode.SUCCESS) {
                 yield put({

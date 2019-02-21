@@ -1,6 +1,6 @@
-import React, {Fragment} from 'react';
-import {connect} from 'dva';
-import {Button, Card, DatePicker, Divider, Dropdown, Form, Icon, Menu, Modal} from 'antd';
+import React, { Fragment } from 'react';
+import { connect } from 'dva';
+import { Button, Card, DatePicker, Divider, Dropdown, Form, Icon, Menu, Modal } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import StandardTable from '@/components/StandardTable';
 import SearchBar from '@/components/ext/SearchBar';
@@ -9,24 +9,24 @@ import * as LangKit from '../../../utils/LangKit';
 import * as DateFormatter from '../../../utils/formatter/DateFormatter';
 
 @connect(
-    ({example: {page}, loading}) => ({
+    ({ example: { page }, loading }) => ({
         data: LangKit.toAntProPage(page),
         loading: loading.effects['example/$paging'],
     }),
     dispatch => ({
-        $paging: (args = {}) => dispatch({type: 'staff/$paging', ...args}),
+        $paging: (args = {}) => dispatch({ type: 'staff/paging', ...args }),
         $deletes: (args = {}) => {
             Modal.confirm({
                 title: '删除确认',
                 content: '是否确定删除？',
                 okText: '确认',
                 cancelText: '取消',
-                onOk: () => dispatch({type: 'staff/$deletes', ...args}),
+                onOk: () => dispatch({ type: 'staff/deletes', ...args }),
             });
         },
-        $gotoEditPage: (args = {}) => dispatch({type: 'router/gotoStaffEdit', ...args}),
-        $gotoAddPage: (args = {}) => dispatch({type: 'router/gotoStaffAdd', ...args}),
-        $gotoDetailPage: (args = {}) => dispatch({type: 'router/gotoStaffDetail', ...args}),
+        $gotoEditPage: (args = {}) => dispatch({ type: 'router/gotoStaffEdit', ...args }),
+        $gotoAddPage: (args = {}) => dispatch({ type: 'router/gotoStaffAdd', ...args }),
+        $gotoDetailPage: (args = {}) => dispatch({ type: 'router/gotoStaffDetail', ...args }),
     })
 )
 @Form.create()
@@ -57,7 +57,7 @@ export default class Index extends React.Component {
             title: '操作',
             key: 'operation',
             render: (text, record) => {
-                const MoreMenus = ({onClick}) => (
+                const MoreMenus = ({ onClick }) => (
                     <Menu onClick={onClick}>
                         <Menu.Item key="edit">修改</Menu.Item>
                         <Menu.Item key="delete">删除</Menu.Item>
@@ -66,17 +66,17 @@ export default class Index extends React.Component {
 
                 return (
                     <Fragment>
-                        <a onClick={this.onClickMoreMenu.bind(this, record, {key: 'detail'})}>
+                        <a onClick={this.onClickMoreMenu.bind(this, record, { key: 'detail' })}>
                             查看详情
                         </a>
-                        <Divider type="vertical"/>
+                        <Divider type="vertical" />
                         <Dropdown
                             overlay={
-                                <MoreMenus onClick={this.onClickMoreMenu.bind(this, record)}/>
+                                <MoreMenus onClick={this.onClickMoreMenu.bind(this, record)} />
                             }
                         >
                             <a className="ant-dropdown-link">
-                                更多操作 <Icon type="down"/>
+                                更多操作 <Icon type="down" />
                             </a>
                         </Dropdown>
                     </Fragment>
@@ -86,22 +86,22 @@ export default class Index extends React.Component {
     ];
 
     componentDidMount() {
-        const {$paging} = this.props;
+        const { $paging } = this.props;
         $paging();
     }
 
     render() {
         const {
-            route: {name},
+            route: { name },
             data,
             loading,
         } = this.props;
-        const {selectedRows} = this.state;
+        const { selectedRows } = this.state;
 
         /**
          * 批量操作菜单
          */
-        const BatchMenus = ({onClick}) => (
+        const BatchMenus = ({ onClick }) => (
             <Menu onClick={onClick}>
                 <Menu.Item key="delete">批量删除</Menu.Item>
             </Menu>
@@ -114,7 +114,7 @@ export default class Index extends React.Component {
                             <Form.Item label="创建日期">
                                 {form.getFieldDecorator('createdAt')(
                                     <DatePicker
-                                        style={{width: '100%'}}
+                                        style={{ width: '100%' }}
                                         placeholder="请输入更新日期"
                                     />
                                 )}
@@ -122,7 +122,7 @@ export default class Index extends React.Component {
                         ]}
                     </SearchBar>
                     <Toolbar
-                        menu={<BatchMenus onClick={this.onClickBatchMenu}/>}
+                        menu={<BatchMenus onClick={this.onClickBatchMenu} />}
                         selectedRows={selectedRows}
                     >
                         <Button
@@ -156,9 +156,9 @@ export default class Index extends React.Component {
      * @param e
      */
     onClickBatchMenu = e => {
-        const {selectedRows} = this.state;
+        const { selectedRows } = this.state;
         if (!selectedRows) return;
-        const {$deletes} = this.props;
+        const { $deletes } = this.props;
         switch (e.key) {
             case 'delete': {
                 $deletes({
@@ -181,9 +181,9 @@ export default class Index extends React.Component {
      * @param obj
      * @param e
      */
-    onClickMoreMenu = ({id}, e) => {
+    onClickMoreMenu = ({ id }, e) => {
         console.log('点击更多操作菜单', id, e.key);
-        const {$deletes, $gotoDetailPage, $gotoEditPage} = this.props;
+        const { $deletes, $gotoDetailPage, $gotoEditPage } = this.props;
         switch (e.key) {
             case 'edit': {
                 $gotoEditPage({
@@ -215,7 +215,7 @@ export default class Index extends React.Component {
     };
 
     onClickAdd = () => {
-        const {$gotoAddPage} = this.props;
+        const { $gotoAddPage } = this.props;
         $gotoAddPage();
     };
 
@@ -237,18 +237,18 @@ export default class Index extends React.Component {
      */
     onChangeStandardTableCondition = (pagination, filtersArg, sorter) => {
         const filters = Object.keys(filtersArg).reduce((obj, key) => {
-            const newObj = {...obj};
+            const newObj = { ...obj };
             newObj[key] = toString(filtersArg[key]);
             return newObj;
         }, {});
-        const {searchValues} = this.state;
-        const {$paging} = this.props;
+        const { searchValues } = this.state;
+        const { $paging } = this.props;
 
         const params = {
             page: pagination.current,
             limit: pagination.pageSize,
             condition: {
-                ...searchValues
+                ...searchValues,
             },
             ...filters,
         };
@@ -257,8 +257,8 @@ export default class Index extends React.Component {
                 [sorter.field]: sorter.order === 'descend' ? 'DESC' : 'ASC',
             };
         }
-        this.setState({searchValues: params});
-        $paging({payload: params});
+        this.setState({ searchValues: params });
+        $paging({ payload: params });
     };
 
     /**
@@ -266,18 +266,21 @@ export default class Index extends React.Component {
      * @param values
      */
     onClickSearch = values => {
-        this.setState((state) => ({
-            searchValues: {
-                ...state.searchValues,
-                condition: {
-                    ...state.condition,
-                    ...values
-                }
+        this.setState(
+            state => ({
+                searchValues: {
+                    ...state.searchValues,
+                    condition: {
+                        ...state.condition,
+                        ...values,
+                    },
+                },
+            }),
+            () => {
+                const { $paging } = this.props;
+                const { searchValues } = this.state;
+                $paging({ payload: searchValues });
             }
-        }), () => {
-            const {$paging} = this.props;
-            const {searchValues} = this.state;
-            $paging({payload: searchValues});
-        });
+        );
     };
 }

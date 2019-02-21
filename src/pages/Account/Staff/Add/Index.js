@@ -30,10 +30,10 @@ const submitFormLayout = {
             location: { query },
         },
     }) => ({
-        loading: loading.effects['staff/$insert'],
+        loading: loading.effects['staff/insert'],
     }),
     dispatch => ({
-        $submit: (args = {}) => dispatch({ type: 'staff/$insert', ...args }),
+        $submit: (args = {}) => dispatch({ type: 'staff/insert', ...args }),
     })
 )
 @Form.create()
