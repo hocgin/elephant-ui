@@ -1,7 +1,8 @@
 import request from '@/utils/request';
 
-export async function query() {
-  return request('/api/users');
+const prefix = '/staff';
+export async function fetch(payload) {
+  return request(`${prefix}`);
 }
 
 export async function queryCurrent() {

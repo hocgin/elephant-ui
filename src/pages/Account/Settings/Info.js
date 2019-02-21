@@ -8,8 +8,8 @@ import styles from './Info.less';
 
 const { Item } = Menu;
 
-@connect(({ user }) => ({
-  currentUser: user.currentUser,
+@connect(({ account }) => ({
+  currentUser: account.currentUser,
 }))
 class Info extends Component {
   constructor(props) {
@@ -95,7 +95,7 @@ class Info extends Component {
 
   render() {
     const { children, currentUser } = this.props;
-    if (!currentUser.userid) {
+    if (!currentUser.id) {
       return '';
     }
     const { mode, selectKey } = this.state;

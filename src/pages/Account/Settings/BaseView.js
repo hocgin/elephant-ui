@@ -51,8 +51,8 @@ const validatorPhone = (rule, value, callback) => {
   callback();
 };
 
-@connect(({ user }) => ({
-  currentUser: user.currentUser,
+@connect(({ account }) => ({
+  currentUser: account.currentUser,
 }))
 @Form.create()
 class BaseView extends Component {

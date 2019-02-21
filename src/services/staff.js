@@ -1,6 +1,6 @@
 import request from '@/utils/request';
 
-const prefix = '/api/v1/staff';
+const prefix = '/staff';
 
 // 分页查询
 export async function paging(payload) {

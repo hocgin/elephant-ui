@@ -5,7 +5,7 @@ import ArticleListContent from '@/components/ArticleListContent';
 import styles from './Articles.less';
 
 @connect(({ list }) => ({
-  list,
+  list: [],
 }))
 class Center extends PureComponent {
   render() {

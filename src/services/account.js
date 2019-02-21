@@ -1,43 +1,32 @@
-import { stringify } from 'qs';
+import {stringify} from 'qs';
 import request from '@/utils/request';
+
+const prefix = '/account';
 
 /**
  * 登陆
- * @param username
- * @param password
  */
-export async function login({ username, password }) {
-    return request(`/api/v1/account/login`, {
+export async function login(payload) {
+    return request(`${prefix}/login`, {
         method: 'POST',
         body: {
-            username,
-            password,
+            ...payload
         },
     });
 }
 
 /**
  * 获取当前登陆账号信息
- * @param query
  */
-export async function getCurrentUserInfo(query) {
-    const search = stringify(query);
-    let uri = '/api/v1/account';
-    if (search.length) {
-        uri += `?${search}`;
-    }
-    return request(uri);
+export async function getCurrentAccount(payload) {
+    const search = stringify(payload);
+    return request(`${prefix}?${search}`);
 }
 
 /**
  * 获取当前账号具备的菜单
- * @param query
  */
-export async function getMenus(query) {
-    const search = stringify(query);
-    let uri = '/api/v1/account/menus';
-    if (search.length) {
-        uri += `?${search}`;
-    }
-    return request(uri);
+export async function getMenus(payload) {
+    const search = stringify(payload);
+    return request(`${prefix}/menus?${search}`);
 }

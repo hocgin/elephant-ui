@@ -1,6 +1,6 @@
 import request from '@/utils/request';
 
-const prefix = '/api/v1/roles';
+const prefix = '/roles';
 
 /**
  * 查询所有

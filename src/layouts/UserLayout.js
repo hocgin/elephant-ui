@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import { formatMessage } from 'umi/locale';
 import Link from 'umi/link';
+import config from '../app.config';
 import { Icon } from 'antd';
 import GlobalFooter from '@/components/GlobalFooter';
 import SelectLang from '@/components/SelectLang';
@@ -56,10 +57,10 @@ class UserLayout extends React.PureComponent {
             <div className={styles.header}>
               <Link to="/">
                 <img alt="logo" className={styles.logo} src={logo} />
-                <span className={styles.title}>Ant Design</span>
+                <span className={styles.title}>{config.title}</span>
               </Link>
             </div>
-            <div className={styles.desc}>Ant Design 是西湖区最具影响力的 Web 设计规范</div>
+            <div className={styles.desc}>{config.description}</div>
           </div>
           {children}
         </div>

@@ -2,7 +2,7 @@ import { stringify } from 'qs';
 import request from '@/utils/request';
 import { toString } from '@/utils/utils';
 
-const prefix = '/api/v1/resources';
+const prefix = '/resources';
 
 /**
  * 查询节点信息

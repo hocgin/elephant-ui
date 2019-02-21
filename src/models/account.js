@@ -1,22 +1,23 @@
-import {getCurrentUserInfo, getMenus, login} from '@/services/account';
+import {getCurrentAccount, getMenus, login} from '@/services/account';
 import {message} from 'antd';
 import * as LangKit from "../utils/LangKit";
+import queryString from "query-string";
 
 export default {
     namespace: 'account',
     state: {
-        status: undefined,
+        status: null,
         currentUser: {},
         menus: [],
     },
 
     effects: {
         // 查询当前账号信息
-        * getCurrentUserInfo({payload}, {call, put}) {
-            const result = yield call(getCurrentUserInfo, payload);
+        * getCurrentAccount({payload}, {call, put}) {
+            const result = yield call(getCurrentAccount, payload);
             if (result.code === 200) {
                 yield put({
-                    type: 'saveCurrentUserInfo',
+                    type: 'fillCurrentUser',
                     payload: result.data,
                 });
             } else {
@@ -39,22 +40,33 @@ export default {
     },
 
     reducers: {
-        example2(state, {payload}) {
-        },
         // 保存用户信息
-        saveCurrentUserInfo(state, {payload}) {
+        fillCurrentUser(state, {payload}) {
             return {
                 ...state,
-                currentUser: payload || {},
+                currentUser: payload,
             };
         },
         // 更新菜单列表
         fillMenus(state, {payload}) {
             return {
                 ...state,
-                menus: payload || [],
+                menus: payload,
             };
         },
     },
-    subscriptions: {},
+    subscriptions: {
+        setup({dispatch, history}, done) {
+            // 监听路由的变化，请求页面数据
+            return history.listen(({pathname, search}) => {
+                const query = queryString.parse(search);
+                switch (pathname) {
+                    case '/account/center':{
+                        dispatch({ type: 'account/getCurrentAccount', payload: {} });
+                        break;
+                    }
+                }
+            });
+        }
+    },
 };

@@ -285,23 +285,27 @@ export default [
                 routes: [
                     {
                         path: '/account/center',
-                        name: 'center',
+                        name: '个人中心',
                         component: './Account/Center/Center',
                         routes: [
                             {
                                 path: '/account/center',
+                                name: '个人中心',
                                 redirect: '/account/center/articles',
                             },
                             {
                                 path: '/account/center/articles',
+                                name: '个人中心',
                                 component: './Account/Center/Articles',
                             },
                             {
                                 path: '/account/center/applications',
+                                name: '个人中心',
                                 component: './Account/Center/Applications',
                             },
                             {
                                 path: '/account/center/projects',
+                                name: '个人中心',
                                 component: './Account/Center/Projects',
                             },
                         ],
@@ -313,22 +317,27 @@ export default [
                         routes: [
                             {
                                 path: '/account/settings',
+                                name: '个人设置',
                                 redirect: '/account/settings/base',
                             },
                             {
                                 path: '/account/settings/base',
+                                name: '个人设置',
                                 component: './Account/Settings/BaseView',
                             },
                             {
                                 path: '/account/settings/security',
+                                name: '个人设置',
                                 component: './Account/Settings/SecurityView',
                             },
                             {
                                 path: '/account/settings/binding',
+                                name: '个人设置',
                                 component: './Account/Settings/BindingView',
                             },
                             {
                                 path: '/account/settings/notification',
+                                name: '个人设置',
                                 component: './Account/Settings/NotificationView',
                             },
                         ],

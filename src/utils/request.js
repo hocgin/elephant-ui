@@ -1,7 +1,7 @@
 import fetch from 'dva/fetch';
 import { notification } from 'antd';
 import router from 'umi/router';
-import config from './app.config';
+import config from '../app.config';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
 import { LocalStorage } from './Constant';
@@ -95,7 +95,7 @@ export default function request(url, option) {
         credentials: 'include',
     };
     const token = localStorage.getItem(LocalStorage.TOKEN);
-    if (url !== '/api/v1/account/login' && token) {
+    if (url !== '/account/login' && token) {
         options.headers = {
             ...options.headers,
             Authorization: `Bearer ${token}`,

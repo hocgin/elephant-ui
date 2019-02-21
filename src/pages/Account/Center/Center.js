@@ -6,10 +6,10 @@ import { Card, Row, Col, Icon, Avatar, Tag, Divider, Spin, Input } from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import styles from './Center.less';
 
-@connect(({ loading, user, project }) => ({
-  listLoading: loading.effects['list/fetch'],
-  currentUser: user.currentUser,
-  currentUserLoading: loading.effects['user/fetchCurrent'],
+@connect(({ loading, account, project }) => ({
+  // listLoading: loading.effects['list/fetch'],
+  currentUser: account.currentUser,
+  currentUserLoading: loading.effects['account/getCurrentUser'],
   project,
   projectLoading: loading.effects['project/fetchNotice'],
 }))
@@ -21,19 +21,19 @@ class Center extends PureComponent {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'user/fetchCurrent',
-    });
-    dispatch({
-      type: 'list/fetch',
-      payload: {
-        count: 8,
-      },
-    });
-    dispatch({
-      type: 'project/fetchNotice',
-    });
+    // const { dispatch } = this.props;
+    // dispatch({
+    //   type: 'user/fetchCurrent',
+    // });
+    // dispatch({
+    //   type: 'list/fetch',
+    //   payload: {
+    //     count: 8,
+    //   },
+    // });
+    // dispatch({
+    //   type: 'project/fetchNotice',
+    // });
   }
 
   onTabChange = key => {
@@ -128,28 +128,28 @@ class Center extends PureComponent {
                 <div>
                   <div className={styles.avatarHolder}>
                     <img alt="" src={currentUser.avatar} />
-                    <div className={styles.name}>{currentUser.name}</div>
-                    <div>{currentUser.signature}</div>
+                    <div className={styles.name}>{currentUser.username}</div>
+                    <div>{`currentUser.signature`}</div>
                   </div>
                   <div className={styles.detail}>
                     <p>
                       <i className={styles.title} />
-                      {currentUser.title}
+                      {`currentUser.title`}
                     </p>
                     <p>
                       <i className={styles.group} />
-                      {currentUser.group}
+                      {`currentUser.group`}
                     </p>
                     <p>
                       <i className={styles.address} />
-                      {currentUser.geographic.province.label}
-                      {currentUser.geographic.city.label}
+                      {`currentUser.geographic.province.label`}
+                      {`currentUser.geographic.city.label`}
                     </p>
                   </div>
                   <Divider dashed />
                   <div className={styles.tags}>
                     <div className={styles.tagsTitle}>标签</div>
-                    {currentUser.tags.concat(newTags).map(item => (
+                    {['2', '1'].concat(newTags).map(item => (
                       <Tag key={item.key}>{item.label}</Tag>
                     ))}
                     {inputVisible && (
