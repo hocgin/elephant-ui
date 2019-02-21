@@ -7,7 +7,7 @@ import request from '@/utils/request';
  * @param password
  */
 export async function login({ username, password }) {
-    return request(`/account/login`, {
+    return request(`/api/v1/account/login`, {
         method: 'POST',
         body: {
             username,
@@ -22,7 +22,7 @@ export async function login({ username, password }) {
  */
 export async function getCurrentUserInfo(query) {
     const search = stringify(query);
-    let uri = '/account';
+    let uri = '/api/v1/account';
     if (search.length) {
         uri += `?${search}`;
     }
@@ -35,7 +35,7 @@ export async function getCurrentUserInfo(query) {
  */
 export async function getMenus(query) {
     const search = stringify(query);
-    let uri = '/account/menus';
+    let uri = '/api/v1/account/menus';
     if (search.length) {
         uri += `?${search}`;
     }

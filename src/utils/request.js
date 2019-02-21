@@ -95,7 +95,7 @@ export default function request(url, option) {
         credentials: 'include',
     };
     const token = localStorage.getItem(LocalStorage.TOKEN);
-    if (url !== '/account/login' && token) {
+    if (url !== '/api/v1/account/login' && token) {
         options.headers = {
             ...options.headers,
             Authorization: `Bearer ${token}`,

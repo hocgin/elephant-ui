@@ -8,7 +8,7 @@ export default {
     /**
      * 获取当前账号信息
      */
-    'GET /account': (req, res) => {
+    'GET /api/v1/account': (req, res) => {
         return res.json(
             success({
                 account: 'a8524965',
@@ -26,7 +26,7 @@ export default {
     /**
      * 账号登录
      */
-    'POST /account/login': (req, res) => {
+    'POST /api/v1/account/login': (req, res) => {
         return res.json(
             success({
                 token: 'ACCOUNT_TOKEN',
@@ -37,7 +37,7 @@ export default {
     /**
      * 获取菜单列表
      */
-    'GET /account/menus': (req, res) => {
+    'GET /api/v1/account/menus': (req, res) => {
         return res.json(
             success(allResource())
         );

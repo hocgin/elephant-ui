@@ -4,14 +4,13 @@ import { stringify } from 'qs';
 import { fakeAccountLogin, getFakeCaptcha } from '@/services/api';
 import { getPageQuery } from '@/utils/utils';
 import { LocalStorage } from '../utils/Constant';
-import router from 'umi/router';
 import { message as Message } from 'antd';
 
 export default {
     namespace: 'login',
 
     state: {
-        status: undefined,
+        status: null,
     },
 
     effects: {
@@ -39,7 +38,7 @@ export default {
                         return;
                     }
                 }
-                yield put(router.replace(redirect || '/'));
+                yield put(routerRedux.replace(redirect || '/'));
             } else {
                 Message.error(message);
             }

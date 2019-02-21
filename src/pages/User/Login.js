@@ -51,7 +51,10 @@ export default class LoginPage extends Component {
                         <Password
                             name="password"
                             placeholder="密码"
-                            onPressEnter={() => this.loginForm.validateFields(this.onSubmitLogin)}
+                            onPressEnter={(e) => {
+                                e.preventDefault();
+                                this.loginForm.validateFields(this.onSubmitLogin);
+                            }}
                         />
                     </Tab>
                     <Tab key="mobile" tab={formatMessage({id: 'app.login.tab-login-mobile'})}>
@@ -74,11 +77,10 @@ export default class LoginPage extends Component {
                         <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
                             <FormattedMessage id="app.login.remember-me"/>
                         </Checkbox>
-                        <a style={{float: 'right'}} href="">
+                        <a style={{float: 'right'}}>
                             <FormattedMessage id="app.login.forgot-password"/>
                         </a>
                     </div>
-                    <Button htmlType={"submit"}>登陆</Button>
                     <Submit loading={submitting}>
                         登陆
                     </Submit>
@@ -143,7 +145,6 @@ export default class LoginPage extends Component {
      * @param values
      */
     onSubmitLogin = (err, values) => {
-        console.log('登陆', err);
         if (err) {
             return;
         }
@@ -152,7 +153,7 @@ export default class LoginPage extends Component {
         $login({
             payload: {
                 ...values,
-                type,
+                type: type,
             },
         });
     }

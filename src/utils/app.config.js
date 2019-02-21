@@ -1,6 +1,5 @@
 export default {
     host() {
-        console.log(this);
         if (this.isDev()) {
             return `http://localhost:8000`;
         }
