@@ -221,15 +221,15 @@ export default class Index extends React.Component {
                         />
                     </div>
                 </Card>
-                {operateRow.id && (
-                    <SetRolesModal
-                        id={operateRow.id}
-                        roles={roles}
-                        selected={operateRow.roles}
-                        visible={setRoleModalVisible}
-                        onCancel={this.onClose.bind(this, Constant.SET_ROLE_MODAL_VISIBLE)}
-                    />
-                )}
+                {operateRow.id &&
+                    setRoleModalVisible && (
+                        <SetRolesModal
+                            id={operateRow.id}
+                            roles={roles}
+                            visible={setRoleModalVisible}
+                            onCancel={this.onClose.bind(this, Constant.SET_ROLE_MODAL_VISIBLE)}
+                        />
+                    )}
             </PageHeaderWrapper>
         );
     }

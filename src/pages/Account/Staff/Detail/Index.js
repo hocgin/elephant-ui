@@ -25,15 +25,6 @@ const { Description } = DescriptionList;
     })
 )
 export default class Index extends React.Component {
-    componentDidMount() {
-        const { $fetch, id } = this.props;
-        $fetch({
-            payload: {
-                id,
-            },
-        });
-    }
-
     render() {
         const {
             route: { name },
@@ -67,11 +58,13 @@ export default class Index extends React.Component {
                             </Description>
                         </DescriptionList>
                         <Divider style={{ marginBottom: 32 }} />
-                        <DescriptionList
-                            size="large"
-                            title="扩展信息"
-                            style={{ marginBottom: 32 }}
-                        />
+                        <DescriptionList size="large" title="扩展信息" style={{ marginBottom: 32 }}>
+                            <Description term="角色列表">
+                                {(data.roles || [{ name: '暂未分配' }])
+                                    .map(({ name }) => name)
+                                    .toString()}
+                            </Description>
+                        </DescriptionList>
                     </Card>
                 </PageHeaderWrapper>
             )

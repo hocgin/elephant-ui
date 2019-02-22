@@ -1,9 +1,19 @@
-import React, {PureComponent} from 'react';
-import {Form, Modal, Select} from 'antd';
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import { Form, message as Message, Modal, Select } from 'antd';
+import { connect } from 'dva';
+import PropTypes from 'prop-types';
 
 @Form.create()
-export default class SetRolesModal extends PureComponent {
+@connect(
+    ({ staff }) => ({
+        data: staff.detail || {},
+    }),
+    dispatch => ({
+        $setRoles: (args = {}) => dispatch({ type: 'staff/update', ...args }),
+        $fetch: (args = {}) => dispatch({ type: 'staff/fetch', ...args }),
+    })
+)
+export default class SetRolesModal extends Component {
     static propTypes = {
         id: PropTypes.string,
         roles: PropTypes.array,
@@ -18,20 +28,24 @@ export default class SetRolesModal extends PureComponent {
         roles: [],
         visible: false,
         selected: [],
-        onTabChange: () => {
-        },
-        onCancel: () => {
-        },
+        onTabChange: () => {},
+        onCancel: () => {},
     };
+
+    componentDidMount() {
+        const { $fetch, id } = this.props;
+        $fetch({ payload: { id } });
+    }
 
     render() {
         const {
             onCancel,
             visible,
             roles,
-            selected,
-            form: {getFieldDecorator},
+            data,
+            form: { getFieldDecorator },
         } = this.props;
+        let selected = (data.roles || []).map(({ id }) => id);
         return (
             <Modal
                 destroyOnClose
@@ -40,12 +54,12 @@ export default class SetRolesModal extends PureComponent {
                 onCancel={onCancel}
                 onOk={this.onSubmit}
             >
-                <Form.Item labelCol={{span: 5}} wrapperCol={{span: 15}} label="角色列表">
+                <Form.Item labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="角色列表">
                     {getFieldDecorator('roles', {
                         initialValue: selected,
                     })(
-                        <Select mode="multiple" style={{width: '100%'}} placeholder="请选择角色">
-                            {roles.map(({id, name}) => (
+                        <Select mode="multiple" style={{ width: '100%' }} placeholder="请选择角色">
+                            {roles.map(({ id, name }) => (
                                 <Select.Option key={id}>{name}</Select.Option>
                             ))}
                         </Select>
@@ -59,16 +73,23 @@ export default class SetRolesModal extends PureComponent {
      * 提交
      */
     onSubmit = () => {
-        const {id} = this.props;
+        const { id } = this.props;
         const {
-            form: {validateFields, resetFields},
+            form: { validateFields, resetFields },
+            onCancel,
+            $setRoles,
         } = this.props;
         validateFields((err, fieldsValue) => {
             if (err) return;
-            resetFields();
-            console.log({
-                id,
-                ...fieldsValue,
+            $setRoles({
+                payload: {
+                    id,
+                    ...fieldsValue,
+                },
+                callback: () => {
+                    Message.success('分配角色成功');
+                    onCancel();
+                },
             });
         });
     };

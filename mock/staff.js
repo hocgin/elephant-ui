@@ -1,5 +1,6 @@
 import { pageWrapper, success } from './util/result';
 import { createdAt, deletedAt, updatedAt } from './util/mock';
+import { allRole } from './role';
 
 let i = 0,
     create = object =>
@@ -10,7 +11,7 @@ let i = 0,
                 nickname: 'staff_nickname',
                 username: 'staff_username',
                 avatar: 'http://iph.href.lu/55x55',
-                roles: ['uuid_role_0'],
+                roles: allRole(),
                 gender: 0,
                 nonExpired: true,
                 nonLocked: true,
