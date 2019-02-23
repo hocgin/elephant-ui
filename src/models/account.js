@@ -1,7 +1,12 @@
-import {getCurrentAccount, getMenus, login} from '@/services/account';
-import {message} from 'antd';
+import {getCurrentAccount, getMenus, login, update} from '@/services/account';
+import {message as Message, message} from 'antd';
 import * as LangKit from "../utils/LangKit";
+import { getPageQuery } from '@/utils/utils';
 import queryString from "query-string";
+import {LocalStorage, ResultCode} from "../utils/Constant";
+import * as routerRedux from "react-router-redux";
+import router from "umi/router";
+import {stringify} from "qs";
 
 export default {
     namespace: 'account',
@@ -12,6 +17,47 @@ export default {
     },
 
     effects: {
+        // 更新
+        * update({ payload, callback }, { call, put }) {
+            const { code, data, message } = yield call(update, payload);
+            if (code === ResultCode.SUCCESS) {
+                if (callback) {
+                    callback();
+                }
+            } else {
+                Message.error(message);
+            }
+
+        },
+        // 登陆
+        *login({ payload }, { call, put }) {
+            const { code, data, message } = yield call(login, payload);
+            if (code === ResultCode.SUCCESS) {
+                const { token } = data;
+                // 存储token
+                localStorage.setItem(LocalStorage.TOKEN, token);
+                const urlParams = new URL(window.location.href);
+                const params = getPageQuery();
+                let { redirect } = params;
+
+                // 如果含有跳转URL则进行跳转。例如,?redirect=[url]
+                if (redirect) {
+                    const redirectUrlParams = new URL(redirect);
+                    if (redirectUrlParams.origin === urlParams.origin) {
+                        redirect = redirect.substr(urlParams.origin.length);
+                        if (redirect.startsWith('/#')) {
+                            redirect = redirect.substr(2);
+                        }
+                    } else {
+                        window.location.href = redirect;
+                        return;
+                    }
+                }
+                yield put(routerRedux.replace(redirect || '/'));
+            } else {
+                Message.error(message);
+            }
+        },
         // 查询当前账号信息
         * getCurrentAccount({payload}, {call, put}) {
             const result = yield call(getCurrentAccount, payload);
@@ -37,6 +83,28 @@ export default {
                 message.error(result.message);
             }
         },
+        // 注销登陆
+        *logout(_, { put }) {
+            yield put({
+                type: 'changeLoginStatus',
+                payload: {
+                    status: false,
+                },
+            });
+            yield put(
+                router.push({
+                    pathname: '/user/login',
+                    search: stringify({
+                        redirect: window.location.href,
+                    }),
+                })
+            );
+        },
+        // 获取验证码
+        *getCaptcha({ payload }, { call }) {
+            throw 'TODO: 获取验证码';
+            // yield call(getFakeCaptcha, payload);
+        },
     },
 
     reducers: {
@@ -52,6 +120,13 @@ export default {
             return {
                 ...state,
                 menus: payload,
+            };
+        },
+        changeLoginStatus(state, { payload }) {
+            return {
+                ...state,
+                status: payload.status,
+                type: payload.type,
             };
         },
     },

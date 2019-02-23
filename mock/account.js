@@ -1,4 +1,4 @@
-import { success } from './util/result';
+import {success} from './util/result';
 import {allResource, resource} from './resource';
 
 /**
@@ -41,5 +41,12 @@ export default {
         return res.json(
             success(allResource())
         );
+    },
+
+    /**
+     * 更新个人信息
+     */
+    'PUT /api/v1/account/:id': (req, res) => {
+        return res.json(success({}));
     },
 };

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'dva';
 import {formatMessage, FormattedMessage} from 'umi/locale';
 import Link from 'umi/link';
-import {Alert, Button, Checkbox, Icon} from 'antd';
+import {Alert, Checkbox, Icon} from 'antd';
 import styles from './Login.less';
 import Login from '@/components/Login';
 
@@ -13,14 +13,18 @@ const {Tab, UserName, Password, Mobile, Captcha, Submit} = Login;
         submitting: loading.effects['account/login'],
     }),
     dispatch => ({
-        $login: (args = {}) => dispatch({type: 'login/login', ...args}),
-        $getCaptcha: (args = {}) => dispatch({type: 'login/getCaptcha', ...args}),
+        $login: (args = {}) => dispatch({type: 'account/login', ...args}),
+        $getCaptcha: (args = {}) => dispatch({type: 'account/getCaptcha', ...args}),
     }))
 export default class LoginPage extends Component {
     state = {
         type: 'account',
         autoLogin: true,
     };
+
+    componentDidMount() {
+        const {$test} = this.props;
+    }
 
     render() {
         const {login, submitting} = this.props;
@@ -136,7 +140,8 @@ export default class LoginPage extends Component {
                         .catch(reject);
                 }
             });
-        });
+        })
+        ;
     };
 
     /**

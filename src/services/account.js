@@ -16,6 +16,18 @@ export async function login(payload) {
 }
 
 /**
+ * 更新
+ */
+export async function update(payload) {
+    return request(`${prefix}`, {
+        method: 'PUT',
+        body: {
+            ...payload
+        },
+    });
+}
+
+/**
  * 获取当前登陆账号信息
  */
 export async function getCurrentAccount(payload) {
