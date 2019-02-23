@@ -8,6 +8,9 @@ export default {
         return `${this.host()}/files/upload`
     },
     getImageUrl({id, ...query}) {
+        if (!id) {
+            return 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
+        }
         return `${this.host()}/files/image/${id}?${stringify(query)}`;
     }
     ,

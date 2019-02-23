@@ -4,6 +4,7 @@ import { Layout, message } from 'antd';
 import Animate from 'rc-animate';
 import { connect } from 'dva';
 import router from 'umi/router';
+import config from '@/app.config';
 import GlobalHeader from '@/components/GlobalHeader';
 import TopNavHeader from '@/components/TopNavHeader';
 import styles from './Header.less';
@@ -153,7 +154,9 @@ class HeaderView extends PureComponent {
 export default connect(({ account, global, setting, loading }) => ({
   currentUser: {
       name: account.currentUser.username,
-      avatar: account.currentUser.avatar
+      avatar: config.getImageUrl({
+          id: account.currentUser.avatar
+      })
   },
   collapsed: global.collapsed,
   fetchingNotices: loading.effects['global/fetchNotices'],

@@ -38,13 +38,9 @@ class BaseView extends Component {
 
     getAvatarURL() {
         const {currentUser} = this.props;
-        if (currentUser.avatar) {
-            return config.getImageUrl({
-                id: currentUser.avatar,
-            });
-        }
-        const url = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
-        return url;
+        return config.getImageUrl({
+            id: currentUser.avatar,
+        });
     }
 
     getViewDom = ref => {
