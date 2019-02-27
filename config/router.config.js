@@ -375,6 +375,23 @@ export default [
                     // }
                 ],
             },
+            {
+                name: '日志监控',
+                icon: 'user',
+                path: '/log',
+                routes: [
+                    {
+                        name: '访问日志',
+                        path: '/log/access-log',
+                        component: './Log/Access/Index',
+                    },
+                    {
+                        name: '员工详情',
+                        path: '/log/access-log/detail',
+                        component: './Log/Access/Detail/Index',
+                    },
+                ],
+            },
             // 例子
             {
                 name: '模版',
