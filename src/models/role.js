@@ -5,14 +5,7 @@ import { ResultCode } from '../utils/Constant';
 export default {
     namespace: 'role',
     state: {
-        page: {
-            records: [],
-            total: 0,
-            size: 0,
-            current: 1,
-            pages: 1,
-            searchCount: true,
-        },
+        page: {},
         all: [],
         detail: {},
     },
@@ -115,5 +108,7 @@ export default {
             };
         },
     },
-    subscriptions: {},
+    subscriptions: {
+
+    },
 };

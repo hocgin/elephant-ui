@@ -12,11 +12,11 @@ import moment from 'moment';
  */
 export function toAntProPage(mybatisPlusPage) {
     return {
-        list: mybatisPlusPage.records,
+        list: mybatisPlusPage.records || [],
         pagination: {
-            total: mybatisPlusPage.total,
-            pageSize: mybatisPlusPage.size,
-            current: mybatisPlusPage.current,
+            total: mybatisPlusPage.total || 1,
+            pageSize: mybatisPlusPage.size || 10,
+            current: mybatisPlusPage.current || 1,
         },
     };
 }
