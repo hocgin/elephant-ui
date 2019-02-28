@@ -197,7 +197,7 @@ export default class UpdateModal extends PureComponent {
                 <Modal
                     width={640}
                     bodyStyle={{ padding: '32px 40px 48px' }}
-                    title="创建角色"
+                    title="更新角色"
                     visible={visible}
                     onCancel={onCancel}
                     footer={Step.footer()}

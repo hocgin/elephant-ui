@@ -75,7 +75,7 @@ export default class Index extends PureComponent {
         } = this.props;
         const {selectedRows, expandedKeys, autoExpandParent} = this.state;
         return (
-            allResource.length && (
+            allResource.length > 0 && (
                 <PageHeaderWrapper title={name}>
                     <Card bordered={false}>
                         <div className={styles.tableList}>

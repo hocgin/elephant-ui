@@ -202,8 +202,7 @@ export default class Index extends PureComponent {
                         />
                     </div>
                 </Card>
-                {operateRow.id &&
-                createModalVisible && (
+                {createModalVisible && (
                     <CreateModal
                         visible={createModalVisible}
                         onCancel={this.onClose.bind(this, Constant.CREATE_MODAL_VISIBLE)}
@@ -231,7 +230,7 @@ export default class Index extends PureComponent {
 
     onClose = (key) => {
         this.setState({
-            [key]: true,
+            [key]: false,
         });
     };
 

@@ -1,6 +1,6 @@
 import React, {Fragment} from 'react';
 import {connect} from 'dva';
-import {Button, Card, Divider, Dropdown, Form, Icon, Input, Menu, Select, message as Message} from 'antd';
+import {Button, Card, Divider, Dropdown, Form, Icon, Input, Menu, Select, message as Message, DatePicker} from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import StandardTable from '@/components/StandardTable';
 import SearchBar from '@/components/ext/SearchBar';
@@ -8,6 +8,7 @@ import Toolbar from '@/components/ext/Toolbar';
 import * as LangKit from '../../../utils/LangKit';
 import * as DateFormatter from '../../../utils/formatter/DateFormatter';
 import router from "umi/router";
+const { RangePicker } = DatePicker;
 
 @connect(
     ({accessLog: {page}, loading}) => ({
@@ -140,12 +141,9 @@ export default class Index extends React.Component {
                                     </Select>
                                 )}
                             </Form.Item>,
-                            <Form.Item label="日志级别">
-                                {form.getFieldDecorator('level')(
-                                    <Select style={{width: '100%'}}>
-                                        <Option value="INFO">INFO</Option>
-                                        <Option value="ERROR">ERROR</Option>
-                                    </Select>
+                            <Form.Item label="创建时间">
+                                {form.getFieldDecorator('createdAt')(
+                                    <RangePicker />
                                 )}
                             </Form.Item>,
                         ]}
@@ -202,7 +200,7 @@ export default class Index extends React.Component {
         const {$deletes, $paging} = this.props;
         switch (e.key) {
             default:
-                Message.error('暂不支持')
+                Message.error('暂不支持');
                 return;
         }
     };

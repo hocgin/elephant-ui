@@ -75,7 +75,7 @@ export default {
         * getMenus({payload}, {call, put}) {
             const result = yield call(getMenus, payload);
             if (result.code === 200) {
-                const menus = result.data.length ? LangKit.buildTree2(result.data).children : [];
+                const menus = result.data.length ? LangKit.buildTree3(result.data).children : [{}];
                 yield put({
                     type: 'fillMenus',
                     payload: menus,

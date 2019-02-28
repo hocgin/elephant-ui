@@ -40,7 +40,7 @@ export default class SearchBar extends React.PureComponent {
                                 </Row>
                             ))
                             .concat(
-                                <div style={{ overflow: 'hidden' }}>
+                                <div key={3} style={{ overflow: 'hidden' }}>
                                     <div style={{ float: 'right', marginBottom: 24 }}>
                                         <Button type="primary" htmlType="submit">
                                             查询
