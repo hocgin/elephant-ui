@@ -41,7 +41,7 @@ export default class Index extends React.Component {
                             <Description term="来源IP">{data.ip}</Description>
                             <Description term="操作行为">{data.operating}</Description>
                             <Description term="耗时">{data.usageTime} ms</Description>
-                            <Description term="访问者账号ID">{data.visitor} ms</Description>
+                            <Description term="访问者账号ID">{data.visitor}</Description>
                             <Description term="创建时间">
                                 {LangKit.toUTC(data.createdAt)}
                             </Description>

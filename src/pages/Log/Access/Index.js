@@ -122,21 +122,29 @@ export default class Index extends React.Component {
                 <Card bordered={false}>
                     <SearchBar onSubmit={this.onClickSearch}>
                         {form => [
-                            <Form.Item label="昵称">
-                                {form.getFieldDecorator('nickname')(
-                                    <Input style={{width: '100%'}} placeholder="请输入昵称"/>
+                            <Form.Item label="请求路径">
+                                {form.getFieldDecorator('uri')(
+                                    <Input style={{width: '100%'}} placeholder="请输入请求路径"/>
                                 )}
                             </Form.Item>,
-                            <Form.Item label="用户名">
-                                {form.getFieldDecorator('username')(
-                                    <Input style={{width: '100%'}} placeholder="请输入用户名"/>
+                            <Form.Item label="访问者ID">
+                                {form.getFieldDecorator('visitor')(
+                                    <Input style={{width: '100%'}} placeholder="请输入账号ID"/>
                                 )}
                             </Form.Item>,
-                            <Form.Item label="性别">
-                                {form.getFieldDecorator('gender')(
+                            <Form.Item label="日志级别">
+                                {form.getFieldDecorator('level')(
                                     <Select style={{width: '100%'}}>
-                                        <Option value="1">男</Option>
-                                        <Option value="0">女</Option>
+                                        <Option value="INFO">INFO</Option>
+                                        <Option value="ERROR">ERROR</Option>
+                                    </Select>
+                                )}
+                            </Form.Item>,
+                            <Form.Item label="日志级别">
+                                {form.getFieldDecorator('level')(
+                                    <Select style={{width: '100%'}}>
+                                        <Option value="INFO">INFO</Option>
+                                        <Option value="ERROR">ERROR</Option>
                                     </Select>
                                 )}
                             </Form.Item>,

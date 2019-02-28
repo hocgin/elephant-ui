@@ -11,13 +11,14 @@ import {stringify} from "qs";
 export default {
     namespace: 'account',
     state: {
-        status: null,
+        status: false,
         currentUser: {},
         menus: [],
+        type: 'account'
     },
 
     effects: {
-        // 更新
+        // 更新账号信息
         * update({ payload, callback }, { call, put }) {
             const { code, data, message } = yield call(update, payload);
             if (code === ResultCode.SUCCESS) {
@@ -84,21 +85,18 @@ export default {
             }
         },
         // 注销登陆
-        *logout(_, { put }) {
+        *logout(_, { put , select}) {
+            const type = yield select(({account}) => account.type);
             yield put({
                 type: 'changeLoginStatus',
-                payload: {
-                    status: false,
-                },
+                payload: false,
             });
-            yield put(
-                router.push({
-                    pathname: '/user/login',
-                    search: stringify({
-                        redirect: window.location.href,
-                    }),
-                })
-            );
+            router.push({
+                pathname: '/user/login',
+                search: stringify({
+                    redirect: window.location.href,
+                }),
+            })
         },
         // 获取验证码
         *getCaptcha({ payload }, { call }) {
@@ -122,11 +120,11 @@ export default {
                 menus: payload,
             };
         },
+        // 更改登陆状态
         changeLoginStatus(state, { payload }) {
             return {
                 ...state,
-                status: payload.status,
-                type: payload.type,
+                status: payload,
             };
         },
     },
