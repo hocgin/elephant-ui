@@ -1,9 +1,14 @@
-@新坑
+## 概要 
+接入 `iScaffold/manager` 0.0.1
 
-## 计划 
-- 接入 
-`iScaffold/manager` 部分
-
+## 功能
+- 账号管理
+    - 员工管理
+- 访问控制
+    - 资源管理
+    - 角色管理
+- 日志监控
+    - 访问日志
 
 ## Ant.Pro
 > [参考1](https://www.missshi.cn/api/view/blog/5ab755dd22890966e2000003)
