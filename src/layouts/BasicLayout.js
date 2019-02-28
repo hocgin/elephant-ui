@@ -257,7 +257,6 @@ class BasicLayout extends React.PureComponent {
                 const routerMap = {};
                 const mergeMenuAndRouter = data => {
                     (data || []).forEach(menuItem => {
-                        console.log('menuItem', menuItem);
                         if (menuItem.routes) {
                             mergeMenuAndRouter(menuItem.routes);
                         }

@@ -96,7 +96,6 @@ export default {
             // 监听路由的变化，请求页面数据
             return history.listen(({ pathname, search }) => {
                 const query = queryString.parse(search);
-                console.log('pathname', pathname);
                 switch (pathname) {
                     // 员工管理
                     case '/account/staff': {
