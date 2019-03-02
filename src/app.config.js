@@ -1,19 +1,18 @@
-import {stringify} from "qs";
+import { stringify } from 'qs';
 
 export default {
     title: '后台管理系统',
     description: '后台管理系统, 👷‍👷‍施工中',
     // 文件上传地址
     getFileStorageUrl() {
-        return `${this.host()}/files/upload`
+        return `${this.host()}/files/upload`;
     },
-    getImageUrl({id, ...query}) {
-        if (!id) {
+    getImageUrl(avatar) {
+        if (!avatar) {
             return 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
         }
-        return `${this.host()}/files/image/${id}?${stringify(query)}`;
-    }
-    ,
+        return avatar;
+    },
     host() {
         if (this.isDev()) {
             return `http://localhost:8000/api/v1`;
