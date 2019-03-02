@@ -51,6 +51,12 @@ const query = {
     dispatch => ({
         $getCurrentAccount: (args = {}) => dispatch({type: 'account/getCurrentAccount', ...args}),
         $getMenus: (args = {}) => dispatch({type: 'account/getMenus', ...args}),
+        $handleMenuCollapse: (collapsed) => {
+            dispatch({
+                type: `global/changeLayoutCollapsed`,
+                payload: collapsed,
+            });
+        }
     })
 )
 class BasicLayout extends React.PureComponent {
@@ -115,9 +121,9 @@ class BasicLayout extends React.PureComponent {
         // if collapsed is true, you need to click twice to display
         this.breadcrumbNameMap = this.getBreadcrumbNameMap();
         const {isMobile} = this.state;
-        let {collapsed} = this.props;
+        let {collapsed, $handleMenuCollapse} = this.props;
         if (isMobile && !preProps.isMobile && !collapsed) {
-            this.props.handleMenuCollapse(false);
+            $handleMenuCollapse(false);
         }
     }
 
@@ -136,6 +142,7 @@ class BasicLayout extends React.PureComponent {
             children,
             location: {pathname},
             menuData,
+            $handleMenuCollapse,
             route: {routes}
         } = this.props;
         const {isMobile} = this.state;
@@ -148,7 +155,7 @@ class BasicLayout extends React.PureComponent {
                     <SiderMenu
                         logo={logo}
                         theme={navTheme}
-                        onCollapse={this.props.handleMenuCollapse}
+                        onCollapse={$handleMenuCollapse}
                         menuData={menuData}
                         isMobile={isMobile}
                         {...this.props}
@@ -163,7 +170,7 @@ class BasicLayout extends React.PureComponent {
                 >
                     <Header
                         menuData={menuData}
-                        handleMenuCollapse={this.props.handleMenuCollapse}
+                        handleMenuCollapse={$handleMenuCollapse}
                         logo={logo}
                         isMobile={isMobile}
                         {...this.props}
