@@ -166,6 +166,7 @@ export default class Index extends React.Component {
                             icon="plus"
                             type="primary"
                             onClick={this.onClickAdd}
+                            disabled
                         >
                             新建
                         </Button>
@@ -186,18 +187,6 @@ export default class Index extends React.Component {
             </PageHeaderWrapper>
         );
     }
-
-    onShow = key => {
-        this.setState({
-            [key]: true,
-        });
-    };
-
-    onClose = key => {
-        this.setState({
-            [key]: false,
-        });
-    };
 
     /**
      * 点击批量操作菜单
