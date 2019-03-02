@@ -1,26 +1,39 @@
-import React, {Fragment} from 'react';
-import {connect} from 'dva';
-import {Button, Card, Divider, Dropdown, Form, Icon, Input, Menu, Select, message as Message, DatePicker} from 'antd';
+import React, { Fragment } from 'react';
+import { connect } from 'dva';
+import {
+    Button,
+    Card,
+    Divider,
+    Dropdown,
+    Form,
+    Icon,
+    Input,
+    Menu,
+    Select,
+    message as Message,
+    DatePicker,
+} from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import StandardTable from '@/components/StandardTable';
 import SearchBar from '@/components/ext/SearchBar';
 import Toolbar from '@/components/ext/Toolbar';
 import * as LangKit from '../../../utils/LangKit';
 import * as DateFormatter from '../../../utils/formatter/DateFormatter';
-import router from "umi/router";
+import router from 'umi/router';
 const { RangePicker } = DatePicker;
 
 @connect(
-    ({accessLog: {page}, loading}) => ({
+    ({ accessLog: { page }, loading }) => ({
         data: LangKit.toAntProPage(page),
         loading: loading.effects['accessLog/paging'],
     }),
     dispatch => ({
-        $paging: (args = {}) => dispatch({type: 'accessLog/paging', ...args}),
+        $paging: (args = {}) => dispatch({ type: 'accessLog/paging', ...args }),
         $deletes: (args = {}) => console.error('no support'),
         $gotoEditPage: (args = {}) => console.error('no support'),
         $gotoAddPage: (args = {}) => console.error('no support'),
-        $gotoDetailPage: (args = {}) => router.push({pathname: '/log/access-log/detail', ...args}),
+        $gotoDetailPage: (args = {}) =>
+            router.push({ pathname: '/log/access-log/detail', ...args }),
     })
 )
 @Form.create()
@@ -43,7 +56,7 @@ export default class Index extends React.Component {
         {
             title: '请求耗时',
             dataIndex: 'usageTime',
-            render: text => `${text} ms`
+            render: text => `${text} ms`,
         },
         {
             title: '日志级别',
@@ -52,6 +65,7 @@ export default class Index extends React.Component {
         {
             title: '创建时间',
             dataIndex: 'createdAt',
+            defaultSortOrder: 'descend',
             sorter: true,
             render: val => <span>{DateFormatter.toUTC(val)}</span>,
         },
@@ -63,7 +77,7 @@ export default class Index extends React.Component {
             title: '操作',
             key: 'operation',
             render: (text, record) => {
-                const MoreMenus = ({onClick}) => (
+                const MoreMenus = ({ onClick }) => (
                     <Menu onClick={onClick}>
                         <Menu.Item key="detail">查看详情</Menu.Item>
                     </Menu>
@@ -82,15 +96,15 @@ export default class Index extends React.Component {
 
                 return (
                     <Fragment>
-                        <a onClick={onClickOperateRow.bind(this, record, {key: 'detail'})}>
+                        <a onClick={onClickOperateRow.bind(this, record, { key: 'detail' })}>
                             查看详情
                         </a>
-                        <Divider type="vertical"/>
+                        <Divider type="vertical" />
                         <Dropdown
-                            overlay={<MoreMenus onClick={onClickOperateRow.bind(this, record)}/>}
+                            overlay={<MoreMenus onClick={onClickOperateRow.bind(this, record)} />}
                         >
                             <a className="ant-dropdown-link">
-                                更多操作 <Icon type="down"/>
+                                更多操作 <Icon type="down" />
                             </a>
                         </Dropdown>
                     </Fragment>
@@ -101,19 +115,16 @@ export default class Index extends React.Component {
 
     render() {
         const {
-            route: {name},
+            route: { name },
             data,
             loading,
             roles,
         } = this.props;
-        const {
-            selectedRows,
-            operateRow,
-        } = this.state;
+        const { selectedRows, operateRow } = this.state;
         /**
          * 批量操作菜单
          */
-        const BatchMenus = ({onClick}) => (
+        const BatchMenus = ({ onClick }) => (
             <Menu onClick={onClick}>
                 <Menu.Item key="delete">批量删除</Menu.Item>
             </Menu>
@@ -125,31 +136,29 @@ export default class Index extends React.Component {
                         {form => [
                             <Form.Item label="请求路径">
                                 {form.getFieldDecorator('uri')(
-                                    <Input style={{width: '100%'}} placeholder="请输入请求路径"/>
+                                    <Input style={{ width: '100%' }} placeholder="请输入请求路径" />
                                 )}
                             </Form.Item>,
                             <Form.Item label="访问者ID">
                                 {form.getFieldDecorator('visitor')(
-                                    <Input style={{width: '100%'}} placeholder="请输入账号ID"/>
+                                    <Input style={{ width: '100%' }} placeholder="请输入账号ID" />
                                 )}
                             </Form.Item>,
                             <Form.Item label="日志级别">
                                 {form.getFieldDecorator('level')(
-                                    <Select style={{width: '100%'}}>
+                                    <Select style={{ width: '100%' }}>
                                         <Option value="INFO">INFO</Option>
                                         <Option value="ERROR">ERROR</Option>
                                     </Select>
                                 )}
                             </Form.Item>,
                             <Form.Item label="创建时间">
-                                {form.getFieldDecorator('createdAt')(
-                                    <RangePicker />
-                                )}
+                                {form.getFieldDecorator('createdAt')(<RangePicker />)}
                             </Form.Item>,
                         ]}
                     </SearchBar>
                     <Toolbar
-                        menu={<BatchMenus onClick={this.onClickBatchMenu}/>}
+                        menu={<BatchMenus onClick={this.onClickBatchMenu} />}
                         selectedRows={selectedRows}
                     >
                         <Button
@@ -195,9 +204,9 @@ export default class Index extends React.Component {
      * @param e
      */
     onClickBatchMenu = e => {
-        const {selectedRows, searchValues} = this.state;
+        const { selectedRows, searchValues } = this.state;
         if (!selectedRows) return;
-        const {$deletes, $paging} = this.props;
+        const { $deletes, $paging } = this.props;
         switch (e.key) {
             default:
                 Message.error('暂不支持');
@@ -210,9 +219,9 @@ export default class Index extends React.Component {
      * @param obj
      * @param e
      */
-    onClickMoreMenu = ({id}, e) => {
-        const {searchValues} = this.state;
-        const {$gotoDetailPage} = this.props;
+    onClickMoreMenu = ({ id }, e) => {
+        const { searchValues } = this.state;
+        const { $gotoDetailPage } = this.props;
         switch (e.key) {
             case 'detail': {
                 $gotoDetailPage({
@@ -228,7 +237,7 @@ export default class Index extends React.Component {
     };
 
     onClickAdd = () => {
-        const {$gotoAddPage} = this.props;
+        const { $gotoAddPage } = this.props;
         $gotoAddPage();
     };
 
@@ -250,12 +259,12 @@ export default class Index extends React.Component {
      */
     onChangeStandardTableCondition = (pagination, filtersArg, sorter) => {
         const filters = Object.keys(filtersArg).reduce((obj, key) => {
-            const newObj = {...obj};
+            const newObj = { ...obj };
             newObj[key] = toString(filtersArg[key]);
             return newObj;
         }, {});
-        const {searchValues} = this.state;
-        const {$paging} = this.props;
+        const { searchValues } = this.state;
+        const { $paging } = this.props;
 
         const params = {
             page: pagination.current,
@@ -270,8 +279,8 @@ export default class Index extends React.Component {
                 [sorter.field]: sorter.order === 'descend' ? 'DESC' : 'ASC',
             };
         }
-        this.setState({searchValues: params});
-        $paging({payload: params});
+        this.setState({ searchValues: params });
+        $paging({ payload: params });
     };
 
     /**
@@ -290,9 +299,9 @@ export default class Index extends React.Component {
                 },
             }),
             () => {
-                const {$paging} = this.props;
-                const {searchValues} = this.state;
-                $paging({payload: searchValues});
+                const { $paging } = this.props;
+                const { searchValues } = this.state;
+                $paging({ payload: searchValues });
             }
         );
     };

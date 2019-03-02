@@ -1,7 +1,7 @@
-import {message as Message} from "antd";
-import {deletes, detail, insert, paging, update} from '@/services/accessLog';
-import {ResultCode} from "../utils/Constant";
-import queryString from "query-string";
+import { message as Message } from 'antd';
+import { deletes, detail, insert, paging, update } from '@/services/accessLog';
+import { ResultCode } from '../utils/Constant';
+import queryString from 'query-string';
 
 export default {
     namespace: 'accessLog',
@@ -12,8 +12,8 @@ export default {
     },
 
     effects: {
-        * paging({payload, callback}, {call, put}) {
-            const {code, message, data} = yield call(paging, payload);
+        *paging({ payload, callback }, { call, put }) {
+            const { code, message, data } = yield call(paging, payload);
             if (code === ResultCode.SUCCESS) {
                 yield put({
                     type: 'fillPage',
@@ -26,8 +26,8 @@ export default {
                 Message.error(message);
             }
         },
-        * fetch({payload, callback}, {call, put}) {
-            const {code, message, data} = yield call(detail, payload);
+        *fetch({ payload, callback }, { call, put }) {
+            const { code, message, data } = yield call(detail, payload);
             if (code === ResultCode.SUCCESS) {
                 yield put({
                     type: 'fillDetail',
@@ -40,8 +40,8 @@ export default {
                 Message.error(message);
             }
         },
-        * deletes({payload, callback}, {call, put}) {
-            const {code, message, data} = yield call(deletes, payload);
+        *deletes({ payload, callback }, { call, put }) {
+            const { code, message, data } = yield call(deletes, payload);
             if (code === ResultCode.SUCCESS) {
                 if (callback) {
                     callback();
@@ -50,8 +50,8 @@ export default {
                 Message.error(message);
             }
         },
-        * insert({payload, callback}, {call, put}) {
-            const {code, message, data} = yield call(insert, payload);
+        *insert({ payload, callback }, { call, put }) {
+            const { code, message, data } = yield call(insert, payload);
             if (code === ResultCode.SUCCESS) {
                 if (callback) {
                     callback();
@@ -60,8 +60,8 @@ export default {
                 Message.error(message);
             }
         },
-        * update({payload, callback}, {call, put}) {
-            const {code, message, data} = yield call(update, payload);
+        *update({ payload, callback }, { call, put }) {
+            const { code, message, data } = yield call(update, payload);
             if (code === ResultCode.SUCCESS) {
                 if (callback) {
                     callback();
@@ -73,13 +73,13 @@ export default {
     },
 
     reducers: {
-        fillPage(state, {payload}) {
+        fillPage(state, { payload }) {
             return {
                 ...state,
                 page: payload,
             };
         },
-        fillDetail(state, {payload}) {
+        fillDetail(state, { payload }) {
             return {
                 ...state,
                 detail: payload,
@@ -94,7 +94,12 @@ export default {
                 switch (pathname) {
                     // 员工管理
                     case '/log/access-log': {
-                        dispatch({ type: 'accessLog/paging', payload: {} });
+                        dispatch({
+                            type: 'accessLog/paging',
+                            payload: {
+                                sort: { createdAt: 'DESC' },
+                            },
+                        });
                         break;
                     }
                     case '/log/access-log/detail': {
@@ -105,5 +110,5 @@ export default {
                 }
             });
         },
-    }
+    },
 };
