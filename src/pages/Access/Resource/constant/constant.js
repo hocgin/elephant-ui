@@ -23,10 +23,6 @@ export const Types = [
     },
     {
         value: 1,
-        text: '按钮',
-    },
-    {
-        value: 2,
         text: '链接',
     },
 ];

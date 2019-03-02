@@ -33,12 +33,12 @@ export default class Index extends React.Component {
 
     columns = [
         {
-            title: '编号',
-            dataIndex: 'id',
+            title: '操作描述',
+            dataIndex: 'operating',
         },
         {
-            title: '日志信息',
-            dataIndex: 'message',
+            title: '来源',
+            dataIndex: 'source',
         },
         {
             title: '请求耗时',

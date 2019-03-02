@@ -59,10 +59,6 @@ export default class Index extends React.Component {
 
     columns = [
         {
-            title: '编号',
-            dataIndex: 'id',
-        },
-        {
             title: '用户名',
             dataIndex: 'username',
         },
